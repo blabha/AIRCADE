@@ -31,7 +31,7 @@ export default function App() {
   const {
     screen, lang, player, currentQuestion,
     answers, score, totalEnergy, totalWater, totalCo2,
-    sessionId, persona, smartTip, lastDelta,
+    sessionId, persona, smartTip, lastDelta, prevCompletedCount,
   } = state;
 
   switch (screen) {
@@ -68,9 +68,13 @@ export default function App() {
         <PathMap
           lang={lang}
           completedCount={answers.length}
+          prevCompletedCount={prevCompletedCount}
           score={score}
-          onGo={() => goToScreen(SCREENS.QUESTION)}
-          showComplete={false}
+          lastDelta={lastDelta}
+          onGo={() => {
+            if (answers.length >= QUESTIONS.length) goToScreen(SCREENS.RESULTS);
+            else goToScreen(SCREENS.QUESTION);
+          }}
         />
       );
 
@@ -78,6 +82,7 @@ export default function App() {
       return (
         <QuestionScreen
           lang={lang}
+          industry={player.industry}
           questionIndex={currentQuestion}
           totalEnergy={totalEnergy}
           totalWater={totalWater}

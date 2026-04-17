@@ -14,16 +14,28 @@ export const SCREENS = {
 };
 
 /**
- * New scoring system — range per question: -3 to +4
- * Total range over 5 questions: -15 to +20
+ * Scoring — morality layer added.
  *
- * weight 1 → -3  (heavy AI, terrible environmental choice)
- * weight 2 → -1  (high AI use)
- * weight 3 → +1  (moderate use)
- * weight 4 → +2  (good choice)
- * weight 5 → +3  (great choice)
- * weight 6 → +4  (zero footprint, perfect)
+ * Environmental component (from option.weight):
+ *   weight 1 → -3 | weight 2 → -1 | weight 3 → +1
+ *   weight 4 → +2 | weight 5 → +3 | weight 6 → +4
+ *
+ * Moral adjustment (from option.moralScore):
+ *   0 (impulse/convenience) → -1  extra penalty
+ *   1 (practical)           →  0  no change
+ *   2 (conscious choice)    → +1  bonus
+ *
+ * Combined = clamp(envScore + moralAdj, -3, +4)
+ * Total range over 5 questions: -15 to +20 (unchanged — personas stay the same)
  */
+export function scoreForOption(option) {
+  const ENV = { 1: -3, 2: -1, 3: 1, 4: 2, 5: 3, 6: 4 };
+  const envScore = ENV[option.weight] ?? 0;
+  const moralAdj = (option.moralScore ?? 1) - 1;   // default 1 → no change
+  return Math.max(-3, Math.min(4, envScore + moralAdj));
+}
+
+/** @deprecated Use scoreForOption instead */
 export function scoreForWeight(weight) {
   const map = { 1: -3, 2: -1, 3: 1, 4: 2, 5: 3, 6: 4 };
   return map[weight] ?? 0;
@@ -49,7 +61,8 @@ const INITIAL_STATE = {
   sessionId: "",
   persona: null,
   smartTip: "",
-  lastDelta: null,   // score delta from the last answer (+4, -3, etc.)
+  lastDelta: null,          // score delta from the last answer (+4, -3, etc.)
+  prevCompletedCount: 0,    // answers.length before the most recent answer (for PathMap walk animation)
 };
 
 function generateSessionId() {
@@ -85,7 +98,7 @@ function gameReducer(state, action) {
 
     case "ANSWER_QUESTION": {
       const option   = action.option;
-      const delta    = scoreForWeight(option.weight);
+      const delta    = scoreForOption(option);
       const newScore = state.score + delta;
       const newEnergy = state.totalEnergy + option.energyWh;
       const newWater  = state.totalWater  + option.waterMl;
@@ -93,32 +106,25 @@ function gameReducer(state, action) {
       const newAnswers = [...state.answers, option];
       const isLast = state.currentQuestion >= QUESTIONS.length - 1;
 
-      if (isLast) {
-        const persona = getPersona(newScore);
-        const tip = getSmartTip(state.player.industry, persona.id, state.lang);
-        return {
-          ...state,
-          answers: newAnswers,
-          score: newScore,
-          totalEnergy: newEnergy,
-          totalWater:  newWater,
-          totalCo2:    newCo2,
-          screen: SCREENS.TRANSITION,
-          persona,
-          smartTip: tip,
-          lastDelta: delta,
-        };
-      }
+      const persona = isLast ? getPersona(newScore) : state.persona;
+      const tip = isLast
+        ? getSmartTip(state.player.industry, persona.id, state.lang)
+        : state.smartTip;
 
       return {
         ...state,
-        answers: newAnswers,
-        score: newScore,
-        totalEnergy: newEnergy,
-        totalWater:  newWater,
-        totalCo2:    newCo2,
-        screen: SCREENS.TRANSITION,
-        lastDelta: delta,
+        answers:           newAnswers,
+        score:             newScore,
+        totalEnergy:       newEnergy,
+        totalWater:        newWater,
+        totalCo2:          newCo2,
+        // Advance currentQuestion now so PATH_MAP → QUESTION shows the next one
+        currentQuestion:   isLast ? state.currentQuestion : state.currentQuestion + 1,
+        screen:            SCREENS.PATH_MAP,
+        prevCompletedCount: state.answers.length,   // where Nimbus was before
+        persona,
+        smartTip:          tip,
+        lastDelta:         delta,
       };
     }
 

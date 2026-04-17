@@ -1,131 +1,124 @@
-import React, { useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { QUESTIONS } from "../data/questions";
 import CloudCharacter from "./CloudCharacter";
 
 const T = {
   en: {
-    title:   "MISSION MAP",
-    go:      "GO ▶",
-    level:   (n) => `LEVEL ${n}`,
-    of:      (n) => `/ ${n}`,
-    locked:  "LOCKED",
-    complete:"COMPLETE!",
+    title:     "MISSION MAP",
+    go:        "GO ▶",
+    level:     (n) => `LEVEL ${n}`,
+    locked:    "LOCKED",
+    complete:  "COMPLETE!",
     levelDone: (n) => `LEVEL ${n} COMPLETE!`,
-    start:   "START",
+    results:   "SEE RESULTS ▶",
   },
   es: {
-    title:   "MAPA DE MISIÓN",
-    go:      "IR ▶",
-    level:   (n) => `NIVEL ${n}`,
-    of:      (n) => `/ ${n}`,
-    locked:  "BLOQUEADO",
-    complete:"¡COMPLETO!",
+    title:     "MAPA DE MISIÓN",
+    go:        "IR ▶",
+    level:     (n) => `NIVEL ${n}`,
+    locked:    "BLOQUEADO",
+    complete:  "¡COMPLETO!",
     levelDone: (n) => `¡NIVEL ${n} COMPLETO!`,
-    start:   "INICIO",
+    results:   "VER RESULTADOS ▶",
   },
   ca: {
-    title:   "MAPA DE MISSIÓ",
-    go:      "ANAR ▶",
-    level:   (n) => `NIVELL ${n}`,
-    of:      (n) => `/ ${n}`,
-    locked:  "BLOQUEJAT",
-    complete:"COMPLET!",
+    title:     "MAPA DE MISSIÓ",
+    go:        "ANAR ▶",
+    level:     (n) => `NIVELL ${n}`,
+    locked:    "BLOQUEJAT",
+    complete:  "COMPLET!",
     levelDone: (n) => `NIVELL ${n} COMPLET!`,
-    start:   "INICI",
+    results:   "VEURE RESULTATS ▶",
   },
 };
 
-// Each level has a theme: name, icon, accent colour, and terrain colour
 const LEVEL_THEMES = [
-  { name: "DIGITAL STUDIO", icon: "🎨", color: "#0099FF", terrain: "#1a0020", nodeColor: "#0099FF" },
-  { name: "QUERY TOWER",    icon: "💬", color: "#0099FF", terrain: "#001a20", nodeColor: "#0099FF" },
-  { name: "REPORT HALL",    icon: "📝", color: "#FF00FF", terrain: "#1a001a", nodeColor: "#FF00FF" },
-  { name: "PHOTO VAULT",    icon: "📸", color: "#FF00FF", terrain: "#150013", nodeColor: "#FF00FF" },
-  { name: "LAUNCH PAD",     icon: "🚀", color: "#39FF14", terrain: "#001a00", nodeColor: "#39FF14" },
+  { name: "DIGITAL STUDIO", icon: "🎨", color: "#0099FF" },
+  { name: "QUERY TOWER",    icon: "💬", color: "#0099FF" },
+  { name: "REPORT HALL",    icon: "📝", color: "#FF00FF" },
+  { name: "PHOTO VAULT",    icon: "📸", color: "#FF00FF" },
+  { name: "LAUNCH PAD",     icon: "🚀", color: "#39FF14" },
 ];
 
-// Node positions on the 560×380 canvas (bottom-left to top-right winding path)
+// Node centers on a 560×340 canvas — winding bottom-left → top-right
 const NODES = [
-  { x: 60,  y: 295 },   // Level 1 — bottom-left
-  { x: 170, y: 215 },   // Level 2
-  { x: 290, y: 250 },   // Level 3 — middle dip
-  { x: 400, y: 155 },   // Level 4
-  { x: 490, y: 70  },   // Level 5 — top-right
+  { x: 60,  y: 270 },
+  { x: 170, y: 195 },
+  { x: 290, y: 230 },
+  { x: 400, y: 130 },
+  { x: 490, y: 50  },
 ];
 
-// Pixel terrain tile definitions — [col, row, color]
-// These fill the background with biome blocks to give a map feel
-function buildTerrain() {
-  const tiles = [];
-  const TILE = 28; // tile size
-  const COLS = 20;
-  const ROWS = 14;
-
-  // Simple noise-like map: base is dark, then lighter patches near nodes
-  const biomes = [
-    "#0a0010", "#0d0015", "#100018", "#0a000e", "#150020",
-    "#001015", "#001820", "#001a22", "#000e12", "#001518",
-    "#0f000f", "#140014", "#180018", "#0c000c", "#1a001a",
-    "#10000a", "#16000e", "#1a0014", "#0e0009", "#18000f",
-    "#001800", "#002000", "#001a00", "#001500", "#002200",
-  ];
-
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      // pick a biome based on rough diagonal position
-      const idx = Math.abs((c + r * 3) % biomes.length);
-      tiles.push({ x: c * TILE, y: r * TILE, color: biomes[idx] });
-    }
-  }
-  return tiles;
-}
-
-const TERRAIN = buildTerrain();
-
-// Build the SVG path string through all node centers
-function buildPath(nodes) {
-  return nodes.map((n, i) => {
-    const cx = n.x + 20;
-    const cy = n.y + 20;
-    if (i === 0) return `M ${cx} ${cy}`;
-    // Curved bezier through midpoints
-    const prev = nodes[i - 1];
-    const px = prev.x + 20;
-    const py = prev.y + 20;
-    const mx = (px + cx) / 2;
-    return `Q ${mx} ${py} ${cx} ${cy}`;
-  }).join(" ");
-}
-
-const PATH_D = buildPath(NODES);
+// Walk duration ms (CSS transition matches this)
+const WALK_MS = 750;
+// Delay before Nimbus starts walking
+const WALK_DELAY_MS = 350;
 
 export default function PathMap({
   lang,
-  completedCount,   // how many questions answered
+  completedCount,
+  prevCompletedCount,
   onGo,
-  showComplete,     // brief "level X complete" overlay
   score,
+  lastDelta,
 }) {
   const t = T[lang] || T.en;
-  const currentIdx = completedCount; // 0-based index of current (next to play) node
+  const allDone = completedCount >= QUESTIONS.length;
 
-  // cloud mood based on score so far
+  // ── Nimbus walk animation ──────────────────────────────────────────────────
+  // nimbusIdx: which node Nimbus is visually at (may lag behind completedCount)
+  const startIdx = prevCompletedCount != null
+    ? Math.min(prevCompletedCount, NODES.length - 1)
+    : Math.min(completedCount, NODES.length - 1);
+
+  const [nimbusIdx,  setNimbusIdx]  = useState(startIdx);
+  const [isWalking,  setIsWalking]  = useState(false);
+  const [walkDone,   setWalkDone]   = useState(prevCompletedCount == null || prevCompletedCount >= completedCount);
+
+  useEffect(() => {
+    const targetIdx = Math.min(completedCount, NODES.length - 1);
+
+    if (prevCompletedCount != null && prevCompletedCount < completedCount) {
+      const fromIdx = Math.min(prevCompletedCount, NODES.length - 1);
+      setNimbusIdx(fromIdx);
+      setIsWalking(true);
+      setWalkDone(false);
+
+      const t1 = setTimeout(() => setNimbusIdx(targetIdx), WALK_DELAY_MS);
+      const t2 = setTimeout(() => {
+        setIsWalking(false);
+        setWalkDone(true);
+      }, WALK_DELAY_MS + WALK_MS + 100);
+
+      return () => { clearTimeout(t1); clearTimeout(t2); };
+    } else {
+      setNimbusIdx(targetIdx);
+      setWalkDone(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedCount, prevCompletedCount]);
+
+  // ── Cloud mood / message ───────────────────────────────────────────────────
   const cloudMood =
-    completedCount === 0 ? "neutral" :
-    score < 0            ? "worried" :
-    score < 8            ? "neutral" :
-    score < 15           ? "happy"   : "celebrating";
+    completedCount === 0 ? "neutral"  :
+    score < 0            ? "worried"  :
+    score < 8            ? "neutral"  :
+    score < 15           ? "happy"    : "celebrating";
 
-  const cloudMsg =
-    completedCount === 0
-      ? lang === "es" ? "¡EMPECEMOS!" : lang === "ca" ? "COMENCEM!" : "LET'S GO!"
-      : showComplete
-        ? lang === "es" ? "¡BIEN HECHO!" : lang === "ca" ? "BEN FET!" : "NICE WORK!"
-        : score < 0
-          ? lang === "es" ? "CUIDA TU HUELLA..." : lang === "ca" ? "VIGILA LA TEVA PETJADA..." : "WATCH YOUR FOOTPRINT..."
-          : score >= 15
-            ? lang === "es" ? "¡INCREÍBLE!" : lang === "ca" ? "INCREÏBLE!" : "OUTSTANDING!"
-            : null;
+  const cloudMsg = (() => {
+    if (completedCount === 0)
+      return lang === "es" ? "¡EMPECEMOS!" : lang === "ca" ? "COMENCEM!" : "LET'S GO!";
+    if (lastDelta != null) {
+      if (lastDelta >= 4) return lang === "es" ? "¡PERFECTO!" : lang === "ca" ? "PERFECTE!" : "PERFECT!";
+      if (lastDelta >= 2) return lang === "es" ? "¡BIEN HECHO!" : lang === "ca" ? "BEN FET!" : "NICE WORK!";
+      if (lastDelta >= 0) return lang === "es" ? "SIGUE ASÍ..." : lang === "ca" ? "SEGUEIX AIXÍ..." : "KEEP GOING...";
+      return lang === "es" ? "¡CUIDA TU HUELLA!" : lang === "ca" ? "VIGILA LA TEVA PETJADA!" : "WATCH YOUR FOOTPRINT!";
+    }
+    return null;
+  })();
+
+  const nimbusNode = NODES[nimbusIdx];
+  const currentTheme = LEVEL_THEMES[Math.min(completedCount, LEVEL_THEMES.length - 1)];
 
   return (
     <div
@@ -137,129 +130,76 @@ export default function PathMap({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "20px",
-        padding: "24px 16px",
+        gap: "18px",
+        padding: "20px 16px",
       }}
     >
-      {/* Header */}
+      {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
         <div
           style={{
             fontFamily: "'Press Start 2P', cursive",
-            fontSize: "clamp(0.55rem, 1.8vw, 0.85rem)",
-            color: showComplete ? "#39FF14" : "#FF00FF",
-            textShadow: `0 0 10px ${showComplete ? "#39FF14" : "#FF00FF"}`,
+            fontSize: "clamp(0.5rem, 1.6vw, 0.8rem)",
+            color: "#FF00FF",
+            textShadow: "0 0 10px #FF00FF",
             letterSpacing: "0.1em",
           }}
         >
-          {showComplete
-            ? t.levelDone(completedCount)
-            : t.title}
+          {t.title}
         </div>
-        {/* Score badge */}
-        <ScoreBadge score={score} lang={lang} />
+        <ScoreBadge score={score} lastDelta={lastDelta} />
       </div>
 
-      {/* ── MAP CANVAS ── */}
+      {/* ── Map canvas ── */}
       <div
         style={{
           position: "relative",
           width: "min(560px, 94vw)",
-          height: "380px",
-          border: "4px solid #0099FF",
-          boxShadow: "0 0 24px #0099FF44, inset 0 0 40px #00000088",
+          height: "340px",
+          border: "3px solid #0099FF44",
+          background: "#050510",
           overflow: "hidden",
           flexShrink: 0,
+          boxShadow: "0 0 20px #0099FF22",
         }}
       >
-        {/* Terrain tiles */}
-        {TERRAIN.map((tile, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: tile.x,
-              top:  tile.y,
-              width: 28,
-              height: 28,
-              background: tile.color,
-            }}
-          />
-        ))}
-
-        {/* Zone glow circles behind each node */}
-        {NODES.map((node, i) => {
-          const theme = LEVEL_THEMES[i];
-          const done    = i < completedCount;
-          const current = i === currentIdx && currentIdx < QUESTIONS.length;
-          if (!done && !current) return null;
-          return (
-            <div
-              key={`glow${i}`}
-              style={{
-                position: "absolute",
-                left: node.x - 16,
-                top:  node.y - 16,
-                width: 72,
-                height: 72,
-                borderRadius: 0,
-                background: `radial-gradient(circle, ${theme.color}22 0%, transparent 70%)`,
-                pointerEvents: "none",
-              }}
-            />
-          );
-        })}
-
-        {/* SVG: path + dashes */}
+        {/* Subtle grid lines */}
         <svg
-          style={{ position: "absolute", inset: 0, overflow: "visible" }}
-          viewBox="0 0 560 380"
-          width="100%"
-          height="100%"
-          preserveAspectRatio="none"
+          style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+          width="100%" height="100%"
         >
-          {/* Base path (dim) */}
-          <path
-            d={PATH_D}
+          {Array.from({ length: 11 }).map((_, i) => (
+            <line key={`v${i}`} x1={i * 56} y1={0} x2={i * 56} y2={340}
+              stroke="#ffffff06" strokeWidth="1" />
+          ))}
+          {Array.from({ length: 7 }).map((_, i) => (
+            <line key={`h${i}`} x1={0} y1={i * 56} x2={560} y2={i * 56}
+              stroke="#ffffff06" strokeWidth="1" />
+          ))}
+
+          {/* Dim full route */}
+          <polyline
+            points={NODES.map(n => `${n.x + 20},${n.y + 20}`).join(" ")}
             fill="none"
-            stroke="#ffffff11"
-            strokeWidth="10"
+            stroke="#ffffff0a"
+            strokeWidth="8"
             strokeLinecap="square"
           />
-          {/* Completed path segments */}
-          {NODES.slice(0, completedCount).map((node, i) => {
-            if (i === 0) return null;
-            const prev = NODES[i - 1];
-            const segD = `M ${prev.x + 20} ${prev.y + 20} Q ${(prev.x + node.x) / 2 + 20} ${prev.y + 20} ${node.x + 20} ${node.y + 20}`;
+
+          {/* Completed segments */}
+          {NODES.slice(1).map((node, i) => {
+            if (i + 1 > completedCount) return null;
+            const prev = NODES[i];
             return (
-              <path
+              <line
                 key={`seg${i}`}
-                d={segD}
-                fill="none"
-                stroke={LEVEL_THEMES[i].color}
-                strokeWidth="5"
-                strokeDasharray="10 6"
+                x1={prev.x + 20} y1={prev.y + 20}
+                x2={node.x + 20} y2={node.y + 20}
+                stroke={LEVEL_THEMES[i + 1].color}
+                strokeWidth="4"
+                strokeDasharray="8 5"
                 strokeLinecap="square"
                 className="path-trace"
-              />
-            );
-          })}
-          {/* Path dots (coins) along the full route */}
-          {Array.from({ length: 24 }).map((_, i) => {
-            const t_val = i / 23;
-            // Approximate position along path
-            const segIdx = Math.floor(t_val * (NODES.length - 1));
-            const segT   = (t_val * (NODES.length - 1)) % 1;
-            const n1 = NODES[Math.min(segIdx, NODES.length - 1)];
-            const n2 = NODES[Math.min(segIdx + 1, NODES.length - 1)];
-            const px = (n1.x + 20) + (n2.x - n1.x) * segT;
-            const py = (n1.y + 20) + (n2.y - n1.y) * segT;
-            return (
-              <rect
-                key={`dot${i}`}
-                x={px - 2} y={py - 2}
-                width={4} height={4}
-                fill="#ffffff08"
               />
             );
           })}
@@ -267,54 +207,87 @@ export default function PathMap({
 
         {/* Level nodes */}
         {NODES.map((node, i) => {
-          const theme   = LEVEL_THEMES[i];
           const done    = i < completedCount;
-          const current = i === currentIdx && currentIdx < QUESTIONS.length;
+          const current = i === completedCount && completedCount < QUESTIONS.length;
           const locked  = !done && !current;
-
+          const theme   = LEVEL_THEMES[i];
           return (
-            <LevelNode
+            <div
               key={i}
-              node={node}
-              index={i}
-              theme={theme}
-              done={done}
-              current={current}
-              locked={locked}
-              lang={lang}
-              t={t}
-            />
+              className={current ? "pixel-pulse" : ""}
+              style={{
+                position: "absolute",
+                left: node.x,
+                top:  node.y,
+                width: 40,
+                height: 40,
+                border: `3px solid ${locked ? "#1a1a1a" : theme.color}`,
+                background: done    ? `${theme.color}33`
+                          : current ? `${theme.color}18`
+                          : "#00000088",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: locked ? 0.2 : 1,
+                zIndex: 10,
+                boxShadow: done || current ? `0 0 12px ${theme.color}88` : "none",
+              }}
+            >
+              {done ? (
+                <span style={{ fontSize: "16px" }}>⭐</span>
+              ) : current ? (
+                <span style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.55rem", color: theme.color }}>
+                  {i + 1}
+                </span>
+              ) : (
+                <span style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.4rem", color: "#333" }}>
+                  {i + 1}
+                </span>
+              )}
+              {/* Icon tag below node */}
+              <div style={{
+                position: "absolute",
+                bottom: -18,
+                left: "50%",
+                transform: "translateX(-50%)",
+                fontSize: "12px",
+                opacity: locked ? 0.3 : 1,
+              }}>
+                {theme.icon}
+              </div>
+            </div>
           );
         })}
 
-        {/* Cloud character at current node */}
-        {currentIdx < QUESTIONS.length && (
-          <div
-            style={{
-              position: "absolute",
-              left: NODES[currentIdx].x - 12,
-              top:  NODES[currentIdx].y - 80,
-              zIndex: 20,
-            }}
-          >
-            <CloudCharacter
-              mood={cloudMood}
-              message={cloudMsg}
-              size="sm"
-              animate="float"
-            />
-          </div>
-        )}
+        {/* Nimbus — animated between nodes */}
+        <div
+          style={{
+            position: "absolute",
+            left: nimbusNode.x - 14,
+            top:  nimbusNode.y - 82,
+            zIndex: 20,
+            transition: isWalking
+              ? `left ${WALK_MS}ms cubic-bezier(0.4,0,0.2,1), top ${WALK_MS}ms cubic-bezier(0.4,0,0.2,1)`
+              : "none",
+          }}
+        >
+          <CloudCharacter
+            mood={isWalking ? "neutral" : cloudMood}
+            message={walkDone ? cloudMsg : null}
+            size="sm"
+            animate={isWalking ? "bounce" : allDone ? "bounce" : "float"}
+          />
+        </div>
 
-        {/* Completion star at level 5 if all done */}
-        {completedCount >= QUESTIONS.length && (
+        {/* Completion star at node 5 when all done */}
+        {allDone && (
           <div
             className="star-spin"
             style={{
               position: "absolute",
-              left: NODES[4].x - 4,
-              top:  NODES[4].y - 32,
-              fontSize: "24px",
+              left: NODES[4].x,
+              top:  NODES[4].y - 28,
+              fontSize: "20px",
               zIndex: 20,
             }}
           >
@@ -322,48 +295,47 @@ export default function PathMap({
           </div>
         )}
 
-        {/* Mini compass */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 8, right: 8,
-            fontFamily: "'Press Start 2P', cursive",
-            fontSize: "0.35rem",
-            color: "#ffffff22",
-          }}
-        >
+        {/* Corner watermark */}
+        <div style={{
+          position: "absolute",
+          bottom: 6, right: 8,
+          fontFamily: "'Press Start 2P', cursive",
+          fontSize: "0.28rem",
+          color: "#ffffff18",
+          letterSpacing: "0.06em",
+        }}>
           AIRCADE MAP
         </div>
       </div>
 
-      {/* Progress indicator */}
-      <ProgressBar completedCount={completedCount} total={QUESTIONS.length} lang={lang} t={t} />
+      {/* ── Progress bar ── */}
+      <ProgressBar completedCount={completedCount} total={QUESTIONS.length} />
 
-      {/* GO button */}
-      {!showComplete && completedCount < QUESTIONS.length && (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-          <div
-            style={{
+      {/* ── GO / RESULTS button — only shown after walk completes ── */}
+      {walkDone && (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
+          {!allDone && (
+            <div style={{
               fontFamily: "'Press Start 2P', cursive",
-              fontSize: "clamp(0.45rem, 1.3vw, 0.6rem)",
-              color: LEVEL_THEMES[currentIdx]?.color || "#FF00FF",
-              letterSpacing: "0.1em",
+              fontSize: "clamp(0.4rem, 1.2vw, 0.55rem)",
+              color: currentTheme.color,
+              letterSpacing: "0.08em",
               textAlign: "center",
-            }}
-          >
-            {LEVEL_THEMES[currentIdx]?.icon} {t.level(currentIdx + 1)}: {LEVEL_THEMES[currentIdx]?.name}
-          </div>
+            }}>
+              {currentTheme.icon} {t.level(completedCount + 1)}: {currentTheme.name}
+            </div>
+          )}
           <button
             className="pixel-btn zone-pulse"
             onClick={onGo}
             style={{
-              color: LEVEL_THEMES[currentIdx]?.color || "#FF00FF",
-              fontSize: "clamp(0.55rem, 1.8vw, 0.85rem)",
-              padding: "16px 48px",
-              letterSpacing: "0.14em",
+              color:       allDone ? "#39FF14" : currentTheme.color,
+              fontSize:    "clamp(0.5rem, 1.6vw, 0.8rem)",
+              padding:     "14px 44px",
+              letterSpacing: "0.12em",
             }}
           >
-            {t.go}
+            {allDone ? t.results : t.go}
           </button>
         </div>
       )}
@@ -373,108 +345,32 @@ export default function PathMap({
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function LevelNode({ node, index, theme, done, current, locked, lang, t }) {
+function ProgressBar({ completedCount, total }) {
   return (
-    <div
-      className={current ? "pixel-pulse" : ""}
-      style={{
-        position: "absolute",
-        left: node.x,
-        top:  node.y,
-        width: 40,
-        height: 40,
-        border: `3px solid ${locked ? "#333" : theme.color}`,
-        background: done
-          ? `${theme.color}33`
-          : current
-            ? `${theme.color}22`
-            : "#00000088",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: "2px",
-        opacity: locked ? 0.25 : 1,
-        zIndex: 10,
-        boxShadow: done || current ? `0 0 10px ${theme.color}88` : "none",
-      }}
-    >
-      {done ? (
-        <>
-          <span style={{ fontSize: "14px" }}>⭐</span>
-          <span style={{ fontFamily: "'Press Start 2P', cursive", fontSize: "0.3rem", color: theme.color }}>
-            ✓
-          </span>
-        </>
-      ) : current ? (
-        <span
-          style={{
-            fontFamily: "'Press Start 2P', cursive",
-            fontSize: "0.55rem",
-            color: theme.color,
-          }}
-        >
-          {index + 1}
-        </span>
-      ) : (
-        <span style={{ fontSize: "14px" }}>🔒</span>
-      )}
-      {/* Level name tag */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: -20,
-          left: "50%",
-          transform: "translateX(-50%)",
-          fontFamily: "'Press Start 2P', cursive",
-          fontSize: "0.28rem",
-          color: locked ? "#333" : theme.color,
-          whiteSpace: "nowrap",
-          letterSpacing: "0.04em",
-        }}
-      >
-        {theme.icon}
-      </div>
-    </div>
-  );
-}
-
-function ProgressBar({ completedCount, total, t }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        width: "min(560px, 94vw)",
-      }}
-    >
-      <div
-        style={{
-          fontFamily: "'Press Start 2P', cursive",
-          fontSize: "0.4rem",
-          color: "#ffffff55",
-          whiteSpace: "nowrap",
-        }}
-      >
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "min(560px, 94vw)" }}>
+      <div style={{
+        fontFamily: "'Press Start 2P', cursive",
+        fontSize: "0.38rem",
+        color: "#ffffff44",
+        whiteSpace: "nowrap",
+      }}>
         {completedCount}/{total}
       </div>
-      <div
-        style={{
-          flex: 1,
-          height: "10px",
-          background: "#ffffff11",
-          border: "2px solid #ffffff22",
-          overflow: "hidden",
-        }}
-      >
+      <div style={{
+        flex: 1,
+        height: "8px",
+        background: "#ffffff0a",
+        border: "2px solid #ffffff18",
+        overflow: "hidden",
+      }}>
         <div
           className="bar-animate"
           style={{
             height: "100%",
             width: `${(completedCount / total) * 100}%`,
-            background: "linear-gradient(90deg, #0099FF, #FF00FF, #FFFFFF)",
+            background: "linear-gradient(90deg, #0099FF, #FF00FF, #39FF14)",
             boxShadow: "0 0 6px #0099FF",
+            transition: "width 0.6s ease",
           }}
         />
       </div>
@@ -482,11 +378,12 @@ function ProgressBar({ completedCount, total, t }) {
         <div
           key={i}
           style={{
-            width: "10px",
-            height: "10px",
-            background: i < completedCount ? theme.color : "#ffffff11",
-            border: `2px solid ${i < completedCount ? theme.color : "#ffffff22"}`,
+            width: "8px",
+            height: "8px",
+            background: i < completedCount ? theme.color : "#ffffff0a",
+            border: `2px solid ${i < completedCount ? theme.color : "#ffffff18"}`,
             boxShadow: i < completedCount ? `0 0 4px ${theme.color}` : "none",
+            transition: "background 0.3s, box-shadow 0.3s",
           }}
         />
       ))}
@@ -494,24 +391,37 @@ function ProgressBar({ completedCount, total, t }) {
   );
 }
 
-function ScoreBadge({ score, lang }) {
-  const label = lang === "es" ? "PTS" : "PTS";
+function ScoreBadge({ score, lastDelta }) {
   const color = score < 0 ? "#FF3A20" : score < 8 ? "#FF00FF" : score < 15 ? "#0099FF" : "#39FF14";
   return (
-    <div
-      style={{
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div style={{
         fontFamily: "'Press Start 2P', cursive",
-        fontSize: "0.5rem",
+        fontSize: "0.48rem",
         color,
         border: `2px solid ${color}`,
-        padding: "4px 10px",
+        padding: "3px 9px",
         textShadow: `0 0 6px ${color}`,
         boxShadow: `0 0 8px ${color}44`,
         letterSpacing: "0.06em",
         whiteSpace: "nowrap",
-      }}
-    >
-      {score >= 0 ? "+" : ""}{score} {label}
+      }}>
+        {score >= 0 ? "+" : ""}{score} PTS
+      </div>
+      {lastDelta != null && (
+        <div
+          className="pop-in"
+          style={{
+            fontFamily: "'Press Start 2P', cursive",
+            fontSize: "0.38rem",
+            color: lastDelta >= 0 ? "#39FF14" : "#FF3A20",
+            textShadow: `0 0 6px ${lastDelta >= 0 ? "#39FF14" : "#FF3A20"}`,
+            letterSpacing: "0.06em",
+          }}
+        >
+          {lastDelta >= 0 ? `+${lastDelta}` : lastDelta}
+        </div>
+      )}
     </div>
   );
 }
