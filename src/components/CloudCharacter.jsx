@@ -249,7 +249,7 @@ function SpeechBubble({ text, scale, mood }) {
     mood === 'alarmed' ? '#0099FF' :
     mood === 'sad'     ? '#0099FF' :
     mood === 'happy' || mood === 'celebrating' ? '#39FF14' :
-    mood === 'worried' ? '#FFE600' : '#ffffff';
+    mood === 'worried' ? '#FF00FF' : '#ffffff';
 
   const textColor =
     mood === 'alarmed' || mood === 'happy' || mood === 'celebrating' ? '#000' :

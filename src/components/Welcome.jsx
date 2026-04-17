@@ -14,6 +14,12 @@ const T = {
     hint:     "[ HAZ CLIC O PULSA CUALQUIER TECLA ]",
     cloudMsg: "¡HOLA! SOY NIMBUS.\n¡JUGUEMOS!",
   },
+  ca: {
+    subtitle: "Cada prompt deixa una petjada.",
+    prompt:   "INSEREIX MONEDA / PREM START",
+    hint:     "[ FES CLIC O PREM QUALSEVOL TECLA ]",
+    cloudMsg: "HOLA! SÓC NIMBUS.\nJUGUEM!",
+  },
 };
 
 export default function Welcome({ lang, onStart, play }) {
@@ -90,7 +96,7 @@ export default function Welcome({ lang, onStart, play }) {
         style={{
           fontFamily: "'Press Start 2P', cursive",
           fontSize: "clamp(0.45rem, 1.5vw, 0.75rem)",
-          color: "#FFE600",
+          color: "#FF00FF",
           textAlign: "center",
           letterSpacing: "0.12em",
         }}
@@ -117,7 +123,7 @@ export default function Welcome({ lang, onStart, play }) {
 }
 
 function ColorBar({ reverse }) {
-  const colors = ["#0099FF","#FFE600","#FFFFFF","#0099FF","#FFE600","#FFFFFF","#0099FF"];
+  const colors = ["#0099FF","#FF00FF","#FFFFFF","#0099FF","#FF00FF","#FFFFFF","#0099FF"];
   return (
     <div style={{ display: "flex", gap: "4px" }}>
       {(reverse ? [...colors].reverse() : colors).map((c, i) => (

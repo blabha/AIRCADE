@@ -23,14 +23,24 @@ const T = {
     levelDone: (n) => `¡NIVEL ${n} COMPLETO!`,
     start:   "INICIO",
   },
+  ca: {
+    title:   "MAPA DE MISSIÓ",
+    go:      "ANAR ▶",
+    level:   (n) => `NIVELL ${n}`,
+    of:      (n) => `/ ${n}`,
+    locked:  "BLOQUEJAT",
+    complete:"COMPLET!",
+    levelDone: (n) => `NIVELL ${n} COMPLET!`,
+    start:   "INICI",
+  },
 };
 
 // Each level has a theme: name, icon, accent colour, and terrain colour
 const LEVEL_THEMES = [
   { name: "DIGITAL STUDIO", icon: "🎨", color: "#0099FF", terrain: "#1a0020", nodeColor: "#0099FF" },
   { name: "QUERY TOWER",    icon: "💬", color: "#0099FF", terrain: "#001a20", nodeColor: "#0099FF" },
-  { name: "REPORT HALL",    icon: "📝", color: "#FFE600", terrain: "#1a1a00", nodeColor: "#FFE600" },
-  { name: "PHOTO VAULT",    icon: "📸", color: "#FFE600", terrain: "#1a0800", nodeColor: "#FFE600" },
+  { name: "REPORT HALL",    icon: "📝", color: "#FF00FF", terrain: "#1a001a", nodeColor: "#FF00FF" },
+  { name: "PHOTO VAULT",    icon: "📸", color: "#FF00FF", terrain: "#150013", nodeColor: "#FF00FF" },
   { name: "LAUNCH PAD",     icon: "🚀", color: "#39FF14", terrain: "#001a00", nodeColor: "#39FF14" },
 ];
 
@@ -55,8 +65,8 @@ function buildTerrain() {
   const biomes = [
     "#0a0010", "#0d0015", "#100018", "#0a000e", "#150020",
     "#001015", "#001820", "#001a22", "#000e12", "#001518",
-    "#0f0f00", "#141400", "#181800", "#0c0c00", "#1a1a00",
-    "#100800", "#160a00", "#1a0c00", "#0e0600", "#180a00",
+    "#0f000f", "#140014", "#180018", "#0c000c", "#1a001a",
+    "#10000a", "#16000e", "#1a0014", "#0e0009", "#18000f",
     "#001800", "#002000", "#001a00", "#001500", "#002200",
   ];
 
@@ -108,13 +118,13 @@ export default function PathMap({
 
   const cloudMsg =
     completedCount === 0
-      ? (lang === "es" ? "¡EMPECEMOS!" : "LET'S GO!")
+      ? lang === "es" ? "¡EMPECEMOS!" : lang === "ca" ? "COMENCEM!" : "LET'S GO!"
       : showComplete
-        ? (lang === "es" ? "¡BIEN HECHO!" : "NICE WORK!")
+        ? lang === "es" ? "¡BIEN HECHO!" : lang === "ca" ? "BEN FET!" : "NICE WORK!"
         : score < 0
-          ? (lang === "es" ? "CUIDA TU HUELLA..." : "WATCH YOUR FOOTPRINT...")
+          ? lang === "es" ? "CUIDA TU HUELLA..." : lang === "ca" ? "VIGILA LA TEVA PETJADA..." : "WATCH YOUR FOOTPRINT..."
           : score >= 15
-            ? (lang === "es" ? "¡INCREÍBLE!" : "OUTSTANDING!")
+            ? lang === "es" ? "¡INCREÍBLE!" : lang === "ca" ? "INCREÏBLE!" : "OUTSTANDING!"
             : null;
 
   return (
@@ -137,8 +147,8 @@ export default function PathMap({
           style={{
             fontFamily: "'Press Start 2P', cursive",
             fontSize: "clamp(0.55rem, 1.8vw, 0.85rem)",
-            color: showComplete ? "#39FF14" : "#FFE600",
-            textShadow: `0 0 10px ${showComplete ? "#39FF14" : "#FFE600"}`,
+            color: showComplete ? "#39FF14" : "#FF00FF",
+            textShadow: `0 0 10px ${showComplete ? "#39FF14" : "#FF00FF"}`,
             letterSpacing: "0.1em",
           }}
         >
@@ -336,7 +346,7 @@ export default function PathMap({
             style={{
               fontFamily: "'Press Start 2P', cursive",
               fontSize: "clamp(0.45rem, 1.3vw, 0.6rem)",
-              color: LEVEL_THEMES[currentIdx]?.color || "#FFE600",
+              color: LEVEL_THEMES[currentIdx]?.color || "#FF00FF",
               letterSpacing: "0.1em",
               textAlign: "center",
             }}
@@ -347,7 +357,7 @@ export default function PathMap({
             className="pixel-btn zone-pulse"
             onClick={onGo}
             style={{
-              color: LEVEL_THEMES[currentIdx]?.color || "#FFE600",
+              color: LEVEL_THEMES[currentIdx]?.color || "#FF00FF",
               fontSize: "clamp(0.55rem, 1.8vw, 0.85rem)",
               padding: "16px 48px",
               letterSpacing: "0.14em",
@@ -463,7 +473,7 @@ function ProgressBar({ completedCount, total, t }) {
           style={{
             height: "100%",
             width: `${(completedCount / total) * 100}%`,
-            background: "linear-gradient(90deg, #0099FF, #FFE600, #FFFFFF)",
+            background: "linear-gradient(90deg, #0099FF, #FF00FF, #FFFFFF)",
             boxShadow: "0 0 6px #0099FF",
           }}
         />
@@ -486,7 +496,7 @@ function ProgressBar({ completedCount, total, t }) {
 
 function ScoreBadge({ score, lang }) {
   const label = lang === "es" ? "PTS" : "PTS";
-  const color = score < 0 ? "#FF3A20" : score < 8 ? "#FFE600" : score < 15 ? "#0099FF" : "#39FF14";
+  const color = score < 0 ? "#FF3A20" : score < 8 ? "#FF00FF" : score < 15 ? "#0099FF" : "#39FF14";
   return (
     <div
       style={{

@@ -172,11 +172,11 @@
 
 /* ---------- Title bounce / glitch ---------- */
 @keyframes title-glitch {
-  0%   { transform: translate(0, 0); text-shadow: 4px 0 #0099FF, -4px 0 #FFE600; }
-  10%  { transform: translate(-2px, 0); text-shadow: 3px 0 #0099FF, -3px 0 #FFE600; }
-  20%  { transform: translate(2px, 0); text-shadow: -3px 0 #FFE600, 3px 0 #0099FF; }
-  30%  { transform: translate(0, 0); text-shadow: 4px 0 #FFE600, -4px 0 #0099FF; }
-  100% { transform: translate(0, 0); text-shadow: 4px 0 #0099FF, -4px 0 #FFE600; }
+  0%   { transform: translate(0, 0); text-shadow: 4px 0 #0099FF, -4px 0 #FF00FF; }
+  10%  { transform: translate(-2px, 0); text-shadow: 3px 0 #0099FF, -3px 0 #FF00FF; }
+  20%  { transform: translate(2px, 0); text-shadow: -3px 0 #FF00FF, 3px 0 #0099FF; }
+  30%  { transform: translate(0, 0); text-shadow: 4px 0 #FF00FF, -4px 0 #0099FF; }
+  100% { transform: translate(0, 0); text-shadow: 4px 0 #0099FF, -4px 0 #FF00FF; }
 }
 .title-glitch {
   animation: title-glitch 3s steps(1) infinite;
@@ -184,9 +184,9 @@
 
 /* ---------- Pixel pulse (node on map) ---------- */
 @keyframes pixel-pulse {
-  0%   { box-shadow: 0 0 0px 0px #FFE600; }
-  50%  { box-shadow: 0 0 12px 6px #FFE600; }
-  100% { box-shadow: 0 0 0px 0px #FFE600; }
+  0%   { box-shadow: 0 0 0px 0px #FF00FF; }
+  50%  { box-shadow: 0 0 12px 6px #FF00FF; }
+  100% { box-shadow: 0 0 0px 0px #FF00FF; }
 }
 .pixel-pulse {
   animation: pixel-pulse 1.2s steps(4) infinite;
@@ -252,7 +252,7 @@
 /* ---------- Neon glow text ---------- */
 .neon-pink  { color: #0099FF; text-shadow: 0 0 8px #0099FF, 0 0 20px #0099FFCC; }
 .neon-cyan  { color: #0099FF; text-shadow: 0 0 8px #0099FF, 0 0 20px #0099FFCC; }
-.neon-yellow{ color: #FFE600; text-shadow: 0 0 8px #FFE600, 0 0 20px #FFE600CC; }
+.neon-yellow{ color: #FF00FF; text-shadow: 0 0 8px #FF00FF, 0 0 20px #FF00FFCC; }
 .neon-green { color: #39FF14; text-shadow: 0 0 8px #39FF14, 0 0 20px #39FF14CC; }
 
 /* ---------- Pixel input ---------- */
@@ -269,9 +269,9 @@
   box-sizing: border-box;
 }
 .pixel-input:focus {
-  border-color: #FFE600;
-  box-shadow: 0 0 8px #FFE600;
-  color: #FFE600;
+  border-color: #FF00FF;
+  box-shadow: 0 0 8px #FF00FF;
+  color: #FF00FF;
 }
 .pixel-input::placeholder {
   color: #0099FF55;
@@ -293,9 +293,9 @@
   cursor: pointer;
 }
 .pixel-select:focus {
-  border-color: #FFE600;
-  box-shadow: 0 0 8px #FFE600;
-  color: #FFE600;
+  border-color: #FF00FF;
+  box-shadow: 0 0 8px #FF00FF;
+  color: #FF00FF;
 }
 .pixel-select option {
   background: #000;
@@ -324,7 +324,7 @@
 
 /* ---------- Persona colour utilities ---------- */
 .persona-turbo   { color: #FF3A20; }
-.persona-casual  { color: #FFE600; }
+.persona-casual  { color: #FF00FF; }
 .persona-mindful { color: #0099FF; }
 .persona-green   { color: #39FF14; }
 

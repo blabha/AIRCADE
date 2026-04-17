@@ -42,6 +42,25 @@ const T = {
     again: "▶ JUGAR DE NUEVO",
     outOf: "/ 20",
   },
+  ca: {
+    title: "(AI)RCADE",
+    session: "SESSIÓ",
+    player: "JUGADOR",
+    age: "EDAT",
+    gender: "GÈNERE",
+    industry: "INDÚSTRIA",
+    persona: "EL TEU PERSONATGE IA",
+    footprint: "LA TEVA PETJADA",
+    energy: "ENERGIA",
+    water: "AIGUA",
+    co2: "CO₂",
+    score: "PUNTS",
+    tip: "EL TEU CONSELL INTEL·LIGENT",
+    quote: "Cada prompt deixa una petjada.\nDeixa'n una de positiva.",
+    print: "🖨 IMPRIMIR TIQUET",
+    again: "▶ JUGAR DE NOU",
+    outOf: "/ 20",
+  },
 };
 
 export default function ResultsTicket({
@@ -59,8 +78,9 @@ export default function ResultsTicket({
   play,
 }) {
   const t = T[lang] || T.en;
-  const personaName = lang === "es" ? persona.es.name : persona.en.name;
-  const personaTagline = lang === "es" ? persona.es.tagline : persona.en.tagline;
+  const personaLoc = persona[lang] || persona.en;
+  const personaName = personaLoc.name;
+  const personaTagline = personaLoc.tagline;
   const comparisons = buildComparisons(totalEnergy, totalWater, totalCo2);
 
   useEffect(() => {
@@ -96,10 +116,10 @@ export default function ResultsTicket({
         <CloudCharacter
           mood={persona.cloudMood || "neutral"}
           message={
-            persona.id === "green"   ? (lang === "es" ? "¡INCREÍBLE TRABAJO!" : "OUTSTANDING WORK!") :
-            persona.id === "mindful" ? (lang === "es" ? "¡BUEN TRABAJO!" : "GREAT JOB!") :
-            persona.id === "casual"  ? (lang === "es" ? "PUEDES MEJORAR..." : "ROOM TO IMPROVE...") :
-                                       (lang === "es" ? "¡AY, LA HUELLA!" : "OUCH, THAT FOOTPRINT!")
+            persona.id === "green"   ? (lang === "es" ? "¡INCREÍBLE TRABAJO!" : lang === "ca" ? "FEINA INCREÏBLE!"   : "OUTSTANDING WORK!") :
+            persona.id === "mindful" ? (lang === "es" ? "¡BUEN TRABAJO!"      : lang === "ca" ? "BON TREBALL!"       : "GREAT JOB!") :
+            persona.id === "casual"  ? (lang === "es" ? "PUEDES MEJORAR..."   : lang === "ca" ? "POTS MILLORAR..."   : "ROOM TO IMPROVE...") :
+                                       (lang === "es" ? "¡AY, LA HUELLA!"     : lang === "ca" ? "AU, QUINA PETJADA!" : "OUCH, THAT FOOTPRINT!")
           }
           size="md"
           animate={persona.id === "green" ? "bounce" : "float"}

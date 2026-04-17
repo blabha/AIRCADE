@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { INDUSTRIES, INDUSTRIES_ES } from "../data/industries";
+import { INDUSTRIES, INDUSTRIES_ES, INDUSTRIES_CA } from "../data/industries";
 import CloudCharacter from "./CloudCharacter";
 
 const T = {
@@ -33,11 +33,26 @@ const T = {
     cloudMsg:         "¡CUÉNTAME\nSOBRE TI!",
     cloudReady:       "¡VAMOS!",
   },
+  ca: {
+    title:            "REGISTRE DE JUGADOR",
+    name:             "NOM",
+    namePlaceholder:  "INTRODUEIX NOM",
+    age:              "EDAT",
+    agePlaceholder:   "00",
+    gender:           "GÈNERE",
+    genderOptions:    ["Seleccionar...", "Masculí", "Femení", "No binari", "Prefereixo no dir-ho"],
+    industry:         "INDÚSTRIA",
+    industryPlaceholder: "Seleccionar indústria...",
+    start:            "PREM START",
+    required:         "* OMPLE TOTS ELS CAMPS",
+    cloudMsg:         "EXPLICA'M\nQUI ETS!",
+    cloudReady:       "ANEM!",
+  },
 };
 
 export default function PlayerRegistration({ lang, player, setPlayer, onStart, play }) {
   const t         = T[lang] || T.en;
-  const industries = lang === "es" ? INDUSTRIES_ES : INDUSTRIES;
+  const localizedIndustries = lang === "es" ? INDUSTRIES_ES : lang === "ca" ? INDUSTRIES_CA : INDUSTRIES;
   const [error, setError]       = useState(false);
   const [ready, setReady]       = useState(false);
 
@@ -161,7 +176,7 @@ export default function PlayerRegistration({ lang, player, setPlayer, onStart, p
                 <option value="">{t.industryPlaceholder}</option>
                 {INDUSTRIES.map((ind, i) => (
                   <option key={i} value={ind}>
-                    {lang === "es" ? INDUSTRIES_ES[i] : ind}
+                    {localizedIndustries[i]}
                   </option>
                 ))}
               </select>
@@ -188,13 +203,13 @@ export default function PlayerRegistration({ lang, player, setPlayer, onStart, p
             className="pixel-btn"
             onClick={handleSubmit}
             style={{
-              color: isComplete ? "#FFE600" : "#ffffff33",
+              color: isComplete ? "#FF00FF" : "#ffffff33",
               fontSize: "clamp(0.48rem, 1.4vw, 0.7rem)",
               padding: "16px 0",
               marginTop: "6px",
               letterSpacing: "0.12em",
               width: "100%",
-              borderColor: isComplete ? "#FFE600" : "#ffffff22",
+              borderColor: isComplete ? "#FF00FF" : "#ffffff22",
             }}
           >
             {t.start}

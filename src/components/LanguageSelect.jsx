@@ -43,22 +43,23 @@ export default function LanguageSelect({ onSelect, play }) {
             letterSpacing: "0.08em",
           }}
         >
-          SELECT LANGUAGE / ELIGE IDIOMA
+          SELECT LANGUAGE / ELIGE IDIOMA / TRIA IDIOMA
         </div>
       </div>
 
       {/* Cloud with greeting */}
       <CloudCharacter
         mood="neutral"
-        message={"HELLO!\nHOLA!"}
+        message={"HELLO!\nHOLA!\nHOLA!"}
         size="md"
         animate="float"
       />
 
       {/* Buttons */}
       <div style={{ display: "flex", gap: "32px", flexWrap: "wrap", justifyContent: "center" }}>
-        <LangButton label="ENGLISH" color="#FFE600" onClick={() => handleSelect("en")} />
+        <LangButton label="ENGLISH" color="#FF00FF" onClick={() => handleSelect("en")} />
         <LangButton label="ESPAÑOL" color="#39FF14" onClick={() => handleSelect("es")} />
+        <LangButton label="CATALÀ"  color="#0099FF" onClick={() => handleSelect("ca")} />
       </div>
 
       {/* Pixel dots */}
@@ -68,7 +69,7 @@ export default function LanguageSelect({ onSelect, play }) {
             key={i}
             style={{
               width: "8px", height: "8px",
-              background: i % 3 === 0 ? "#0099FF" : i % 3 === 1 ? "#FFE600" : "#FFFFFF",
+              background: i % 3 === 0 ? "#0099FF" : i % 3 === 1 ? "#FF00FF" : "#FFFFFF",
               imageRendering: "pixelated",
             }}
           />

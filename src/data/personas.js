@@ -19,6 +19,10 @@ export const PERSONAS = {
       name: "El Tapeador Turbo",
       tagline: "A toda velocidad, sin remordimientos — cada píxel cuenta en tu contra.",
     },
+    ca: {
+      name: "El Tapeador Turbo",
+      tagline: "A tota velocitat, sense remordiments — cada píxel compta en contra teva.",
+    },
     scoreRange: [-15, 0],
     color: "#FF3A20",
     glowColor: "#FF3A2088",
@@ -35,9 +39,13 @@ export const PERSONAS = {
       name: "El Clicker Casual",
       tagline: "No eres el problema — pero tampoco eres la solución.",
     },
+    ca: {
+      name: "El Clicker Casual",
+      tagline: "No ets el problema — però tampoc ets la solució.",
+    },
     scoreRange: [1, 7],
-    color: "#FFE600",
-    glowColor: "#FFE60088",
+    color: "#FF00FF",
+    glowColor: "#FF00FF88",
     sound: "casual",
     cloudMood: "neutral",
   },
@@ -50,6 +58,10 @@ export const PERSONAS = {
     es: {
       name: "El Creador Consciente",
       tagline: "Pausas antes de preguntar. El planeta lo nota.",
+    },
+    ca: {
+      name: "El Creador Conscient",
+      tagline: "Fas una pausa abans de preguntar. El planeta ho nota.",
     },
     scoreRange: [8, 14],
     color: "#0099FF",
@@ -66,6 +78,10 @@ export const PERSONAS = {
     es: {
       name: "El Hacker Verde",
       tagline: "Huella baja, alto impacto. Juegas a largo plazo.",
+    },
+    ca: {
+      name: "El Hacker Verd",
+      tagline: "Petjada baixa, alt impacte. Juga a llarg termini.",
     },
     scoreRange: [15, 20],
     color: "#39FF14",

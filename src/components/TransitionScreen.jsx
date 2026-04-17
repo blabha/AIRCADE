@@ -31,6 +31,20 @@ const T = {
       perfect:  "¡CERO HUELLA!\n¡INCREÍBLE!",
     },
   },
+  ca: {
+    complete:    (n) => `NIVELL ${n} COMPLET!`,
+    tap:         "TOCA PER CONTINUAR",
+    allDone:     "TOTS ELS NIVELLS COMPLETATS!",
+    calculating: "CALCULANT RESULTATS...",
+    cloudMsgs: {
+      terrible: "AU!\nMOLT COST.",
+      bad:      "AIXÒ HA COSTAT CAR...",
+      moderate: "NO ÉS EL TEU MILLOR...",
+      good:     "BON MOVIMENT!",
+      great:    "GRAN ELECCIÓ!",
+      perfect:  "ZERO PETJADA!\nINCREÏBLE!",
+    },
+  },
 };
 
 export default function TransitionScreen({ lang, completedCount, lastDelta, onContinue, play }) {
@@ -93,8 +107,8 @@ export default function TransitionScreen({ lang, completedCount, lastDelta, onCo
         style={{
           width: "72px",
           height: "72px",
-          border: `4px solid ${tier === "terrible" ? "#FF3A20" : tier === "bad" ? "#FFE600" : "#39FF14"}`,
-          boxShadow: `0 0 20px ${tier === "terrible" ? "#FF3A20" : tier === "bad" ? "#FFE600" : "#39FF14"}`,
+          border: `4px solid ${tier === "terrible" ? "#FF3A20" : tier === "bad" ? "#FF00FF" : "#39FF14"}`,
+          boxShadow: `0 0 20px ${tier === "terrible" ? "#FF3A20" : tier === "bad" ? "#FF00FF" : "#39FF14"}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -133,7 +147,7 @@ export default function TransitionScreen({ lang, completedCount, lastDelta, onCo
           style={{
             fontFamily: "'Press Start 2P', cursive",
             fontSize: "clamp(0.38rem, 1.1vw, 0.58rem)",
-            color: "#FFE600",
+            color: "#FF00FF",
             textAlign: "center",
             letterSpacing: "0.1em",
           }}

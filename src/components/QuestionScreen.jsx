@@ -48,6 +48,27 @@ const T = {
     },
     impactContext: "EN CONTEXTO:",
   },
+  ca: {
+    level:    (n, t) => `NIVELL ${n} DE ${t}`,
+    choose:   "QUÈ FARIES?",
+    tier: {
+      perfect:  "PERFECTE! ★",
+      great:    "GRAN ELECCIÓ!",
+      good:     "BON MOVIMENT.",
+      moderate: "MODERAT.",
+      bad:      "ALT IMPACTE!",
+      terrible: "DANY CRÍTIC!",
+    },
+    cloudMsg: {
+      perfect:  "ZERO PETJADA!\nINCREÏBLE!",
+      great:    "GRAN ELECCIÓ!",
+      good:     "NO ESTÀ MAL!",
+      moderate: "PODRIA SER MILLOR...",
+      bad:      "OH NO!",
+      terrible: "AIXÒ FA MOLT DE MAL!",
+    },
+    impactContext: "EN CONTEXT:",
+  },
 };
 
 const MAX_ENERGY = 60;
@@ -69,12 +90,12 @@ const TIER_CONFIG = {
   perfect:  { color: "#39FF14", flash: "good-flash",   sound: "goodChoice", mood: "celebrating" },
   great:    { color: "#0099FF", flash: "good-flash",   sound: "goodChoice", mood: "happy"       },
   good:     { color: "#0099FF", flash: "good-flash",   sound: "goodChoice", mood: "happy"       },
-  moderate: { color: "#FFE600", flash: "",             sound: "click",      mood: "neutral"     },
-  bad:      { color: "#FF8800", flash: "damage-flash", sound: "damage",     mood: "alarmed"     },
+  moderate: { color: "#FF00FF", flash: "",             sound: "click",      mood: "neutral"     },
+  bad:      { color: "#FF3A20", flash: "damage-flash", sound: "damage",     mood: "alarmed"     },
   terrible: { color: "#FF3A20", flash: "damage-flash", sound: "damage",     mood: "alarmed"     },
 };
 
-const OPTION_COLORS = ["#0099FF", "#FFE600", "#FFFFFF"];
+const OPTION_COLORS = ["#0099FF", "#FF00FF", "#FFFFFF"];
 
 export default function QuestionScreen({
   lang, questionIndex, totalEnergy, totalWater, totalCo2,
@@ -97,7 +118,7 @@ export default function QuestionScreen({
     setFlashClass("");
     setShakeScreen(false);
     setCloudMood("neutral");
-    setCloudMsg(lang === "es" ? "¿QUÉ HARÍAS?" : "WHAT WOULD\nYOU DO?");
+    setCloudMsg(lang === "es" ? "¿QUÉ HARÍAS?" : lang === "ca" ? "QUÈ FARIES?" : "WHAT WOULD\nYOU DO?");
     setScoreDelta(null);
   }, [questionIndex, lang]);
 
@@ -125,7 +146,7 @@ export default function QuestionScreen({
     setTimeout(() => onAnswer(option), 2100);
   }
 
-  const questionText = lang === "es" ? question.es : question.en;
+  const questionText = lang === "es" ? question.es : lang === "ca" ? question.ca : question.en;
   const liveEnergy = totalEnergy + (selected ? selected.energyWh : 0);
   const liveWater  = totalWater  + (selected ? selected.waterMl  : 0);
   const liveCo2    = totalCo2    + (selected ? selected.co2g     : 0);
@@ -160,8 +181,8 @@ export default function QuestionScreen({
           style={{
             fontFamily: "'Press Start 2P', cursive",
             fontSize: "clamp(0.38rem, 1.1vw, 0.58rem)",
-            color: "#FFE600",
-            textShadow: "0 0 6px #FFE600",
+            color: "#FF00FF",
+            textShadow: "0 0 6px #FF00FF",
             letterSpacing: "0.1em",
           }}
         >
@@ -257,7 +278,7 @@ export default function QuestionScreen({
                   }}
                 >
                   <span style={{ minWidth: "22px", fontWeight: "bold" }}>{option.label})</span>
-                  <span>{lang === "es" ? option.es : option.en}</span>
+                  <span>{lang === "es" ? option.es : lang === "ca" ? option.ca : option.en}</span>
                 </button>
               );
             })}
@@ -277,6 +298,7 @@ export default function QuestionScreen({
         co2={liveCo2}
         animate={!!selected}
         isBad={isBad}
+        lang={lang}
       />
     </div>
   );
@@ -359,7 +381,7 @@ function ConsequenceReveal({ option, delta, t, lang }) {
             {t.impactContext}
           </div>
           {option.energyWh > 0 && (
-            <CompRow icon={eHuman.icon} label={eHuman.label} color="#FFE600" />
+            <CompRow icon={eHuman.icon} label={eHuman.label} color="#FF00FF" />
           )}
           {option.waterMl > 0 && (
             <CompRow icon={wHuman.icon} label={wHuman.label} color="#0099FF" />
@@ -389,12 +411,19 @@ function CompRow({ icon, label, color }) {
   );
 }
 
+const BAR_LABELS = {
+  en: { energy: "⚡ ENERGY", water: "💧 WATER", co2: "🌫️ CO₂" },
+  es: { energy: "⚡ ENERGÍA", water: "💧 AGUA",  co2: "🌫️ CO₂" },
+  ca: { energy: "⚡ ENERGIA", water: "💧 AIGUA", co2: "🌫️ CO₂" },
+};
+
 // ── Footprint bars (bottom strip) ────────────────────────────────────────────
-function FootprintBars({ energy, water, co2, animate, isBad }) {
+function FootprintBars({ energy, water, co2, animate, isBad, lang }) {
+  const bl = BAR_LABELS[lang] || BAR_LABELS.en;
   const bars = [
-    { label: "⚡ ENERGY", value: energy, max: MAX_ENERGY, color: "#FFE600", unit: "Wh" },
-    { label: "💧 WATER",  value: water,  max: MAX_WATER,  color: "#0099FF", unit: "ml" },
-    { label: "🌫️ CO₂",   value: co2,    max: MAX_CO2,    color: "#FFFFFF", unit: "g"  },
+    { label: bl.energy, value: energy, max: MAX_ENERGY, color: "#FF00FF", unit: "Wh" },
+    { label: bl.water,  value: water,  max: MAX_WATER,  color: "#0099FF", unit: "ml" },
+    { label: bl.co2,    value: co2,    max: MAX_CO2,    color: "#FFFFFF", unit: "g"  },
   ];
 
   return (

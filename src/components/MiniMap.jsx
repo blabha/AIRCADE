@@ -2,14 +2,20 @@ import React from "react";
 import { QUESTIONS } from "../data/questions";
 import CloudCharacter from "./CloudCharacter";
 
-// Level themes — blue / yellow alternating
+// Level themes — blue / magenta / white alternating
 const LEVEL_THEMES = [
   { name: "IMAGE",   icon: "🎨", color: "#0099FF" },
-  { name: "QUERY",   icon: "💬", color: "#FFE600" },
+  { name: "QUERY",   icon: "💬", color: "#FF00FF" },
   { name: "REPORT",  icon: "📝", color: "#FFFFFF" },
   { name: "PHOTOS",  icon: "📸", color: "#0099FF" },
-  { name: "LAUNCH",  icon: "🚀", color: "#FFE600" },
+  { name: "LAUNCH",  icon: "🚀", color: "#FF00FF" },
 ];
+
+const T = {
+  en: { header: "PROGRESS", now: "◄ NOW" },
+  es: { header: "PROGRESO", now: "◄ AHORA" },
+  ca: { header: "PROGRÉS",  now: "◄ ARA"  },
+};
 
 /**
  * MiniMap — vertical side-panel showing 5 levels.
@@ -23,6 +29,8 @@ const LEVEL_THEMES = [
  *   lang
  */
 export default function MiniMap({ completedCount, currentIdx, score, lang }) {
+  const t = T[lang] || T.en;
+
   const cloudMood =
     score < 0   ? "worried"   :
     score < 8   ? "neutral"   :
@@ -56,7 +64,7 @@ export default function MiniMap({ completedCount, currentIdx, score, lang }) {
           textShadow: "0 0 6px #0099FF",
         }}
       >
-        PROGRESS
+        {t.header}
       </div>
 
       {/* Score badge */}
@@ -85,7 +93,7 @@ export default function MiniMap({ completedCount, currentIdx, score, lang }) {
               bottom: "20px",
               width: "3px",
               height: `${(completedCount / QUESTIONS.length) * 100}%`,
-              background: "linear-gradient(to top, #0099FF, #FFE600)",
+              background: "linear-gradient(to top, #0099FF, #FF00FF)",
               transition: "height 0.4s steps(8)",
             }}
           />
@@ -165,7 +173,7 @@ export default function MiniMap({ completedCount, currentIdx, score, lang }) {
                       marginTop: "3px",
                     }}
                   >
-                    ◄ NOW
+                    {t.now}
                   </div>
                 )}
               </div>
@@ -183,7 +191,7 @@ export default function MiniMap({ completedCount, currentIdx, score, lang }) {
 }
 
 function ScoreBadge({ score }) {
-  const color = score < 0 ? "#FF4444" : score < 8 ? "#FFE600" : "#0099FF";
+  const color = score < 0 ? "#FF3A20" : score < 8 ? "#FF00FF" : "#0099FF";
   return (
     <div
       style={{
