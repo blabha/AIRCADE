@@ -1,5 +1,6 @@
 import { useReducer, useCallback } from "react";
 import { QUESTIONS } from "../data/questions";
+import { selectQuestions } from "../data/questionBank";
 import { getPersona } from "../data/personas";
 import { getSmartTip } from "../data/industries";
 
@@ -53,6 +54,7 @@ const INITIAL_STATE = {
     industry: "",
   },
   currentQuestion: 0,
+  sessionQuestions: [],
   answers: [],
   score: 0,
   totalEnergy: 0,
@@ -85,6 +87,7 @@ function gameReducer(state, action) {
         ...state,
         screen: SCREENS.PATH_MAP,
         currentQuestion: 0,
+        sessionQuestions: selectQuestions(state.player.industry),
         answers: [],
         score: 0,
         totalEnergy: 0,
@@ -104,7 +107,8 @@ function gameReducer(state, action) {
       const newWater  = state.totalWater  + option.waterMl;
       const newCo2    = state.totalCo2    + option.co2g;
       const newAnswers = [...state.answers, option];
-      const isLast = state.currentQuestion >= QUESTIONS.length - 1;
+      const sessionLen = state.sessionQuestions.length || QUESTIONS.length;
+      const isLast = state.currentQuestion >= sessionLen - 1;
 
       const persona = isLast ? getPersona(newScore) : state.persona;
       const tip = isLast
@@ -129,7 +133,7 @@ function gameReducer(state, action) {
     }
 
     case "NEXT_QUESTION":
-      if (state.currentQuestion >= QUESTIONS.length - 1) {
+      if (state.currentQuestion >= (state.sessionQuestions.length || QUESTIONS.length) - 1) {
         return { ...state, screen: SCREENS.RESULTS };
       }
       return {

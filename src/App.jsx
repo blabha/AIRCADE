@@ -32,6 +32,7 @@ export default function App() {
     screen, lang, player, currentQuestion,
     answers, score, totalEnergy, totalWater, totalCo2,
     sessionId, persona, smartTip, lastDelta, prevCompletedCount,
+    sessionQuestions,
   } = state;
 
   switch (screen) {
@@ -84,6 +85,7 @@ export default function App() {
           lang={lang}
           industry={player.industry}
           questionIndex={currentQuestion}
+          sessionQuestions={sessionQuestions}
           totalEnergy={totalEnergy}
           totalWater={totalWater}
           totalCo2={totalCo2}

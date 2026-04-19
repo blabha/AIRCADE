@@ -119,10 +119,10 @@ const OPTION_COLORS = ["#0099FF", "#FF00FF", "#FFFFFF"];
 
 export default function QuestionScreen({
   lang, industry, questionIndex, totalEnergy, totalWater, totalCo2,
-  onAnswer, play, score,
+  onAnswer, play, score, sessionQuestions,
 }) {
   const t        = T[lang] || T.en;
-  const question = QUESTIONS[questionIndex];
+  const question = (sessionQuestions && sessionQuestions[questionIndex]) || QUESTIONS[questionIndex];
 
   const [selected,    setSelected]    = useState(null);
   const [shakeScreen, setShakeScreen] = useState(false);
@@ -157,8 +157,9 @@ export default function QuestionScreen({
     setTimeout(() => onAnswer(option), 2400);
   }
 
-  // Industry-personalised question text, falls back to default
+  // Bank questions use question.text; legacy questions use en/es/ca with industry override
   const questionText =
+    question.text ||
     getQuestionText(question.id, industry, lang) ||
     (lang === "es" ? question.es : lang === "ca" ? question.ca : question.en);
 
@@ -184,7 +185,7 @@ export default function QuestionScreen({
           fontSize: "clamp(0.38rem, 1.1vw, 0.55rem)",
           color: "#FF00FF", textShadow: "0 0 6px #FF00FF", letterSpacing: "0.1em",
         }}>
-          {t.level(questionIndex + 1, QUESTIONS.length)}
+          {t.level(questionIndex + 1, (sessionQuestions && sessionQuestions.length) || QUESTIONS.length)}
         </div>
         <CloudCharacter
           mood={cloudMood} message={cloudMsg} size="sm"
@@ -252,7 +253,7 @@ export default function QuestionScreen({
                   }}
                 >
                   <span style={{ minWidth: "20px", fontWeight: "bold" }}>{option.label})</span>
-                  <span>{lang === "es" ? option.es : lang === "ca" ? option.ca : option.en}</span>
+                  <span>{option.text || (lang === "es" ? option.es : lang === "ca" ? option.ca : option.en)}</span>
                 </button>
               );
             })}
