@@ -48,12 +48,15 @@ score = clamp(-3, +4, envScore + moralAdj)
 
 ## Personas
 
-| Score Range | Persona |
-|-------------|--------|
-| ≤ 0 | Turbo Tapper |
-| 1–7 | Casual Clicker |
-| 8–14 | Mindful Maker |
-| 15–20 | Green Hacker |
+| Score Range | Persona | Description |
+|-------------|---------|-------------|
+| -15 to -8 | Grid Goblin | Maximum consumption, zero awareness — draining the planet one click at a time |
+| -7 to -2 | Turbo Tapper | Fast and reckless; convenience wins every time, consequences be damned |
+| -1 to 4 | Casual Clicker | Convenience-first with occasional good instincts, but not thinking it through |
+| 5 to 9 | Eco Experimenter | Starting to connect the dots between choices and impact |
+| 10 to 14 | Mindful Maker | Thoughtful and intentional — balancing usefulness with environmental care |
+| 15 to 17 | Green Hacker | Deliberately sustainable; earns the hacker badge for optimizing the right things |
+| 18 to 20 | Sustainable Sage | Near-perfect alignment of impact and intent — the rarest unlock |
 
 ---
 
