@@ -1,0 +1,2112 @@
+{
+  "personalities": {
+    "description": "6 AI user personalities determined by total environmental impact (energy+water+co2 normalized) and mindfulness score. Each answer gets a mindfulness_score from 1-3 (how thoughtfully the player considered trade-offs). Final personality is based on the combination of BOTH dimensions.",
+    "scoring": {
+      "impact_score": "Sum of energy_wh across 5 questions. Low = under 20, Medium = 20-60, High = above 60.",
+      "mindfulness_score": "Sum of mindfulness points across 5 questions (range 5-15). Each answer has a mindfulness value of 1, 2, or 3.",
+      "matrix": {
+        "low_impact + high_mindfulness (13-15)": "the_zen_prompter",
+        "low_impact + low_mindfulness (5-8)": "the_abstainer",
+        "medium_impact + high_mindfulness (11-15)": "the_balanced_byte",
+        "medium_impact + low_mindfulness (5-10)": "the_sleepwalker",
+        "high_impact + high_mindfulness (11-15)": "the_conscious_guzzler",
+        "high_impact + low_mindfulness (5-10)": "the_turbo_tapper"
+      }
+    },
+    "types": {
+      "the_zen_prompter": {
+        "title": "The Zen Prompter",
+        "subtitle": "Minimum input, maximum wisdom",
+        "tone": "positive",
+        "description": "You treat AI like a spice rack — a pinch here, a dash there, never the whole jar. You think before you prompt, you question before you trust, and you probably still handwrite thank-you cards. The internet doesn't deserve you.",
+        "cloud_persona": {
+          "expression": "Calm, serene smile with closed eyes like meditating",
+          "color": "Soft green glow",
+          "accessories": "Tiny leaf or sprout growing on top of the cloud's head, maybe a small halo made of recycling arrows",
+          "animation": "Gentle floating, slow breathing rhythm, occasional peaceful sparkle"
+        }
+      },
+      "the_balanced_byte": {
+        "title": "The Balanced Byte",
+        "subtitle": "Thoughtful power user",
+        "tone": "positive",
+        "description": "You use AI like a good chef uses a blender — when it makes sense, not for everything. You've thought about the trade-offs, you accept the costs when they're worth it, and you probably read the 'why' explanations more carefully than most. Respect.",
+        "cloud_persona": {
+          "expression": "Friendly confident grin, one eyebrow slightly raised like 'I got this'",
+          "color": "Cool blue with subtle cyan accents",
+          "accessories": "Small balanced scale or yin-yang symbol floating beside it, maybe tiny reading glasses",
+          "animation": "Steady float with occasional knowing nod, subtle sparkle trail"
+        }
+      },
+      "the_abstainer": {
+        "title": "The Abstainer",
+        "subtitle": "AI? No thank you, I have hands",
+        "tone": "neutral",
+        "description": "You consistently chose the zero-energy option, which is great for the planet but... did you actually engage with the dilemmas? Sometimes the right answer IS using AI — just thoughtfully. You might be avoiding the tool instead of learning to use it wisely. The future is coming either way!",
+        "cloud_persona": {
+          "expression": "Skeptical side-eye, arms crossed (if clouds had arms), slight frown",
+          "color": "Grey with a stubborn solid outline",
+          "accessories": "A tiny 'NO WIFI' sign or a miniature book it's holding protectively, old-school reading glasses",
+          "animation": "Barely moves, occasional suspicious glance left and right, shakes head sometimes"
+        }
+      },
+      "the_sleepwalker": {
+        "title": "The Sleepwalker",
+        "subtitle": "Using AI on autopilot",
+        "tone": "neutral",
+        "description": "You're using AI, which is fine — but you're kind of just going with the flow without thinking too hard about it. Not great, not terrible, just... vibes. The resources add up when nobody's paying attention, like leaving the tap running while you brush your teeth. Wake up and smell the kilowatts!",
+        "cloud_persona": {
+          "expression": "Drowsy half-closed eyes, mouth slightly open, zoned-out look",
+          "color": "Dull yellow-orange, slightly faded",
+          "accessories": "Tiny Z's floating above its head, maybe holding a phone mindlessly, small drool drop",
+          "animation": "Slow lazy drift, occasional startled wake-up jolt, then back to dozing"
+        }
+      },
+      "the_conscious_guzzler": {
+        "title": "The Conscious Guzzler",
+        "subtitle": "Knows the cost, pays it anyway",
+        "tone": "negative",
+        "description": "Here's the thing — you KNOW AI uses energy, you KNOW the trade-offs, and you chose the heavy options anyway. Points for honesty! But knowing the price and choosing to pay it every time is like reading nutrition labels and still ordering the triple cheeseburger. Your awareness needs a gym buddy called 'restraint.'",
+        "cloud_persona": {
+          "expression": "Guilty smile, sweating a little, eyes looking sideways like 'I know I know'",
+          "color": "Orange with red pulse, slightly overheated looking",
+          "accessories": "Tiny lightning bolts and water drops flying off it chaotically, a small 'I KNOW' speech bubble, maybe a tiny exhaust pipe",
+          "animation": "Bouncy and energetic but slightly frantic, leaves a trail of small energy sparks"
+        }
+      },
+      "the_turbo_tapper": {
+        "title": "The Turbo Tapper",
+        "subtitle": "Full throttle, zero regrets",
+        "tone": "negative",
+        "description": "You hit every AI button available without a second thought. Generate! Regenerate! Analyze! Generate again! The servers felt that. If AI use had a sound, yours would be a jet engine. The good news? Now you've seen the receipts. Maybe next time, just one tiny pause before the next prompt?",
+        "cloud_persona": {
+          "expression": "Wild excited eyes, huge open grin, slightly manic energy",
+          "color": "Bright red with flashing neon accents",
+          "accessories": "Rocket boosters strapped to its sides, a trail of fire/smoke behind it, tiny sunglasses, energy drink in hand",
+          "animation": "Zooming around erratically, bouncing off screen edges, leaves fire trail, occasional explosion sparkle"
+        }
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "category": "everyday_use",
+      "age_group": "under_18",
+      "question": "Geography test tomorrow. Study your notes for 2 hours, or let AI quiz you for 30 minutes?",
+      "answers": {
+        "A": {
+          "text": "AI quiz — it targets what I don't know",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 2,
+          "why": "Efficient learning but builds AI dependency. The 8 Wh is like half a phone charge."
+        },
+        "B": {
+          "text": "Study my notes — writing things out helps me remember",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero energy. Handwriting aids memory, but if your notes have gaps, you'll study the wrong things."
+        },
+        "C": {
+          "text": "Get AI to make a cheat sheet, then memorize it",
+          "energy_wh": 4,
+          "water_ml": 20,
+          "co2_g": 1.2,
+          "mindfulness": 1,
+          "why": "Quick and light, but memorizing a summary isn't understanding the material."
+        }
+      }
+    },
+    {
+      "id": 2,
+      "category": "everyday_use",
+      "age_group": "under_18",
+      "question": "Your club needs a logo. A friend can draw one in a week. AI makes one in 10 seconds. What do you pick?",
+      "answers": {
+        "A": {
+          "text": "Let my friend draw it — it'll actually mean something",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Zero resources and supports your friend. But the club launch gets delayed."
+        },
+        "B": {
+          "text": "AI draft now, friend refines it later",
+          "energy_wh": 35,
+          "water_ml": 220,
+          "co2_g": 11,
+          "mindfulness": 2,
+          "why": "Image generation = one hour of TV energy. Saves time but might sideline your friend."
+        },
+        "C": {
+          "text": "AI — we need it now, we can always change it later",
+          "energy_wh": 35,
+          "water_ml": 220,
+          "co2_g": 11,
+          "mindfulness": 1,
+          "why": "Same energy as B, but 'change it later' rarely happens."
+        }
+      }
+    },
+    {
+      "id": 3,
+      "category": "everyday_use",
+      "age_group": "18-25",
+      "question": "Applying to 30 jobs. One strong cover letter tweaked manually, or AI-custom letters for each?",
+      "answers": {
+        "A": {
+          "text": "One letter, manually tweaked each time",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 2,
+          "why": "Low energy, but a generic letter might get filtered out instantly."
+        },
+        "B": {
+          "text": "AI-custom for each — personalization gets more callbacks",
+          "energy_wh": 60,
+          "water_ml": 300,
+          "co2_g": 18,
+          "mindfulness": 1,
+          "why": "30 generations = charging your laptop twice. Better results, bigger footprint."
+        },
+        "C": {
+          "text": "AI makes 5 templates by industry, I adapt from there",
+          "energy_wh": 12,
+          "water_ml": 60,
+          "co2_g": 4,
+          "mindfulness": 3,
+          "why": "Smart middle ground. You stay involved with a fraction of the energy."
+        }
+      }
+    },
+    {
+      "id": 4,
+      "category": "everyday_use",
+      "age_group": "18-25",
+      "question": "You're terrible at cooking. AI can guide you step-by-step. Your mom offered to teach you this weekend. Pick one.",
+      "answers": {
+        "A": {
+          "text": "AI — I can learn anytime without bothering anyone",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 1,
+          "why": "Convenient but you miss the instinct only a person can teach."
+        },
+        "B": {
+          "text": "Mom — real technique beats text instructions",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero energy, irreplaceable knowledge. But you're limited to her schedule."
+        },
+        "C": {
+          "text": "Mom this weekend, AI on weeknights when I'm alone",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 3,
+          "why": "Best of both. Moderate energy, but you might default to AI over time."
+        }
+      }
+    },
+    {
+      "id": 5,
+      "category": "everyday_use",
+      "age_group": "26-35",
+      "question": "Tight deadline. AI writes a decent report draft in 5 minutes. Doing it yourself takes 3 hours. Client meeting is tomorrow.",
+      "answers": {
+        "A": {
+          "text": "AI draft, then 1 hour of my own editing",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 3,
+          "why": "Pragmatic. But rushed review might miss AI errors."
+        },
+        "B": {
+          "text": "Write it myself — I'll own every word in that meeting",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero AI. Full command, but exhaustion affects your presentation."
+        },
+        "C": {
+          "text": "AI draft, send as-is — nobody reads reports that carefully",
+          "energy_wh": 6,
+          "water_ml": 30,
+          "co2_g": 2,
+          "mindfulness": 1,
+          "why": "Least effort. But if the client asks about a detail AI made up, you're exposed."
+        }
+      }
+    },
+    {
+      "id": 6,
+      "category": "everyday_use",
+      "age_group": "26-35",
+      "question": "Remote team across 3 time zones. AI can translate messages live, but some team members feel uncomfortable being monitored.",
+      "answers": {
+        "A": {
+          "text": "Use it — better communication outweighs the discomfort",
+          "energy_wh": 12,
+          "water_ml": 60,
+          "co2_g": 4,
+          "mindfulness": 1,
+          "why": "Ongoing processing of all messages. Solves one problem, creates a trust issue."
+        },
+        "B": {
+          "text": "AI for official docs only, not casual chat",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 3,
+          "why": "Respects boundaries with moderate energy. Casual miscommunications persist though."
+        },
+        "C": {
+          "text": "Skip AI, hire a part-time human translator",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero AI energy. Builds trust but costs real money."
+        }
+      }
+    },
+    {
+      "id": 7,
+      "category": "everyday_use",
+      "age_group": "36-50",
+      "question": "Your 12-year-old wants an AI tutor app. Grades are slipping, but you're unsure about data privacy.",
+      "answers": {
+        "A": {
+          "text": "Allow it after researching the app's data practices",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 3,
+          "why": "Regular AI sessions add up. Helps grades, but a company now has your child's learning data."
+        },
+        "B": {
+          "text": "Hire a human tutor instead",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero energy. Real mentorship, but the budget might not last."
+        },
+        "C": {
+          "text": "Help them myself — we'll spend time together",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero resources, great bonding. But if you struggle with the material, you might teach wrong."
+        }
+      }
+    },
+    {
+      "id": 8,
+      "category": "everyday_use",
+      "age_group": "36-50",
+      "question": "Renovating your kitchen. AI generates photorealistic mockups. A designer charges €200 for the same with real expertise.",
+      "answers": {
+        "A": {
+          "text": "AI — generate 20 options and narrow it down",
+          "energy_wh": 250,
+          "water_ml": 1500,
+          "co2_g": 75,
+          "mindfulness": 1,
+          "why": "20 images = running your fridge for 6 hours. You'll know what you want, but at a cost."
+        },
+        "B": {
+          "text": "Designer — they know what works structurally",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero AI. Expert guidance, but fewer options and €200 upfront."
+        },
+        "C": {
+          "text": "3 AI mockups to find my style, then bring those to the designer",
+          "energy_wh": 45,
+          "water_ml": 280,
+          "co2_g": 14,
+          "mindfulness": 3,
+          "why": "Combo approach. 3 images = 3 phone charges. You get exploration AND expertise."
+        }
+      }
+    },
+    {
+      "id": 9,
+      "category": "everyday_use",
+      "age_group": "51-65",
+      "question": "You're too emotional to write a eulogy for a close friend. AI could help structure your thoughts. But this is deeply personal.",
+      "answers": {
+        "A": {
+          "text": "Share my memories with AI, let it organize them",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 2,
+          "why": "Helps when grief clouds your thinking. But your most intimate words sit on a server."
+        },
+        "B": {
+          "text": "Write it myself, however messy — raw emotion is honest",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero energy. Authentic, but grief might make you forget things you wanted to say."
+        },
+        "C": {
+          "text": "Ask a mutual friend to help me write it together",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Zero resources. Shared grief is healing, but coordinating adds stress."
+        }
+      }
+    },
+    {
+      "id": 10,
+      "category": "everyday_use",
+      "age_group": "51-65",
+      "question": "Diagnosed with a rare condition. Your doctor explained it, but you want to understand more. AI answers instantly. Medical journals are hard to read.",
+      "answers": {
+        "A": {
+          "text": "AI explains it simply, I bring questions to my doctor",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 3,
+          "why": "AI as a bridge to better doctor conversations. But AI sometimes gets conditions wrong."
+        },
+        "B": {
+          "text": "Read patient forums — real people with the same condition",
+          "energy_wh": 0.5,
+          "water_ml": 3,
+          "co2_g": 0.1,
+          "mindfulness": 2,
+          "why": "Minimal energy, real experience. But forums mix good advice with dangerous info."
+        },
+        "C": {
+          "text": "Have AI summarize 10 medical papers on my condition",
+          "energy_wh": 25,
+          "water_ml": 125,
+          "co2_g": 8,
+          "mindfulness": 1,
+          "why": "Heavy processing. Thorough, but AI may misread the medical nuances that matter for you."
+        }
+      }
+    },
+    {
+      "id": 11,
+      "category": "everyday_use",
+      "age_group": "66+",
+      "question": "Your bank replaced humans with an AI phone system. It keeps misunderstanding your accent. You need to dispute a charge.",
+      "answers": {
+        "A": {
+          "text": "Keep trying — I'll avoid the 45-min wait for a human",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 1,
+          "why": "Extended AI voice processing. Saves time IF it works. Each failed attempt wastes energy."
+        },
+        "B": {
+          "text": "Go to the physical branch — I want a real person",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero AI energy. Problem solved, but costs you half a day."
+        },
+        "C": {
+          "text": "Ask a family member to call — they're better with these systems",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 2,
+          "why": "Practical. But you're losing the ability to manage your own finances."
+        }
+      }
+    },
+    {
+      "id": 12,
+      "category": "everyday_use",
+      "age_group": "66+",
+      "question": "You live alone and feel lonely evenings. An AI chatbot is always available. Your neighbor also wants to chat more.",
+      "answers": {
+        "A": {
+          "text": "AI companion — it's always there, no need to bother anyone",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 1,
+          "why": "Daily AI chats add up. Eases loneliness tonight, may reduce real connection motivation."
+        },
+        "B": {
+          "text": "Knock on my neighbor's door",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero energy, genuine connection. But they might be busy."
+        },
+        "C": {
+          "text": "Both — AI when it's late, neighbor during the day",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 3,
+          "why": "Balanced approach. But AI might gradually replace the effort of real friendships."
+        }
+      }
+    },
+    {
+      "id": 13,
+      "category": "privacy",
+      "age_group": "under_18",
+      "question": "A homework app gives better answers if you share your browser history. Your grades need help.",
+      "answers": {
+        "A": {
+          "text": "Allow it — my history is mostly YouTube and school stuff",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 1,
+          "why": "Continuous processing of your browsing. Harmless now, but it builds a profile that follows you."
+        },
+        "B": {
+          "text": "Use the app without browser access",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 2,
+          "why": "Less exposure. Decent help without giving away your digital habits."
+        },
+        "C": {
+          "text": "Create a separate browser just for schoolwork, share only that",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 3,
+          "why": "Clever workaround. Personalization without exposing your real life."
+        }
+      }
+    },
+    {
+      "id": 14,
+      "category": "privacy",
+      "age_group": "under_18",
+      "question": "Your friend group uses an AI that reads all your messages to suggest activities. You're the only one bothered by this.",
+      "answers": {
+        "A": {
+          "text": "Go along with it — I don't want to be difficult",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 1,
+          "why": "Your entire friend group's conversations become training data."
+        },
+        "B": {
+          "text": "Leave and create a separate chat without the AI",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Protects privacy but risks social isolation. Being 'the privacy person' is lonely at 15."
+        },
+        "C": {
+          "text": "Speak up — maybe others feel the same but haven't said it",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 3,
+          "why": "Takes courage. Even if they agree, actually changing behavior is harder."
+        }
+      }
+    },
+    {
+      "id": 15,
+      "category": "privacy",
+      "age_group": "18-25",
+      "question": "Dream job interview. AI can scrape the interviewer's social media to prep personalized talking points. Thorough prep, or digital stalking?",
+      "answers": {
+        "A": {
+          "text": "Do it — they posted publicly, fair game",
+          "energy_wh": 12,
+          "water_ml": 60,
+          "co2_g": 4,
+          "mindfulness": 1,
+          "why": "If they find out you AI-analyzed their socials, the good impression reverses."
+        },
+        "B": {
+          "text": "Just read their LinkedIn myself — that's normal research",
+          "energy_wh": 0.5,
+          "water_ml": 3,
+          "co2_g": 0.1,
+          "mindfulness": 2,
+          "why": "Normal professional behavior. Less prep but no ethical grey area."
+        },
+        "C": {
+          "text": "AI suggests questions based on the company, not the person",
+          "energy_wh": 4,
+          "water_ml": 20,
+          "co2_g": 1.2,
+          "mindfulness": 3,
+          "why": "Clear ethical line. You show interest in the role without personal surveillance."
+        }
+      }
+    },
+    {
+      "id": 16,
+      "category": "privacy",
+      "age_group": "18-25",
+      "question": "A dating app analyzes ALL your messages to find better matches. Better love life, but every flirty or awkward text gets processed.",
+      "answers": {
+        "A": {
+          "text": "Allow it — dating is hard, this could find someone real",
+          "energy_wh": 20,
+          "water_ml": 100,
+          "co2_g": 7,
+          "mindfulness": 1,
+          "why": "Your most personal messages become training data. You might find love though."
+        },
+        "B": {
+          "text": "Hard no — my private conversations aren't data points",
+          "energy_wh": 1,
+          "water_ml": 5,
+          "co2_g": 0.3,
+          "mindfulness": 2,
+          "why": "Maximum privacy, but worse matches on a platform built around this feature."
+        },
+        "C": {
+          "text": "Start fresh — don't import old chats, let it learn from new ones only",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 3,
+          "why": "Controlled exposure. Smart boundary, but your new chats gradually build the same profile."
+        }
+      }
+    },
+    {
+      "id": 17,
+      "category": "privacy",
+      "age_group": "26-35",
+      "question": "Your company offers 'productivity AI' that monitors your screen all day. Top scorers get bonuses. Bottom scorers get reviewed.",
+      "answers": {
+        "A": {
+          "text": "Opt in — I work hard and want the bonus",
+          "energy_wh": 25,
+          "water_ml": 125,
+          "co2_g": 8,
+          "mindfulness": 1,
+          "why": "Every bathroom break and slow afternoon is now data."
+        },
+        "B": {
+          "text": "Push back with coworkers — this is surveillance",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Zero processing. Protects everyone's dignity, but risks political capital."
+        },
+        "C": {
+          "text": "Opt in but learn to game the metrics",
+          "energy_wh": 25,
+          "water_ml": 125,
+          "co2_g": 8,
+          "mindfulness": 1,
+          "why": "Same energy, feeding a broken system that wastes resources measuring performance theater."
+        }
+      }
+    },
+    {
+      "id": 18,
+      "category": "privacy",
+      "age_group": "26-35",
+      "question": "Client wants you to use their AI invoicing tool. It scans your work folder — including other clients' files.",
+      "answers": {
+        "A": {
+          "text": "Create a separate folder with only their files",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 3,
+          "why": "Smart isolation. You need to maintain this discipline for every future client."
+        },
+        "B": {
+          "text": "Decline — 10 extra minutes of manual invoicing per month",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Protects all clients. But this client might see you as outdated."
+        },
+        "C": {
+          "text": "Use it — the AI probably only reads file names, not content",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 1,
+          "why": "'Probably' is doing a lot of work. Your other clients didn't consent to this."
+        }
+      }
+    },
+    {
+      "id": 19,
+      "category": "privacy",
+      "age_group": "36-50",
+      "question": "School wants to opt your child into AI 'wellness monitoring' that reads their writing for signs of distress. It caught a real crisis last year.",
+      "answers": {
+        "A": {
+          "text": "Opt in — if it catches my child in crisis, it's worth it",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 2,
+          "why": "Might save a life. But your child's emotional world becomes algorithmic data."
+        },
+        "B": {
+          "text": "Opt out — I know my child, they can talk to me",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero processing. Trusts human relationships. But kids don't always tell parents."
+        },
+        "C": {
+          "text": "Ask exactly what's monitored and who sees the data first",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Informed consent. The school may not have clear answers themselves."
+        }
+      }
+    },
+    {
+      "id": 20,
+      "category": "privacy",
+      "age_group": "36-50",
+      "question": "Your spouse uses an AI financial advisor with access to your joint accounts. Good results. But you never agreed to share your data.",
+      "answers": {
+        "A": {
+          "text": "Ask them to disconnect it — joint finances need joint consent",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Clear principle. But it might start a conflict, and the advice was helping."
+        },
+        "B": {
+          "text": "Review the privacy policy together and agree on boundaries",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 2,
+          "why": "Diplomatic. But privacy policies are designed to be hard to understand."
+        },
+        "C": {
+          "text": "Let it continue — gains outweigh abstract privacy concerns",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 1,
+          "why": "Practical, but one breach exposes your entire financial life."
+        }
+      }
+    },
+    {
+      "id": 21,
+      "category": "privacy",
+      "age_group": "51-65",
+      "question": "Your doctor now uses AI to transcribe appointments. Data goes to a company's servers for 30 days. Doctor says it helps them focus on you.",
+      "answers": {
+        "A": {
+          "text": "Accept — my doctor's full attention matters more",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 2,
+          "why": "Better care today. But your health conversations travel through commercial servers."
+        },
+        "B": {
+          "text": "Opt out — I'll accept slower hand-written notes",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Medical conversations stay in the room. But appointment quality may drop."
+        },
+        "C": {
+          "text": "Accept but ask them to skip certain sensitive topics",
+          "energy_wh": 6,
+          "water_ml": 30,
+          "co2_g": 2,
+          "mindfulness": 3,
+          "why": "Compromise. But self-censoring with your doctor defeats the purpose of the visit."
+        }
+      }
+    },
+    {
+      "id": 22,
+      "category": "privacy",
+      "age_group": "51-65",
+      "question": "Selling your old laptop. You deleted files but AI assistants may have cached personal data locally. Buyer asks if it's wiped.",
+      "answers": {
+        "A": {
+          "text": "Full factory reset — better safe than sorry",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Takes an hour but ensures nothing personal remains."
+        },
+        "B": {
+          "text": "Delete the AI apps and clear the browser",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "AI tools often store data in hidden folders uninstalling doesn't touch."
+        },
+        "C": {
+          "text": "I deleted my files — AI stuff is all in the cloud anyway",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Wrong. Many AI tools cache locally. Your personal info could be recoverable."
+        }
+      }
+    },
+    {
+      "id": 23,
+      "category": "privacy",
+      "age_group": "66+",
+      "question": "Pharmacy offers AI medication reminders that track your pills, side effects, and auto-reorder. Just needs your full health profile.",
+      "answers": {
+        "A": {
+          "text": "Sign up — forgetting meds is a real risk at my age",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 2,
+          "why": "Genuine safety benefit. But your complete health profile is now commercial data."
+        },
+        "B": {
+          "text": "Simple alarm app — reminds me without knowing what I take",
+          "energy_wh": 0.1,
+          "water_ml": 0.5,
+          "co2_g": 0.05,
+          "mindfulness": 3,
+          "why": "Does the core job without sharing health data. No side-effect tracking though."
+        },
+        "C": {
+          "text": "My family checks in daily — they can help track it",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Real human care. But it puts responsibility on them and reduces your independence."
+        }
+      }
+    },
+    {
+      "id": 24,
+      "category": "privacy",
+      "age_group": "66+",
+      "question": "Company offers AI cameras in your home to detect falls and auto-call help. Your kids love the idea. You feel watched.",
+      "answers": {
+        "A": {
+          "text": "Accept — a fall when living alone could be fatal",
+          "energy_wh": 20,
+          "water_ml": 100,
+          "co2_g": 7,
+          "mindfulness": 2,
+          "why": "Potentially life-saving. But every moment at home is analyzed by AI."
+        },
+        "B": {
+          "text": "Wearable fall detector instead — works without cameras",
+          "energy_wh": 2,
+          "water_ml": 10,
+          "co2_g": 0.5,
+          "mindfulness": 3,
+          "why": "Same safety goal, much less intrusion. But you have to wear it."
+        },
+        "C": {
+          "text": "Decline all monitoring — I value my dignity",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Full autonomy. But falls are a leading cause of serious injury for older adults."
+        }
+      }
+    },
+    {
+      "id": 25,
+      "category": "environmental",
+      "age_group": "under_18",
+      "question": "Need a background image for a school presentation. Stock photo, draw it yourself, or AI-generate the perfect one?",
+      "answers": {
+        "A": {
+          "text": "AI — it'll match my topic exactly",
+          "energy_wh": 35,
+          "water_ml": 220,
+          "co2_g": 11,
+          "mindfulness": 1,
+          "why": "One image = 2 phone charges. Looks great, but it's just a background."
+        },
+        "B": {
+          "text": "Stock photo — millions already exist",
+          "energy_wh": 0.3,
+          "water_ml": 2,
+          "co2_g": 0.1,
+          "mindfulness": 2,
+          "why": "Near-zero energy. Good enough for a background."
+        },
+        "C": {
+          "text": "Draw it — shows original effort",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Zero energy, maximum character. Quality depends on your skills though."
+        }
+      }
+    },
+    {
+      "id": 26,
+      "category": "environmental",
+      "age_group": "under_18",
+      "question": "Arguing with friends about whether a movie is good. Someone wants to ask AI for 'an objective analysis.' Is AI the right tool?",
+      "answers": {
+        "A": {
+          "text": "Sure — AI can judge filmmaking quality without hype bias",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 1,
+          "why": "Real processing power for a matter of taste. AI can't have genuine opinions on art."
+        },
+        "B": {
+          "text": "No — the argument IS the fun part, don't settle it with a machine",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Zero energy. The debate is more valuable than resolving it."
+        },
+        "C": {
+          "text": "Read actual critic reviews instead",
+          "energy_wh": 0.3,
+          "water_ml": 2,
+          "co2_g": 0.1,
+          "mindfulness": 2,
+          "why": "Human perspectives from people who watched the movie. Minimal energy."
+        }
+      }
+    },
+    {
+      "id": 27,
+      "category": "environmental",
+      "age_group": "18-25",
+      "question": "You run a small shop. AI product descriptions get 15% more clicks than your templates. You have 200 products.",
+      "answers": {
+        "A": {
+          "text": "AI-generate all 200 — 15% more clicks means real income",
+          "energy_wh": 50,
+          "water_ml": 250,
+          "co2_g": 16,
+          "mindfulness": 1,
+          "why": "Like running your laptop for 2 hours. But 15% more revenue funds your livelihood."
+        },
+        "B": {
+          "text": "Templates — the click boost won't last as people spot AI text",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Zero energy. Authentic voice builds loyalty. But you're gambling against data."
+        },
+        "C": {
+          "text": "AI for top 50 products, templates for the rest",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 3,
+          "why": "Focus resources where revenue is highest. Smart prioritization."
+        }
+      }
+    },
+    {
+      "id": 28,
+      "category": "environmental",
+      "age_group": "18-25",
+      "question": "2 AM, can't sleep. You've been chatting with AI about life for 2 hours. Each message reprocesses the entire conversation.",
+      "answers": {
+        "A": {
+          "text": "It helps me process my thoughts — worth the energy",
+          "energy_wh": 30,
+          "water_ml": 150,
+          "co2_g": 10,
+          "mindfulness": 2,
+          "why": "Real benefit for wellbeing. But the energy stacks with every message."
+        },
+        "B": {
+          "text": "I should journal instead — pen and paper, zero electricity",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Evidence-based for anxiety. But at 2 AM the blank page feels harder than a chatbot."
+        },
+        "C": {
+          "text": "Set a 20-minute limit — enough to unload without a marathon",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 3,
+          "why": "Discipline meets need. Cutting off mid-thought isn't always realistic though."
+        }
+      }
+    },
+    {
+      "id": 29,
+      "category": "environmental",
+      "age_group": "26-35",
+      "question": "Startup needs branding: logo, colors, fonts. Designer quotes €3,000. AI can do it in an afternoon.",
+      "answers": {
+        "A": {
+          "text": "AI — €3,000 funds 2 months of operations instead",
+          "energy_wh": 120,
+          "water_ml": 750,
+          "co2_g": 38,
+          "mindfulness": 1,
+          "why": "Real savings, but your brand may look like every other AI startup."
+        },
+        "B": {
+          "text": "Designer — brand identity is worth investing in early",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Unique result. But €3,000 is real money for a startup."
+        },
+        "C": {
+          "text": "AI to explore 50 directions, then hire a designer to execute the best one",
+          "energy_wh": 80,
+          "water_ml": 500,
+          "co2_g": 25,
+          "mindfulness": 2,
+          "why": "Heavy exploration plus designer cost. Speeds creativity but doubles the spending."
+        }
+      }
+    },
+    {
+      "id": 30,
+      "category": "environmental",
+      "age_group": "26-35",
+      "question": "Your company sends AI-generated summary emails to 500 employees daily. Someone asks: is this necessary?",
+      "answers": {
+        "A": {
+          "text": "Yes — saves 30 min per person daily, that's 250 hours collective",
+          "energy_wh": 2500,
+          "water_ml": 12500,
+          "co2_g": 750,
+          "mindfulness": 1,
+          "why": "Energy of running 2 homes for a day. Every day. Genuine time savings though."
+        },
+        "B": {
+          "text": "Switch to weekly digests — most changes don't need daily attention",
+          "energy_wh": 360,
+          "water_ml": 1800,
+          "co2_g": 108,
+          "mindfulness": 3,
+          "why": "85% energy reduction. Forces better prioritization."
+        },
+        "C": {
+          "text": "Make it opt-in, not default",
+          "energy_wh": 500,
+          "water_ml": 2500,
+          "co2_g": 150,
+          "mindfulness": 2,
+          "why": "Probably 80% reduction. Respects choice, but people might miss important updates."
+        }
+      }
+    },
+    {
+      "id": 31,
+      "category": "environmental",
+      "age_group": "36-50",
+      "question": "You coach your kid's recreational soccer team. AI can analyze game footage for tactical insights. The kids are 10.",
+      "answers": {
+        "A": {
+          "text": "Analyze it — even kids benefit from tactics",
+          "energy_wh": 80,
+          "water_ml": 500,
+          "co2_g": 25,
+          "mindfulness": 1,
+          "why": "Video analysis is energy-heavy. Professional tools for a rec league. The kids just want fun."
+        },
+        "B": {
+          "text": "Skip it — at this age, fun matters more than tactics",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Zero energy. Let kids be kids."
+        },
+        "C": {
+          "text": "Just record highlights for parents — no AI needed",
+          "energy_wh": 0.5,
+          "water_ml": 3,
+          "co2_g": 0.1,
+          "mindfulness": 2,
+          "why": "Parents love it, kids love it, almost no energy."
+        }
+      }
+    },
+    {
+      "id": 32,
+      "category": "environmental",
+      "age_group": "36-50",
+      "question": "You spent a week using AI heavily to research solar panels for your house. The AI research itself used significant energy. Worth it?",
+      "answers": {
+        "A": {
+          "text": "Yes — 20 years of solar savings dwarfs one week of AI use",
+          "energy_wh": 40,
+          "water_ml": 200,
+          "co2_g": 13,
+          "mindfulness": 2,
+          "why": "Mathematically correct. The long-term offset is huge."
+        },
+        "B": {
+          "text": "I could've used solar companies' free calculators instead",
+          "energy_wh": 2,
+          "water_ml": 10,
+          "co2_g": 0.5,
+          "mindfulness": 3,
+          "why": "Existing tools built for this purpose. Less customized but way less energy."
+        },
+        "C": {
+          "text": "Any AI use for green decisions justifies itself",
+          "energy_wh": 40,
+          "water_ml": 200,
+          "co2_g": 13,
+          "mindfulness": 1,
+          "why": "Sounds right but could justify unlimited AI for any 'green' purpose."
+        }
+      }
+    },
+    {
+      "id": 33,
+      "category": "environmental",
+      "age_group": "51-65",
+      "question": "You're retired and blog about gardening. AI writes faster, but writing is your hobby.",
+      "answers": {
+        "A": {
+          "text": "Write it myself — retirement is for doing things I enjoy",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "The process IS the reward. Your authentic voice is what readers connect with."
+        },
+        "B": {
+          "text": "AI for SEO and formatting, I write the actual content",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 2,
+          "why": "Light AI for the boring parts. Your voice stays, posts get found."
+        },
+        "C": {
+          "text": "AI drafts posts when I'm tired — keeps the blog active",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 1,
+          "why": "Your readers subscribed for YOUR perspective, not AI's."
+        }
+      }
+    },
+    {
+      "id": 34,
+      "category": "environmental",
+      "age_group": "51-65",
+      "question": "Energy company offers AI smart-home optimization: 15% savings on bills. But the AI runs on cloud servers 24/7.",
+      "answers": {
+        "A": {
+          "text": "Sign up — 15% home savings far exceeds the cloud cost",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 2,
+          "why": "Net positive for the planet. But dependent on their servers and data collection."
+        },
+        "B": {
+          "text": "Program a thermostat schedule myself — gets 10% without cloud",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Nearly as effective, zero data concerns. Adjust it seasonally yourself."
+        },
+        "C": {
+          "text": "Better insulation and efficient appliances matter more than software",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Hardware fixes are permanent. But they require upfront investment."
+        }
+      }
+    },
+    {
+      "id": 35,
+      "category": "environmental",
+      "age_group": "66+",
+      "question": "Grandkids want AI face filters on your weekly video call. It makes them laugh. It also uses a lot of processing power.",
+      "answers": {
+        "A": {
+          "text": "Sure — making my grandkids laugh is worth it once a week",
+          "energy_wh": 25,
+          "water_ml": 125,
+          "co2_g": 8,
+          "mindfulness": 2,
+          "why": "Video processing is heavy. But connection with grandkids is priceless and weekly is bounded."
+        },
+        "B": {
+          "text": "Simple built-in filters — almost as fun, way less energy",
+          "energy_wh": 2,
+          "water_ml": 10,
+          "co2_g": 0.5,
+          "mindfulness": 3,
+          "why": "Kids might not notice the difference. The fun is being together."
+        },
+        "C": {
+          "text": "No filters — seeing real faces is what matters",
+          "energy_wh": 0.5,
+          "water_ml": 3,
+          "co2_g": 0.1,
+          "mindfulness": 1,
+          "why": "Genuine. But kids might find plain calls less exciting over time."
+        }
+      }
+    },
+    {
+      "id": 36,
+      "category": "environmental",
+      "age_group": "66+",
+      "question": "Library replaced the storytelling librarian with AI-generated personalized stories due to budget cuts. AI or nothing.",
+      "answers": {
+        "A": {
+          "text": "AI story time — better than no story time at all",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 2,
+          "why": "Keeps kids coming to the library. But replaces a community role with a machine."
+        },
+        "B": {
+          "text": "Organize volunteers to tell stories instead",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Builds community. Beautiful but volunteer programs are hard to sustain."
+        },
+        "C": {
+          "text": "Fundraise to keep the librarian — some things shouldn't be automated",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Preserves the human role. May not succeed, leaving kids with nothing."
+        }
+      }
+    },
+    {
+      "id": 37,
+      "category": "critical_thinking",
+      "age_group": "under_18",
+      "question": "AI helped you prep debate arguments on climate change. Opponent asks: 'Where'd you get that?' You say 'I researched it.' True?",
+      "answers": {
+        "A": {
+          "text": "Yes — AI summarized research, that counts as researching",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Technically defensible. But you can't defend the arguments under pressure."
+        },
+        "B": {
+          "text": "No — I should say AI helped, even if it feels embarrassing",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Honest. Might weaken your position if others view AI as less credible."
+        },
+        "C": {
+          "text": "Doesn't matter — what matters is whether the arguments are correct",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Logical. But 'correct' is exactly what you can't verify without the original sources."
+        }
+      }
+    },
+    {
+      "id": 38,
+      "category": "critical_thinking",
+      "age_group": "under_18",
+      "question": "AI wrote you an A+ essay. But in class discussion about the same book, you can't contribute. What's the lesson?",
+      "answers": {
+        "A": {
+          "text": "Use AI to understand the book first, then write myself",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 3,
+          "why": "AI as learning aid. Uses some energy but builds real understanding."
+        },
+        "B": {
+          "text": "The grade matters for my future — I'll catch up later",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "This pattern creates a growing gap between grades and actual knowledge."
+        },
+        "C": {
+          "text": "The grading system isn't designed for AI yet — it's a system problem",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Valid critique. But doesn't solve YOUR learning gap right now."
+        }
+      }
+    },
+    {
+      "id": 39,
+      "category": "critical_thinking",
+      "age_group": "18-25",
+      "question": "Your university allows AI with disclosure. Nobody actually discloses. You used AI for your thesis. Do you disclose?",
+      "answers": {
+        "A": {
+          "text": "Yes — I'd rather be honest whatever the judgment",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Integrity. But being the only one who discloses feels like self-sabotage."
+        },
+        "B": {
+          "text": "No — I shouldn't disadvantage myself when nobody else does",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Game theory logic. Individually rational, collectively degrades everyone's degree."
+        },
+        "C": {
+          "text": "Raise it anonymously with the department — the policy needs enforcement",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Systemic fix. Most responsible, but institutional change is slow."
+        }
+      }
+    },
+    {
+      "id": 40,
+      "category": "critical_thinking",
+      "age_group": "18-25",
+      "question": "You fact-check AI with Google. Top 5 results agree with it. But all 5 might be AI-generated content themselves.",
+      "answers": {
+        "A": {
+          "text": "5 sources agree — probably correct regardless of who wrote them",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "AI-generated pages can all trace to the same flawed training data."
+        },
+        "B": {
+          "text": "Find a pre-AI source: textbook, government database, peer-reviewed paper",
+          "energy_wh": 0.5,
+          "water_ml": 3,
+          "co2_g": 0.1,
+          "mindfulness": 3,
+          "why": "Harder to find but much more reliable."
+        },
+        "C": {
+          "text": "Ask an expert in person — the internet is becoming unreliable",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Gold standard, but access to experts is a privilege."
+        }
+      }
+    },
+    {
+      "id": 41,
+      "category": "critical_thinking",
+      "age_group": "26-35",
+      "question": "AI flags a job candidate as 'high risk' with no explanation. Their CV and interview were both excellent. What do you do?",
+      "answers": {
+        "A": {
+          "text": "Override it and hire them — interview matters more",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Trusts human judgment. But if something goes wrong, you're accountable."
+        },
+        "B": {
+          "text": "Investigate what the flag means before deciding",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 3,
+          "why": "Due diligence. But now you're deep in an AI rabbit hole for a human decision."
+        },
+        "C": {
+          "text": "Move to the next candidate — plenty of applicants, why risk it",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "You just let an opaque algorithm decide someone's career."
+        }
+      }
+    },
+    {
+      "id": 42,
+      "category": "critical_thinking",
+      "age_group": "26-35",
+      "question": "Company AI scores your emails for 'professionalism.' Your real writing style scores low. AI-rewritten emails score high. Manager notices.",
+      "answers": {
+        "A": {
+          "text": "Let AI rewrite my emails — the metric is what counts",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 1,
+          "why": "You survive the system, but your real voice disappears from work."
+        },
+        "B": {
+          "text": "Push back — grading humans by AI preference is backwards",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Might change culture. Or might get you labeled as not a team player."
+        },
+        "C": {
+          "text": "AI for external emails, own style for internal — pick battles",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 2,
+          "why": "Pragmatic. But you're still letting AI define 'professional.'"
+        }
+      }
+    },
+    {
+      "id": 43,
+      "category": "critical_thinking",
+      "age_group": "36-50",
+      "question": "AI suggests a medical treatment your doctor hasn't heard of, with studies to back it up. Who do you trust?",
+      "answers": {
+        "A": {
+          "text": "My doctor — AI sometimes fabricates studies",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Trusts expertise. But doctors don't know everything and medicine evolves."
+        },
+        "B": {
+          "text": "Verify if those studies actually exist, bring real ones to my doctor",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 3,
+          "why": "Most thorough. Requires medical literacy to evaluate what you find."
+        },
+        "C": {
+          "text": "Get a second opinion from another human doctor",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Expert vs expert. Best of both, but takes weeks and may cost money."
+        }
+      }
+    },
+    {
+      "id": 44,
+      "category": "critical_thinking",
+      "age_group": "36-50",
+      "question": "Your teen shows you an AI deepfake of a politician saying something outrageous. Millions of views. They ask if it's real.",
+      "answers": {
+        "A": {
+          "text": "Walk through how to check: find the original source, look for news coverage",
+          "energy_wh": 1,
+          "water_ml": 5,
+          "co2_g": 0.3,
+          "mindfulness": 3,
+          "why": "Teaches verification skills for life. Takes time though."
+        },
+        "B": {
+          "text": "Use an AI deepfake detector — fight fire with fire",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 2,
+          "why": "Detection tools are in an arms race with generation tools."
+        },
+        "C": {
+          "text": "Tell them it's definitely fake — be skeptical of everything online",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "'Assume everything is fake' leads to dismissing real things too."
+        }
+      }
+    },
+    {
+      "id": 45,
+      "category": "critical_thinking",
+      "age_group": "51-65",
+      "question": "You're on a jury. Defense presents AI analysis contradicting the prosecution's expert witness. Should AI evidence carry equal weight?",
+      "answers": {
+        "A": {
+          "text": "Consider it, but not equally — AI can't be cross-examined",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Balanced view. Though an imperfect human might be less accurate than good AI."
+        },
+        "B": {
+          "text": "Judge the analysis quality, not who produced it",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Rational. But most jurors can't evaluate AI analysis quality."
+        },
+        "C": {
+          "text": "AI shouldn't be admitted — justice is a human institution",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Principled, but DNA analysis was once considered too impersonal for courts too."
+        }
+      }
+    },
+    {
+      "id": 46,
+      "category": "critical_thinking",
+      "age_group": "51-65",
+      "question": "AI manages your investments — 4% better returns than your old advisor. Last month it made a move you can't understand.",
+      "answers": {
+        "A": {
+          "text": "Stay — 4% matters more than understanding every move",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 1,
+          "why": "You're trusting your retirement to decisions you can't evaluate."
+        },
+        "B": {
+          "text": "Switch back to a human — I need to understand my money",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Understanding brings peace of mind, even at 4% lower returns."
+        },
+        "C": {
+          "text": "Keep AI but set hard limits that need my manual approval",
+          "energy_wh": 4,
+          "water_ml": 20,
+          "co2_g": 1.2,
+          "mindfulness": 3,
+          "why": "Guardrails. Control over the big moves, AI handles the rest."
+        }
+      }
+    },
+    {
+      "id": 47,
+      "category": "critical_thinking",
+      "age_group": "66+",
+      "question": "AI translates your letters to English for your grandchild's friends. But it modernizes your expressions, losing cultural nuance.",
+      "answers": {
+        "A": {
+          "text": "Ask my grandchild to translate instead — they'll learn my language",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Preserves culture. But they might not be fluent enough."
+        },
+        "B": {
+          "text": "AI translates, we review and fix cultural parts together",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 3,
+          "why": "Teaching moment about what AI misses. Takes time though."
+        },
+        "C": {
+          "text": "Accept it — the core message gets through, that's enough",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 1,
+          "why": "Pragmatic. But each simplified translation erodes cultural connection."
+        }
+      }
+    },
+    {
+      "id": 48,
+      "category": "critical_thinking",
+      "age_group": "66+",
+      "question": "You've played chess your whole life. Your grandson says learning chess is pointless because AI already 'solved it.'",
+      "answers": {
+        "A": {
+          "text": "Chess is about thinking and joy between people, not beating machines",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Defends human pursuits regardless of AI capability."
+        },
+        "B": {
+          "text": "AI engines actually make learning chess better — they show brilliant moves",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 2,
+          "why": "AI as teacher, not replacement. Dependency question remains."
+        },
+        "C": {
+          "text": "He has a point — maybe learn something AI can't do yet",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Strategic thinking. But what AI 'can't do' keeps shrinking."
+        }
+      }
+    },
+    {
+      "id": 49,
+      "category": "social_ethics",
+      "age_group": "under_18",
+      "question": "School bans AI for assignments. But you have dyslexia and AI is the only tool that helps you organize your thoughts.",
+      "answers": {
+        "A": {
+          "text": "Talk to school about an exception — blanket bans ignore accessibility",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Advocates for fair rules. But the process is slow and you have homework due now."
+        },
+        "B": {
+          "text": "Use AI anyway — it's accessibility for me, not cheating",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 2,
+          "why": "Valid reasoning. But breaking rules secretly sets a difficult precedent."
+        },
+        "C": {
+          "text": "Follow the rules and struggle — not worth the risk",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Avoids conflict. But you're accepting an unfair disadvantage."
+        }
+      }
+    },
+    {
+      "id": 50,
+      "category": "social_ethics",
+      "age_group": "under_18",
+      "question": "Friend makes a realistic AI fake of a teacher in a funny situation. Group chat thinks it's hilarious. They want to post it.",
+      "answers": {
+        "A": {
+          "text": "Laugh privately but tell my friend not to post it",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Protects the teacher. But group pressure is still there."
+        },
+        "B": {
+          "text": "Say in the group chat it's funny but wrong to post",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Braver stance. But being the 'buzzkill' has real social cost at your age."
+        },
+        "C": {
+          "text": "Stay quiet — it's not my creation, not my responsibility",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Avoids confrontation. But silence is what lets these things escalate."
+        }
+      }
+    },
+    {
+      "id": 51,
+      "category": "social_ethics",
+      "age_group": "18-25",
+      "question": "You're a teaching assistant. Half the class is using AI for assignments. Reporting them could hurt friends' scholarships.",
+      "answers": {
+        "A": {
+          "text": "Tell the professor — academic integrity matters",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Upholds the system. Your friendships in the program may not survive."
+        },
+        "B": {
+          "text": "Suggest the professor redesign assignments to be AI-proof",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Systemic solution. Existing cheating goes unaddressed though."
+        },
+        "C": {
+          "text": "Look the other way — everyone does it, the system hasn't adapted",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Self-preservation. But you accepted a role that includes this responsibility."
+        }
+      }
+    },
+    {
+      "id": 52,
+      "category": "social_ethics",
+      "age_group": "18-25",
+      "question": "AI can generate a fake professional portfolio — case studies, testimonials, results you never achieved. Looks identical to real work.",
+      "answers": {
+        "A": {
+          "text": "Use it — the job market is brutal, I'll learn once hired",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 1,
+          "why": "When real skills don't match the portfolio, the fallout is career-ending."
+        },
+        "B": {
+          "text": "Never — this is fraud that devalues real portfolios",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Moral clarity. But you're competing against people who might be doing this."
+        },
+        "C": {
+          "text": "Use AI to polish my REAL work — enhance presentation, not content",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 3,
+          "why": "Ethical line maintained. Levels the playing field without lying."
+        }
+      }
+    },
+    {
+      "id": 53,
+      "category": "social_ethics",
+      "age_group": "26-35",
+      "question": "Your company's AI customer service gives worse answers to people with non-standard English. Fixing it costs €50K. Boss says overall metrics are great.",
+      "answers": {
+        "A": {
+          "text": "Escalate it — 'overall' metrics hide real discrimination",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Right thing to do. Puts you against your boss and the budget."
+        },
+        "B": {
+          "text": "Document it and propose a phased fix with a business case",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 2,
+          "why": "Strategic. Might get funded. Affected customers wait during the 'phases.'"
+        },
+        "C": {
+          "text": "We serve thousands — a few edge cases don't justify €50K",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "'Edge cases' are real people getting worse service because of how they speak."
+        }
+      }
+    },
+    {
+      "id": 54,
+      "category": "social_ethics",
+      "age_group": "26-35",
+      "question": "Journalist friend wants help using AI to write more articles daily. Used to do deep investigations. Newsroom now rewards quantity.",
+      "answers": {
+        "A": {
+          "text": "Help them — the industry changed, adapt or lose the job",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 1,
+          "why": "Keeps them employed. Contributes to journalism's decline though."
+        },
+        "B": {
+          "text": "AI for routine pieces, save energy for one deep investigation monthly",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 3,
+          "why": "Best of both. Newsroom incentives still reward the quantity metrics though."
+        },
+        "C": {
+          "text": "Their investigative skills are what makes them irreplaceable",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Principled. Doesn't pay rent if the newsroom penalizes lower output."
+        }
+      }
+    },
+    {
+      "id": 55,
+      "category": "social_ethics",
+      "age_group": "36-50",
+      "question": "Neighborhood AI cameras flag 'suspicious activity.' Caught 3 real thefts, but disproportionately flags delivery workers of certain backgrounds.",
+      "answers": {
+        "A": {
+          "text": "Raise it at the neighborhood meeting — biased surveillance is harmful",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Confronts the problem. Neighbors who feel safer might see you as the troublemaker."
+        },
+        "B": {
+          "text": "Report the bias to the app company and ask for updates",
+          "energy_wh": 2,
+          "water_ml": 10,
+          "co2_g": 0.5,
+          "mindfulness": 2,
+          "why": "Works within the system. Tech companies rarely prioritize individual bias reports."
+        },
+        "C": {
+          "text": "Keep using it — 3 real thefts stopped, false positives are just notifications",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 1,
+          "why": "The false positives you 'ignore' shape how neighbors view the flagged people."
+        }
+      }
+    },
+    {
+      "id": 56,
+      "category": "social_ethics",
+      "age_group": "36-50",
+      "question": "AI replaced 40 colleagues. Now they want YOU to train the AI system that replaced them, using your knowledge.",
+      "answers": {
+        "A": {
+          "text": "Do it — those jobs aren't coming back, refusing just delays things",
+          "energy_wh": 20,
+          "water_ml": 100,
+          "co2_g": 7,
+          "mindfulness": 1,
+          "why": "You're personally building the tool that took your colleagues' livelihoods."
+        },
+        "B": {
+          "text": "Refuse — I won't help replace people I worked alongside",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Moral stand. Might cost you your own position."
+        },
+        "C": {
+          "text": "Agree only if the company funds retraining for displaced workers",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 3,
+          "why": "Uses your leverage for good. Company may agree on paper and underdeliver."
+        }
+      }
+    },
+    {
+      "id": 57,
+      "category": "social_ethics",
+      "age_group": "51-65",
+      "question": "Government wants AI to allocate social services (housing, food programs). More 'fair' than caseworkers, they say. But data reflects past inequities.",
+      "answers": {
+        "A": {
+          "text": "Support it — removes human bias and favoritism",
+          "energy_wh": 10,
+          "water_ml": 50,
+          "co2_g": 3,
+          "mindfulness": 1,
+          "why": "Data reflects historical inequity, not future needs."
+        },
+        "B": {
+          "text": "Oppose — social services need understanding, not data points",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Defends dignity. Human caseworkers have their own biases though."
+        },
+        "C": {
+          "text": "AI flags who needs help, human makes the final call",
+          "energy_wh": 5,
+          "water_ml": 25,
+          "co2_g": 1.5,
+          "mindfulness": 3,
+          "why": "Hybrid. In practice the human often rubber-stamps the AI recommendation."
+        }
+      }
+    },
+    {
+      "id": 58,
+      "category": "social_ethics",
+      "age_group": "51-65",
+      "question": "Church newsletter was always written by volunteers. New chair wants AI because it's 'more professional.' Volunteers feel pushed out.",
+      "answers": {
+        "A": {
+          "text": "Keep the volunteers — personal voices are the whole point",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Preserves community. Writing quality might not attract new members."
+        },
+        "B": {
+          "text": "Volunteers write personal pieces, AI handles announcements",
+          "energy_wh": 3,
+          "water_ml": 15,
+          "co2_g": 1,
+          "mindfulness": 2,
+          "why": "Keeps both community voice and a polished look."
+        },
+        "C": {
+          "text": "The chair's right — looking modern helps us grow",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 1,
+          "why": "Trading authentic voices for polish may attract the wrong audience."
+        }
+      }
+    },
+    {
+      "id": 59,
+      "category": "social_ethics",
+      "age_group": "66+",
+      "question": "Retirement home gets an AI companion robot for residents who never have visitors. Some are forming real emotional bonds with it.",
+      "answers": {
+        "A": {
+          "text": "Better than nothing — loneliness is a health crisis",
+          "energy_wh": 15,
+          "water_ml": 75,
+          "co2_g": 5,
+          "mindfulness": 2,
+          "why": "Real suffering addressed. But normalizes isolation as solvable by machine."
+        },
+        "B": {
+          "text": "Build a volunteer visitor program — real connection can't be replaced",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Ideal. But volunteer programs are unreliable and hard to sustain."
+        },
+        "C": {
+          "text": "Robot daily, volunteer visits weekly — both, not either-or",
+          "energy_wh": 8,
+          "water_ml": 40,
+          "co2_g": 2.5,
+          "mindfulness": 3,
+          "why": "Pragmatic layering. Limited budgets usually mean the robot replaces the program."
+        }
+      }
+    },
+    {
+      "id": 60,
+      "category": "social_ethics",
+      "age_group": "66+",
+      "question": "AI pension system made an error giving you MORE money. Nobody noticed. Correcting it reduces your income. What do you do?",
+      "answers": {
+        "A": {
+          "text": "Report it — that money affects others who need it",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 3,
+          "why": "Integrity. Costs you personally."
+        },
+        "B": {
+          "text": "Keep quiet — AI errors are the system's problem",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 1,
+          "why": "Self-interest. If it affects a shared pool, others receive less."
+        },
+        "C": {
+          "text": "Hint at it: 'What if the AI miscalculated?' — let them catch it",
+          "energy_wh": 0,
+          "water_ml": 0,
+          "co2_g": 0,
+          "mindfulness": 2,
+          "why": "Points toward truth without directly sacrificing your income."
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "total_questions": 60,
+    "questions_per_game": 5,
+    "age_groups": ["under_18", "18-25", "26-35", "36-50", "51-65", "66+"],
+    "categories": {
+      "everyday_use": "How you interact with AI tools day-to-day",
+      "privacy": "How you protect personal data when using AI",
+      "environmental": "Understanding the real-world resource cost of AI",
+      "critical_thinking": "Evaluating AI outputs and knowing its limitations",
+      "social_ethics": "AI's impact on relationships, fairness, and society"
+    },
+    "resource_bars": {
+      "energy": {
+        "unit": "Wh",
+        "icon": "⚡",
+        "reference_comparisons": [
+          { "value": 5, "comparison": "charging your phone" },
+          { "value": 15, "comparison": "3 phone charges" },
+          { "value": 30, "comparison": "1 hour of laptop use" },
+          { "value": 100, "comparison": "1 hour of TV" },
+          { "value": 1000, "comparison": "running a fridge all day" }
+        ]
+      },
+      "water": {
+        "unit": "ml",
+        "icon": "💧",
+        "reference_comparisons": [
+          { "value": 10, "comparison": "a small sip" },
+          { "value": 250, "comparison": "a glass of water" },
+          { "value": 500, "comparison": "a water bottle" },
+          { "value": 1500, "comparison": "filling a kettle" }
+        ]
+      },
+      "co2": {
+        "unit": "g",
+        "icon": "☁️",
+        "reference_comparisons": [
+          { "value": 1, "comparison": "one breath" },
+          { "value": 5, "comparison": "a phone charge" },
+          { "value": 150, "comparison": "driving 1 km" },
+          { "value": 1000, "comparison": "a short flight" }
+        ]
+      }
+    },
+    "bar_mechanics": {
+      "display_thresholds": {
+        "energy": {
+          "low": { "max": 15, "color": "green", "label": "Light footprint" },
+          "moderate": { "max": 50, "color": "yellow", "label": "Notable usage" },
+          "high": { "max": 120, "color": "orange", "label": "Heavy usage" },
+          "extreme": { "above": 120, "color": "red", "label": "Very heavy usage" }
+        },
+        "water": {
+          "low": { "max": 75, "color": "green", "label": "Light footprint" },
+          "moderate": { "max": 300, "color": "yellow", "label": "Notable usage" },
+          "high": { "max": 800, "color": "orange", "label": "Heavy usage" },
+          "extreme": { "above": 800, "color": "red", "label": "Very heavy usage" }
+        },
+        "co2": {
+          "low": { "max": 5, "color": "green", "label": "Light footprint" },
+          "moderate": { "max": 20, "color": "yellow", "label": "Notable usage" },
+          "high": { "max": 60, "color": "orange", "label": "Heavy usage" },
+          "extreme": { "above": 60, "color": "red", "label": "Very heavy usage" }
+        }
+      },
+      "bar_max_values": {
+        "energy": 250,
+        "water": 1500,
+        "co2": 75
+      }
+    },
+    "personality_system": {
+      "how_it_works": "Two axes determine your personality: (1) IMPACT — total energy_wh across 5 answers. Low = under 20, Medium = 20-60, High = above 60. (2) MINDFULNESS — sum of mindfulness scores across 5 answers (range 5-15). High = 13-15, Medium = 9-12, Low = 5-8.",
+      "assignment": {
+        "low_impact + high_mindfulness": "the_zen_prompter",
+        "low_impact + low_to_medium_mindfulness": "the_abstainer",
+        "medium_impact + medium_to_high_mindfulness": "the_balanced_byte",
+        "medium_impact + low_mindfulness": "the_sleepwalker",
+        "high_impact + medium_to_high_mindfulness": "the_conscious_guzzler",
+        "high_impact + low_mindfulness": "the_turbo_tapper"
+      },
+      "thresholds": {
+        "impact": {
+          "low": { "max": 20 },
+          "medium": { "min": 20, "max": 60 },
+          "high": { "min": 60 }
+        },
+        "mindfulness": {
+          "low": { "max": 8 },
+          "medium": { "min": 9, "max": 12 },
+          "high": { "min": 13 }
+        }
+      }
+    },
+    "question_selection": {
+      "method": "Select 1 question from each category (5 total) per game, filtered by age group. Randomize order.",
+      "age_distribution": "2 questions per category per age group (10 per age group, 60 total). Pick 1 of 2 randomly."
+    }
+  }
+}

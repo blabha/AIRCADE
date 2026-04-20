@@ -1,0 +1,219 @@
+{
+  "tip_sets": [
+    {
+      "id": 1,
+      "title": "Smart Sharing Saves Energy",
+      "description": "When AI creates something you like, share it with others instead of having them generate the same thing.",
+      "impact": "Saves 100% of energy for duplicate requests",
+      "icon": "🔄"
+    },
+    {
+      "id": 2,
+      "title": "Try Text Before Pictures",
+      "description": "Ask AI to describe your idea in words first. If you like it, then make the picture. You might not even need the image!",
+      "impact": "Uses 50× less energy than going straight to images",
+      "icon": "📝"
+    },
+    {
+      "id": 3,
+      "title": "Good Enough is Great",
+      "description": "When AI gives you something that works, use it! Clicking 'try again' over and over uses a lot of extra energy for small improvements.",
+      "impact": "Each retry doubles your energy use",
+      "icon": "✓"
+    },
+    {
+      "id": 4,
+      "title": "Be Specific From the Start",
+      "description": "The clearer you are in your first request, the better AI's first answer will be. Add details like size, style, or purpose right away.",
+      "impact": "Reduces retries by 60-80%",
+      "icon": "🎯"
+    },
+    {
+      "id": 5,
+      "title": "Bundle Your Questions",
+      "description": "Got several questions? Ask them all together in one conversation instead of starting fresh each time.",
+      "impact": "Cuts 'startup' energy by 70%",
+      "icon": "📦"
+    },
+    {
+      "id": 6,
+      "title": "Reuse Yesterday's Answers",
+      "description": "If you asked AI something before, look back at that answer instead of asking again. Save your AI conversations!",
+      "impact": "Reusing costs almost zero energy",
+      "icon": "♻️"
+    },
+    {
+      "id": 7,
+      "title": "Use AI at Night",
+      "description": "When possible, use AI in the evening or on weekends. The electricity grid uses more wind and solar power during these times.",
+      "impact": "Reduces carbon by 20-50%",
+      "icon": "🌙"
+    },
+    {
+      "id": 8,
+      "title": "Check If It Already Exists",
+      "description": "Before asking AI to create something (especially images), do a quick search online. It might already exist!",
+      "impact": "Finding existing content uses 95% less energy",
+      "icon": "🔍"
+    },
+    {
+      "id": 9,
+      "title": "Start Small, Add More Later",
+      "description": "Ask for a short answer first. If you need more details, you can always ask AI to expand. Don't start with 'tell me everything!'",
+      "impact": "Short responses use 60% less energy",
+      "icon": "📏"
+    },
+    {
+      "id": 10,
+      "title": "Make One, Edit Many",
+      "description": "If you need similar things (like birthday cards for different people), create one with AI and then edit the details yourself for the others.",
+      "impact": "Saves 80% compared to generating each separately",
+      "icon": "✏️"
+    },
+    {
+      "id": 11,
+      "title": "Your Brain Can Do Simple Stuff",
+      "description": "Save AI for things that are actually hard! Simple math, spelling checks, or basic lists don't need AI - you've got this.",
+      "impact": "Reserves AI energy for tasks that truly need it",
+      "icon": "🧠"
+    },
+    {
+      "id": 12,
+      "title": "Keep Your Data Private",
+      "description": "Before sharing personal info with AI, ask yourself: does it really need to know this? Less data shared = more privacy protected.",
+      "impact": "Protects your personal information",
+      "icon": "🔒"
+    },
+    {
+      "id": 13,
+      "title": "Double-Check Important Stuff",
+      "description": "AI is smart but not perfect. For health, safety, or important decisions, always verify with real experts or trusted sources.",
+      "impact": "Prevents mistakes and keeps you safe",
+      "icon": "✔️"
+    },
+    {
+      "id": 14,
+      "title": "Learn, Don't Just Copy",
+      "description": "When AI helps with homework or learning, use it to understand the topic better - not just to copy answers. You'll remember it longer!",
+      "impact": "Real learning stays with you",
+      "icon": "📚"
+    },
+    {
+      "id": 15,
+      "title": "Give Credit Where It's Due",
+      "description": "If AI helped you create something, be honest about it! Saying 'I made this with AI' shows integrity.",
+      "impact": "Builds trust and transparency",
+      "icon": "🤝"
+    },
+    {
+      "id": 16,
+      "title": "Respect Artists' Styles",
+      "description": "When using AI to create art, avoid copying specific artists' unique styles. Instead, describe what you want in general terms.",
+      "impact": "Supports creative communities",
+      "icon": "🎨"
+    },
+    {
+      "id": 17,
+      "title": "Write Like You, Not a Robot",
+      "description": "If AI writes something for you, rewrite it in your own voice. People want to hear from you, not a computer!",
+      "impact": "Keeps your authentic voice",
+      "icon": "💬"
+    },
+    {
+      "id": 18,
+      "title": "Protect Others' Privacy Too",
+      "description": "Before sharing your contacts, photos with others in them, or any info about friends with AI - remember, that's their privacy too.",
+      "impact": "Respects friends' and family's information",
+      "icon": "👥"
+    },
+    {
+      "id": 19,
+      "title": "Think Before You Share AI Content",
+      "description": "AI can make realistic fake images and videos. Always make it clear when something is AI-generated to avoid spreading confusion.",
+      "impact": "Prevents misinformation",
+      "icon": "⚠️"
+    },
+    {
+      "id": 20,
+      "title": "Choose Your AI Tools Wisely",
+      "description": "If you use AI regularly for sensitive stuff, consider paying for a version that respects your privacy. Free isn't always best.",
+      "impact": "Better privacy protection for your data",
+      "icon": "🛡️"
+    },
+    {
+      "id": 21,
+      "title": "Help Others Learn About AI",
+      "description": "Share what you learned today! Help friends and family understand how to use AI responsibly and sustainably.",
+      "impact": "Multiplies positive impact across your community",
+      "icon": "🌟"
+    }
+  ],
+  "selection_logic": {
+    "default_tips": [1, 3, 6],
+    "by_prompt_type": {
+      "image": {
+        "high_stamina": [2, 4, 10],
+        "medium_stamina": [2, 3, 8],
+        "low_stamina": [2, 8, 11]
+      },
+      "text_short": {
+        "high_stamina": [5, 6, 9],
+        "medium_stamina": [4, 6, 11],
+        "low_stamina": [3, 6, 11]
+      },
+      "text_long": {
+        "high_stamina": [5, 9, 10],
+        "medium_stamina": [4, 9, 11],
+        "low_stamina": [3, 9, 11]
+      }
+    },
+    "by_answer_pattern": {
+      "privacy_concerns": [12, 18, 20],
+      "environmental_conscious": [7, 8, 9],
+      "creative_ethics": [15, 16, 17],
+      "critical_thinking": [13, 14, 19],
+      "social_responsibility": [15, 18, 21]
+    }
+  },
+  "tip_selection_examples": {
+    "example_1": {
+      "scenario": "User selected image prompt, stamina 45%, answered poorly on privacy questions",
+      "selected_tips": [2, 8, 12],
+      "reasoning": "Low stamina + image = prioritize alternatives (2, 8); privacy concerns = add tip 12"
+    },
+    "example_2": {
+      "scenario": "User selected text prompt, stamina 78%, strong environmental answers",
+      "selected_tips": [5, 7, 9],
+      "reasoning": "High stamina + text = optimize efficiency (5, 9); reward environmental awareness with tip 7"
+    },
+    "example_3": {
+      "scenario": "User selected text prompt, stamina 60%, poor critical thinking answers",
+      "selected_tips": [4, 13, 14],
+      "reasoning": "Medium stamina = general efficiency (4); critical thinking gaps = tips 13, 14"
+    }
+  },
+  "metadata": {
+    "total_tips": 21,
+    "tips_shown_per_game": 3,
+    "categories": {
+      "environmental": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "privacy": [12, 18, 20],
+      "learning": [13, 14],
+      "ethics": [15, 16, 17, 19],
+      "community": [21]
+    },
+    "display_format": {
+      "title": "Short, action-oriented headline",
+      "description": "1-2 sentence explanation in simple language",
+      "impact": "Concrete benefit or saving",
+      "icon": "Emoji for visual reference"
+    },
+    "tone_guidelines": [
+      "Positive and encouraging",
+      "Never blame or shame",
+      "Focus on 'you can' not 'you should'",
+      "Celebrate what they did right",
+      "Offer alternatives, not criticism"
+    ]
+  }
+}
