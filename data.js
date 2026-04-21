@@ -987,6 +987,120 @@ function refineTextType(responseText) {
   return wordCount > 200 ? 'text-long' : 'text-short';
 }
 
+// ── Score-based Persona (Scoring_Logic.md table) ──────────────────
+
+const SCORE_PERSONAS = (function () {
+  const C = _CLOUD;
+  const E = _EYES;
+  const S = _SMILE;
+  const BS = _BIGSMILE;
+
+  return {
+    'grid-goblin': {
+      title: 'GRID GOBLIN',
+      subtitle: 'Draining the planet one click at a time',
+      description: 'Maximum consumption, zero awareness. You plugged in and never looked back. Data centres are humming overtime just for you — maybe a pause button is in order?',
+      tip: 'Start small: pick one task this week where you solve it yourself before turning to AI. One conscious pause per day adds up to real change.',
+      byteSvg: _svg(C +
+        '<rect x="115" y="14" width="30" height="20" rx="3" fill="#3a0a1a" stroke="#ff006e" stroke-width="2"/>' +
+        '<rect x="123" y="8" width="5" height="8" rx="1" fill="#ff006e"/>' +
+        '<rect x="132" y="8" width="5" height="8" rx="1" fill="#ff006e"/>' +
+        '<rect x="120" y="23" width="5" height="5" rx="2" fill="#ff006e"/>' +
+        '<rect x="135" y="23" width="5" height="5" rx="2" fill="#ff006e"/>' +
+        '<rect x="54" y="44" width="14" height="8" rx="2" fill="#1a1a2e"/>' +
+        '<rect x="92" y="44" width="14" height="8" rx="2" fill="#1a1a2e"/>' +
+        '<rect x="64" y="64" width="32" height="4" rx="2" fill="#1a1a2e"/>')
+    },
+    'turbo-tapper': {
+      title: 'TURBO TAPPER',
+      subtitle: 'Fast and reckless — consequences be damned',
+      description: 'Convenience wins every time for you. You tap, you get, you forget. Quick choices leave long footprints. Just one more second of thought could change the whole game.',
+      tip: 'Before you hit generate, ask yourself one question: "Can I do even part of this myself?" That two-second pause is where better habits are built.',
+      byteSvg: _svg(C +
+        '<polygon points="126,12 117,32 126,32 112,58 132,28 121,28 134,12" fill="#ffbe0b"/>' +
+        '<polygon points="138,16 131,34 138,34 127,56 143,32 135,32 146,16" fill="#ff9900" opacity="0.75"/>' +
+        '<line x1="110" y1="22" x2="103" y2="24" stroke="#ffbe0b" stroke-width="1.5" opacity="0.5"/>' +
+        '<line x1="110" y1="29" x2="102" y2="29" stroke="#ffbe0b" stroke-width="1.5" opacity="0.5"/>' +
+        '<rect x="50" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>' +
+        '<rect x="92" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>' +
+        '<rect x="54" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>' +
+        '<rect x="96" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>' +
+        '<rect x="66" y="62" width="28" height="7" rx="3.5" fill="#1a1a2e"/>')
+    },
+    'casual-clicker': {
+      title: 'CASUAL CLICKER',
+      subtitle: 'Convenience-first with occasional good instincts',
+      description: 'Not thinking it through, but not reckless either. You have some good instincts hiding in there. A little more intention and you would be surprising yourself.',
+      tip: 'Trust your instincts more. Before your next AI prompt, spend 30 seconds attempting it yourself — you\'ll save energy and often get a more personal result.',
+      byteSvg: _svg(C + E +
+        '<path d="M 64 64 Q 80 70 96 64" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+        '<text x="118" y="50" font-size="22" fill="#ffbe0b">~</text>')
+    },
+    'eco-experimenter': {
+      title: 'ECO EXPERIMENTER',
+      subtitle: 'Starting to connect the dots',
+      description: 'You are beginning to see the link between your choices and their impact. Keep experimenting — every conscious click moves the needle in the right direction.',
+      tip: 'Keep going! Start asking "what\'s the lowest-impact way to get this result?" before every session. The habit becomes automatic faster than you think.',
+      byteSvg: _svg(C + E + S +
+        '<circle cx="130" cy="32" r="13" fill="none" stroke="#06d6a0" stroke-width="2" opacity="0.6"/>' +
+        '<line x1="130" y1="19" x2="130" y2="45" stroke="#06d6a0" stroke-width="1.5" opacity="0.5"/>' +
+        '<line x1="117" y1="32" x2="143" y2="32" stroke="#06d6a0" stroke-width="1.5" opacity="0.5"/>' +
+        '<circle cx="130" cy="26" r="3" fill="#06d6a0"/>')
+    },
+    'mindful-maker': {
+      title: 'MINDFUL MAKER',
+      subtitle: 'Thoughtful and intentional',
+      description: 'You balance usefulness with environmental care. You get things done AND think about how — a rare and valuable combination. The planet quietly appreciates you.',
+      tip: 'You\'re already doing great. Level up by tracking how often you skip AI entirely for tasks you\'d have prompted last year — that gap is your real impact.',
+      byteSvg: _svg(C + E +
+        '<path d="M 60 65 Q 80 76 100 65" stroke="#1a1a2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+        '<ellipse cx="130" cy="28" rx="10" ry="14" fill="#06d6a0" opacity="0.85" transform="rotate(-20 130 28)"/>' +
+        '<line x1="122" y1="38" x2="138" y2="18" stroke="#03a87c" stroke-width="1.5"/>' +
+        '<circle cx="130" cy="20" r="3" fill="#03a87c"/>')
+    },
+    'green-hacker': {
+      title: 'GREEN HACKER',
+      subtitle: 'Optimising the right things',
+      description: 'Deliberately sustainable — you found the cheat codes for low-impact AI use and you are running them. You earn the hacker badge for knowing how the system works AND choosing to work with it.',
+      tip: 'You\'ve found the cheat codes — now teach someone else. Sharing sustainable AI habits multiplies your impact far beyond your own sessions.',
+      byteSvg: _svg(C +
+        '<rect x="48" y="40" width="28" height="22" rx="5" fill="#06d6a0" opacity="0.9"/>' +
+        '<rect x="84" y="40" width="28" height="22" rx="5" fill="#06d6a0" opacity="0.9"/>' +
+        '<line x1="76" y1="51" x2="84" y2="51" stroke="#06d6a0" stroke-width="3"/>' +
+        '<rect x="51" y="43" width="22" height="16" rx="3" fill="#044a35"/>' +
+        '<rect x="87" y="43" width="22" height="16" rx="3" fill="#044a35"/>' +
+        '<rect x="54" y="46" width="7" height="5" rx="1" fill="white" opacity="0.25"/>' +
+        '<path d="M 56 66 Q 80 80 104 66" stroke="#1a1a2e" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+        '<text x="120" y="90" font-size="20">🌿</text>')
+    },
+    'sustainable-sage': {
+      title: 'SUSTAINABLE SAGE',
+      subtitle: 'Near-perfect alignment of impact and intent',
+      description: 'The rarest unlock. You have achieved near-perfect harmony between what you need from AI and the footprint you leave behind. You are not just a player — you are proof it is possible.',
+      tip: 'You\'ve unlocked the top tier. The next challenge: help design systems that make low-impact AI the default, not the exception. You\'re ready for that conversation.',
+      byteSvg: _svg(C +
+        '<rect x="58" y="17" width="44" height="7" rx="2" fill="#06d6a0"/>' +
+        '<polygon points="58,17 64,7 70,17" fill="#06d6a0"/>' +
+        '<polygon points="77,17 80,5 83,17" fill="#06d6a0"/>' +
+        '<polygon points="90,17 96,7 102,17" fill="#06d6a0"/>' +
+        '<circle cx="64" cy="11" r="2.5" fill="#00f5ff"/>' +
+        '<circle cx="80" cy="7" r="3" fill="#ffbe0b"/>' +
+        '<circle cx="96" cy="11" r="2.5" fill="#00f5ff"/>' +
+        _EYES + BS)
+    }
+  };
+})();
+
+function getPersonaFromScore(score) {
+  if (score <= -8)  return SCORE_PERSONAS['grid-goblin'];
+  if (score <= -2)  return SCORE_PERSONAS['turbo-tapper'];
+  if (score <= 4)   return SCORE_PERSONAS['casual-clicker'];
+  if (score <= 9)   return SCORE_PERSONAS['eco-experimenter'];
+  if (score <= 14)  return SCORE_PERSONAS['mindful-maker'];
+  if (score <= 17)  return SCORE_PERSONAS['green-hacker'];
+  return SCORE_PERSONAS['sustainable-sage'];
+}
+
 // ── Session ID generator ─────────────────────
 
 function generateSessionId() {

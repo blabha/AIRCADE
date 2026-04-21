@@ -10,16 +10,18 @@ const state = {
   taskType: 'text-short',
   metrics: null,
   sessionId: generateSessionId(),
-  // Resource accumulators (replaces stamina)
+  // Resource accumulators
   resources: { energy: 0, water: 0, co2: 0 },
-  mindfulness: 0,          // cumulative mindfulness score across 5 answers (range 5-15)
-  score: 0,                // energy-rank score: 1/3/5 per question, total range 5-25
+  mindfulness: 0,
+  score: 0,                // cumulative score from Scoring_Logic.md (-15 to +20)
+  totalScore: 0,           // alias used for icon meters
   // User info
   userName: '',
   userAge: '',
+  userExpertise: '',
   userGender: '',
   // Ethics
-  ethicsAnswers: [],       // {category, letter, color, energy_wh, water_ml, co2_g, mindfulness}
+  ethicsAnswers: [],
   currentQuestions: [],
   currentQuestionIndex: 0,
   persona: null
@@ -30,7 +32,6 @@ const screens = {
   idle:     document.getElementById('screen-idle'),
   userinfo: document.getElementById('screen-userinfo'),
   ethics:   document.getElementById('screen-ethics'),
-  impact:   document.getElementById('screen-impact'),
   greener:  document.getElementById('screen-greener'),
   print:    document.getElementById('screen-print')
 };
@@ -43,8 +44,58 @@ const errorMsg            = document.getElementById('error-msg');
 // Resource bar elements
 const resourceBarsEl = document.getElementById('resource-bars');
 
-// Screens that show the resource bars
-const RESOURCE_SCREENS = new Set(['userinfo', 'ethics', 'impact', 'greener', 'print']);
+// Stamina bars are visible ONLY during the 5 ethics questions
+const RESOURCE_SCREENS = new Set(['ethics']);
+
+// ── Personalized greener tips (see Personalized_Tips.md) ──────
+const GREENER_TIPS = {
+  H: (scenario) => `For <strong>${scenario}</strong>: you picked the highest-impact option. Next time, try doing one step yourself before turning to AI — you'll save energy and often get a better result.`,
+  B: (scenario) => `For <strong>${scenario}</strong>: nice balance! Challenge yourself to take one more step fully offline next time. You might be surprised what you can manage without AI.`,
+  L: (scenario) => `For <strong>${scenario}</strong>: excellent low-impact choice! Share this habit — helping others see the footprint of their prompts multiplies your impact.`
+};
+
+function getPersonalizedGreenerTip() {
+  const answers = state.ethicsAnswers;
+  if (!answers || !answers.length) return null;
+  const worst = answers.find(a => a.type === 'H') || answers[answers.length - 1];
+  return worst;
+}
+
+// ── Per-question consumption comparisons ──────
+function getQComparison(key, value) {
+  if (key === 'water') {
+    if (value <= 25)  return '— a small sip of water';
+    if (value <= 200) return '— about half a glass of water';
+    return '— like a drinking bottle';
+  }
+  if (key === 'energy') {
+    if (value <= 3)  return '— charging your phone for 5 min';
+    if (value <= 20) return '— like 3 phone charges';
+    return '— running a laptop for an hour';
+  }
+  if (key === 'co2') {
+    if (value <= 2)  return '— a single breath';
+    if (value <= 8)  return '— like charging your phone';
+    return '— driving about 100 meters';
+  }
+  return '';
+}
+
+// ── Hide / show game chrome ────────────────────
+function hideGameChrome() {
+  const barsEl = document.getElementById('resource-bars');
+  const pathEl = document.getElementById('snake-path');
+  if (barsEl) barsEl.classList.add('game-chrome-hidden');
+  if (pathEl) pathEl.classList.add('game-chrome-hidden');
+  document.body.classList.remove('stamina-visible');
+}
+
+function showGameChrome() {
+  const barsEl = document.getElementById('resource-bars');
+  const pathEl = document.getElementById('snake-path');
+  if (barsEl) barsEl.classList.remove('game-chrome-hidden');
+  if (pathEl) pathEl.classList.remove('game-chrome-hidden');
+}
 
 // ── Resource Bar Management ───────────────────
 function updateResourceBars(resources) {
@@ -69,8 +120,20 @@ function updateResourceBars(resources) {
 
     fill.style.width = pct + '%';
     valEl.textContent = (Number.isInteger(val) ? val : +val.toFixed(1)) + ' ' + unit;
-    fill.className = 'resource-fill res-' + color;
+    fill.className = 'resource-fill res-' + color + ' bar-updated';
+    setTimeout(() => fill.classList.remove('bar-updated'), 500);
     if (lblEl) lblEl.textContent = label;
+
+    // Update dynamic icon based on totalScore
+    const iconEl = document.getElementById('res-icon-' + key);
+    if (iconEl) {
+      const step = getIconStep(key, state.totalScore);
+      if (iconEl.textContent !== step.icon) {
+        iconEl.textContent = step.icon;
+        iconEl.style.transform = 'scale(1.3)';
+        setTimeout(() => { iconEl.style.transform = ''; }, 300);
+      }
+    }
   });
 }
 
@@ -142,9 +205,20 @@ const PROMPTS = [
 ];
 
 document.getElementById('btn-userinfo-continue').addEventListener('click', () => {
-  state.userName   = document.getElementById('user-name').value.trim() || 'Player';
-  state.userAge    = document.getElementById('user-age').value || '';
-  state.userGender = document.getElementById('user-gender').value || '';
+  const age       = document.getElementById('user-age').value || '';
+  const expertise = document.getElementById('user-expertise').value || '';
+  const errEl     = document.getElementById('userinfo-error');
+
+  if (!age || !expertise) {
+    errEl.classList.remove('hidden');
+    return;
+  }
+  errEl.classList.add('hidden');
+
+  state.userName      = document.getElementById('user-name').value.trim() || 'Player';
+  state.userAge       = age;
+  state.userExpertise = expertise;
+  state.userGender    = '';
 
   const pick = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
   state.prompt   = pick.prompt;
@@ -161,10 +235,18 @@ function startEthicsQuestions() {
   state.resources            = { energy: 0, water: 0, co2: 0 };
   state.mindfulness          = 0;
   state.score                = 0;
-  state.currentQuestions     = selectQuestions(state.userAge);
+  state.totalScore           = 0;
+  state.currentQuestions     = selectQuestionsFromBank(state.userAge, state.userExpertise);
   state.currentQuestionIndex = 0;
 
   updateResourceBars(state.resources);
+  updateSnakePath(0);
+
+  // Reset resource bar icons to best state
+  ['energy', 'water', 'co2'].forEach(cat => {
+    const iconEl = document.getElementById('res-icon-' + cat);
+    if (iconEl) iconEl.textContent = getIconStep(cat, 0).icon;
+  });
 
   document.getElementById('ethics-summary').classList.add('hidden');
   document.getElementById('question-card').classList.remove('hidden');
@@ -193,33 +275,26 @@ function renderQuestion() {
   document.getElementById('ethics-progress-text').textContent =
     `Question ${idx + 1} of ${TOTAL_QUESTIONS}`;
 
-  // Question text — always use the DB field directly
   document.getElementById('question-text').textContent = q.question;
 
-  // Build answers from A/B/C keys; A=green, B=yellow, C=red
-  const colorMap = { A: 'green', B: 'yellow', C: 'red' };
+  // Map type to display color
+  const typeColorMap = { H: 'red', B: 'yellow', L: 'green' };
 
   const answers = ['A', 'B', 'C'].map(letter => ({
     letter,
-    text:        q[letter].text,
-    energy_wh:   q[letter].energy_wh,
-    water_ml:    q[letter].water_ml,
-    co2_g:       q[letter].co2_g,
-    mindfulness: q[letter].mindfulness,
-    why:         q[letter].why,
-    color:       colorMap[letter]
+    text:      q[letter].text,
+    energy_wh: q[letter].energy_wh,
+    water_ml:  q[letter].water_ml,
+    co2_g:     q[letter].co2_g,
+    score:     q[letter].score,
+    type:      q[letter].type,
+    color:     typeColorMap[q[letter].type],
+    why:       q[letter].why || ''
   }));
 
-  // Assign energy-rank score: lowest energy_wh = 1 pt, middle = 3 pts, highest = 5 pts
-  const byEnergy = [...answers].sort((a, b) => a.energy_wh - b.energy_wh);
-  byEnergy[0].score = 1;
-  byEnergy[1].score = 3;
-  byEnergy[2].score = 5;
-
-  // Shuffle order so position doesn't hint at best answer
+  // Shuffle order
   answers.sort(() => Math.random() - 0.5);
 
-  // Reset why-card for the new question
   const whyCard = document.getElementById('why-card');
   whyCard.className = 'why-card hidden';
   document.getElementById('why-text').textContent = '';
@@ -231,12 +306,14 @@ function renderQuestion() {
   answers.forEach((answer, ai) => {
     const btn = document.createElement('button');
     btn.className = 'answer-btn';
-
     btn.innerHTML = `
       <span class="answer-letter">${dispLetters[ai]})</span>
       <span class="answer-text">${answer.text}</span>
     `;
-    btn.addEventListener('click', () => handleAnswer(answer, q.category, btn));
+    btn.addEventListener('click', function () {
+      playSound('click');
+      handleAnswer(answer, q.scenario || '', btn);
+    });
     answersEl.appendChild(btn);
   });
 
@@ -244,6 +321,11 @@ function renderQuestion() {
 }
 
 function handleAnswer(answer, category, clickedBtn) {
+  // Sound feedback based on answer quality
+  if (answer.color === 'green') playSound('goodChoice');
+  else if (answer.color === 'red') playSound('damage');
+  else playSound('click');
+
   // Accumulate resources
   const r = state.resources;
   const newResources = {
@@ -253,80 +335,241 @@ function handleAnswer(answer, category, clickedBtn) {
   };
   updateResourceBars(newResources);
 
-  // Accumulate mindfulness and score
-  state.mindfulness += (answer.mindfulness || 1);
-  state.score       += (answer.score       || 3);
+  // Accumulate score using Scoring_Logic.md formula
+  state.score      += answer.score;
+  state.totalScore  = state.score;
+  state.mindfulness += (answer.score > 1 ? 2 : answer.score > -1 ? 1 : 0);
 
   // Record answer
   state.ethicsAnswers.push({
     category,
-    letter:      answer.letter,
-    color:       answer.color,
-    energy_wh:   answer.energy_wh,
-    water_ml:    answer.water_ml,
-    co2_g:       answer.co2_g,
-    mindfulness: answer.mindfulness
+    letter:    answer.letter,
+    color:     answer.color,
+    type:      answer.type,
+    energy_wh: answer.energy_wh,
+    water_ml:  answer.water_ml,
+    co2_g:     answer.co2_g,
+    score:     answer.score
   });
 
-  // Disable all buttons, highlight selected — button content stays unchanged
+  // Disable all buttons, highlight selected
   const allBtns = document.querySelectorAll('.answer-btn');
   allBtns.forEach(b => b.disabled = true);
   clickedBtn.classList.add(`selected-${answer.color}`);
 
-  // Show "why" in the separate card below the options
+  // Show why card if available
   const whyCard = document.getElementById('why-card');
-  document.getElementById('why-text').textContent = answer.why;
-  whyCard.className = `why-card why-border-${answer.color}`;
+  if (answer.why) {
+    document.getElementById('why-text').textContent = answer.why;
+    whyCard.className = `why-card why-border-${answer.color}`;
+  } else {
+    whyCard.className = 'why-card hidden';
+  }
 
-  // Show Next button — player controls when to advance
+  // Show per-question consumption feedback with real-world comparisons
+  const feedbackEl = document.getElementById('answer-feedback');
+  if (feedbackEl) {
+    document.getElementById('fb-water').textContent      = answer.water_ml  + ' ml';
+    document.getElementById('fb-water-cmp').textContent  = getQComparison('water',  answer.water_ml);
+    document.getElementById('fb-energy').textContent     = answer.energy_wh + ' Wh';
+    document.getElementById('fb-energy-cmp').textContent = getQComparison('energy', answer.energy_wh);
+    document.getElementById('fb-co2').textContent        = answer.co2_g     + ' g';
+    document.getElementById('fb-co2-cmp').textContent    = getQComparison('co2',    answer.co2_g);
+    feedbackEl.classList.remove('hidden');
+  }
+
   document.getElementById('btn-next-question').classList.remove('hidden');
+}
+
+// ── Snake & Ladders Path ─────────────────────
+function updateSnakePath(position, animate) {
+  const avatar = document.getElementById('snake-avatar');
+  if (!avatar) return;
+
+  // Record screen position BEFORE DOM change (for FLIP animation)
+  let oldRect = null;
+  if (animate) {
+    oldRect = avatar.getBoundingClientRect();
+    avatar.style.transition = 'none';
+  }
+
+  // Remove avatar from all nodes, reset classes
+  document.querySelectorAll('.snake-node').forEach(n => {
+    const existing = n.querySelector('.snake-avatar');
+    if (existing) n.removeChild(existing);
+    n.classList.remove('snake-node-active', 'snake-node-done');
+  });
+
+  // Update connector "done" highlight
+  document.querySelectorAll('.snake-connector').forEach(function (c, i) {
+    if (i < position) c.classList.add('done');
+    else c.classList.remove('done');
+  });
+
+  // Mark visited nodes
+  for (let i = 0; i <= Math.min(position, 5); i++) {
+    const node = document.getElementById(`snake-node-${i}`);
+    if (!node) continue;
+    if (i < position) node.classList.add('snake-node-done');
+    if (i === position) node.classList.add('snake-node-active');
+  }
+
+  // Place avatar in target node (centered via CSS)
+  const targetNode = document.getElementById(`snake-node-${Math.min(position, 5)}`);
+  if (!targetNode) return;
+  avatar.style.transform = 'translate(-50%, -50%)';
+  targetNode.appendChild(avatar);
+
+  // FLIP: animate from old screen position to new
+  if (animate && oldRect) {
+    const newRect = avatar.getBoundingClientRect();
+    const dx = oldRect.left - newRect.left;
+    const dy = oldRect.top  - newRect.top;
+
+    // Instantly snap avatar to old visual position
+    avatar.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+    // Force reflow so the browser registers the snapped position
+    avatar.getBoundingClientRect();
+
+    // Animate to natural (centered) position
+    avatar.style.transition = 'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    avatar.style.transform  = 'translate(-50%, -50%)';
+  }
+}
+
+// ── Animated path advance (called by NEXT button) ──
+function animateThenAdvance() {
+  const nextBtn = document.getElementById('btn-next-question');
+  if (nextBtn.disabled) return;
+  nextBtn.disabled = true;
+
+  // Pump current node
+  const currentNode = document.getElementById(`snake-node-${state.currentQuestionIndex}`);
+  if (currentNode) currentNode.classList.add('snake-node-pump');
+
+  playSound('coin');
+
+  // After pump animation, move avatar to next position
+  setTimeout(function () {
+    if (currentNode) currentNode.classList.remove('snake-node-pump');
+    const nextPos = state.currentQuestionIndex + 1;
+    updateSnakePath(nextPos, true);
+    playSound('levelComplete');
+
+    // After avatar travels, advance game state
+    setTimeout(function () {
+      nextBtn.disabled = false;
+      advanceQuestion();
+    }, 580);
+  }, 450);
+}
+
+// ── Icon Consumption Meters ──────────────────
+function updateIconMeters(totalScore) {
+  ['water', 'co2', 'energy'].forEach(cat => {
+    const step    = getIconStep(cat, totalScore);
+    const iconEl  = document.getElementById(`icon-${cat}`);
+    const stepEl  = document.getElementById(`step-${cat}`);
+    if (iconEl) {
+      iconEl.textContent = step.icon;
+      iconEl.classList.remove('icon-animate');
+      void iconEl.offsetWidth; // force reflow for animation restart
+      iconEl.classList.add('icon-animate');
+    }
+    if (stepEl) stepEl.textContent = step.label;
+  });
+}
+
+function showPersonaScreen() {
+  const persona = getPersonaFromScore(state.score);
+  state.persona = persona;
+
+  document.getElementById('persona-byte').innerHTML          = persona.byteSvg;
+  document.getElementById('persona-name').textContent        = persona.title;
+  document.getElementById('persona-tagline').textContent     = persona.subtitle;
+  document.getElementById('persona-description').textContent = persona.description;
+
+  const personaTipEl = document.getElementById('persona-tip-text');
+  if (personaTipEl && persona.tip) personaTipEl.textContent = persona.tip;
+
+  document.getElementById('persona-score-display').textContent = 'Score: ' + state.totalScore + '/20';
+
+  const impactLevel = state.resources.energy < 20 ? 'Low' : state.resources.energy <= 60 ? 'Medium' : 'High';
+  document.getElementById('persona-scores').textContent =
+    'Impact: ' + impactLevel + '  ·  Score: ' + state.totalScore + ' (range -15 to +20)';
+
+  const res = state.resources;
+  const fmt = function (v) { return Number.isInteger(v) ? v : +v.toFixed(1); };
+  document.getElementById('summary-energy').textContent = fmt(res.energy) + ' Wh';
+  document.getElementById('summary-water').textContent  = fmt(res.water)  + ' ml';
+  document.getElementById('summary-co2').textContent    = fmt(res.co2)    + ' g CO₂';
+  document.getElementById('cmp-summary-energy').textContent = getResourceComparison('energy', res.energy);
+  document.getElementById('cmp-summary-water').textContent  = getResourceComparison('water',  res.water);
+  document.getElementById('cmp-summary-co2').textContent    = getResourceComparison('co2',    res.co2);
+
+  ['energy', 'water', 'co2'].forEach(function (cat) {
+    const step   = getIconStep(cat, state.totalScore);
+    const iconEl = document.getElementById('final-icon-' + cat);
+    if (iconEl) iconEl.textContent = step.icon;
+  });
+
+  setTimeout(function () {
+    const energyPct  = Math.min(100, (res.energy / RESOURCE_MAX_DISPLAY.energy) * 100);
+    const waterPct   = Math.min(100, (res.water  / RESOURCE_MAX_DISPLAY.water)  * 100);
+    const co2Pct     = Math.min(100, (res.co2    / RESOURCE_MAX_DISPLAY.co2)    * 100);
+    const fillEnergy = document.getElementById('final-fill-energy');
+    const fillWater  = document.getElementById('final-fill-water');
+    const fillCo2    = document.getElementById('final-fill-co2');
+    if (fillEnergy) fillEnergy.style.width = energyPct + '%';
+    if (fillWater)  fillWater.style.width  = waterPct  + '%';
+    if (fillCo2)    fillCo2.style.width    = co2Pct    + '%';
+  }, 400);
+
+  document.getElementById('question-card').classList.add('hidden');
+  document.getElementById('ethics-summary').classList.remove('hidden');
+  renderProgressDots();
+
+  // Play persona-specific sound based on score
+  const score = state.score;
+  if      (score <= -7)  playSound('turbo');
+  else if (score <= 4)   playSound('casual');
+  else if (score <= 14)  playSound('mindful');
+  else                   playSound('green');
 }
 
 function advanceQuestion() {
   document.getElementById('btn-next-question').classList.add('hidden');
+  const feedbackEl = document.getElementById('answer-feedback');
+  if (feedbackEl) feedbackEl.classList.add('hidden');
   state.currentQuestionIndex++;
 
   if (state.currentQuestionIndex >= TOTAL_QUESTIONS) {
-    const persona = getPersonality(state.resources.energy, state.mindfulness);
-    state.persona = persona;
+    // Hide game chrome (path + stamina bars) — Task 3 & 6
+    hideGameChrome();
 
-    document.getElementById('persona-byte').innerHTML      = persona.byteSvg;
-    document.getElementById('persona-name').textContent    = persona.title;
-    document.getElementById('persona-tagline').textContent = persona.subtitle;
-    document.getElementById('persona-description').textContent = persona.description;
+    // Show suspense screen for 2.5s — Task 4
+    const suspenseEl = document.getElementById('suspense-screen');
+    if (suspenseEl) suspenseEl.classList.remove('hidden');
+    playSound('print');
 
-    document.getElementById('persona-score-display').textContent = `Score: ${state.score}/25`;
-
-    const impactLevel = state.resources.energy < 20 ? 'Low' : state.resources.energy <= 60 ? 'Medium' : 'High';
-    const mindLevel   = state.mindfulness >= 11 ? 'High' : state.mindfulness >= 9 ? 'Medium' : 'Low';
-    document.getElementById('persona-scores').textContent =
-      `Impact: ${impactLevel}  ·  Mindfulness: ${mindLevel} (${state.mindfulness}/15)`;
-
-    const res = state.resources;
-    const fmt = v => Number.isInteger(v) ? v : +v.toFixed(1);
-    document.getElementById('summary-energy').textContent = fmt(res.energy) + ' Wh';
-    document.getElementById('summary-water').textContent  = fmt(res.water)  + ' ml';
-    document.getElementById('summary-co2').textContent    = fmt(res.co2)    + ' g CO₂';
-    document.getElementById('cmp-summary-energy').textContent = getResourceComparison('energy', res.energy);
-    document.getElementById('cmp-summary-water').textContent  = getResourceComparison('water',  res.water);
-    document.getElementById('cmp-summary-co2').textContent    = getResourceComparison('co2',    res.co2);
-
-    document.getElementById('question-card').classList.add('hidden');
-    document.getElementById('ethics-summary').classList.remove('hidden');
-    renderProgressDots();
+    setTimeout(function () {
+      if (suspenseEl) suspenseEl.classList.add('hidden');
+      showPersonaScreen();
+    }, 2500);
   } else {
     renderQuestion();
   }
 }
 
-// Next button — advances to next question after player reads the why explanation
-document.getElementById('btn-next-question').addEventListener('click', advanceQuestion);
+// Next button — pumps path, animates cloud, then advances question
+document.getElementById('btn-next-question').addEventListener('click', animateThenAdvance);
 
-// Continue button — goes to impact screen after player reads personality
+// Continue button — goes directly to greener tips screen
 document.getElementById('btn-continue-ethics').addEventListener('click', () => {
-  populateImpactScreen();
-  showScreen('impact');
-  Byte.setState('impact');
+  populateGreenerScreen();
+  showScreen('greener');
+  Byte.setState('greener');
 });
 
 // ── SCREEN 2: IMPACT ─────────────────────────
@@ -367,15 +610,26 @@ function populateImpactScreen() {
     t('dyk.' + dykId) || DYK_FACTS[dykId];
 }
 
-document.getElementById('btn-go-greener').addEventListener('click', () => {
-  populateGreenerScreen();
-  showScreen('greener');
-  Byte.setState('greener');
-});
-
 // ── SCREEN 3: GO GREENER ─────────────────────
 
 function populateGreenerScreen() {
+  // Personalized tip based on worst-impact answer
+  const worstAnswer  = getPersonalizedGreenerTip();
+  const tipBoxEl     = document.getElementById('personal-tip-box');
+  const tipScenario  = document.getElementById('personal-tip-scenario');
+  const tipTextEl    = document.getElementById('personal-tip-text');
+
+  if (tipBoxEl) tipBoxEl.classList.add('hidden');
+
+  if (worstAnswer && tipBoxEl) {
+    const tipFn    = GREENER_TIPS[worstAnswer.type] || GREENER_TIPS['B'];
+    const scenario = worstAnswer.category || 'your last choice';
+    tipScenario.textContent = '⚡ PERSONALISED FOR YOU';
+    tipTextEl.innerHTML     = tipFn(scenario);
+    tipBoxEl.classList.remove('hidden');
+  }
+
+  // General tips grid
   const tips = selectPersonalizedTips(state.taskType, state.resources, state.ethicsAnswers);
   const grid = document.getElementById('tips-grid');
   grid.innerHTML = '';
@@ -420,26 +674,30 @@ document.getElementById('btn-play-again').addEventListener('click', () => {
   state.resources           = { energy: 0, water: 0, co2: 0 };
   state.mindfulness         = 0;
   state.score               = 0;
+  state.totalScore          = 0;
   state.userName            = '';
   state.userAge             = '';
+  state.userExpertise       = '';
   state.userGender          = '';
   state.ethicsAnswers        = [];
   state.currentQuestions     = [];
   state.currentQuestionIndex = 0;
   state.persona              = null;
 
-  document.getElementById('user-name').value   = '';
-  document.getElementById('user-age').value    = '';
-  document.getElementById('user-gender').value = '';
+  document.getElementById('user-name').value      = '';
+  document.getElementById('user-age').value       = '';
+  document.getElementById('user-expertise').value = '';
 
-  ['meter-water', 'meter-energy', 'meter-co2'].forEach(id => {
+  // Reset final results bar fills
+  ['final-fill-energy', 'final-fill-water', 'final-fill-co2'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.width = '0%';
   });
 
-  ['metric-water', 'metric-energy', 'metric-co2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('highlight-water', 'highlight-energy', 'highlight-co2');
+  // Reset resource bar icons
+  ['energy', 'water', 'co2'].forEach(cat => {
+    const iconEl = document.getElementById('res-icon-' + cat);
+    if (iconEl) iconEl.textContent = getIconStep(cat, 0).icon;
   });
 
   showScreen('idle');

@@ -15,7 +15,7 @@
   ═══════════════════════════════════════════ -->
   <div id="resource-bars" class="resource-bars hidden" aria-label="AI resource meters">
     <div class="resource-bar-item">
-      <span class="resource-icon">⚡</span>
+      <span class="resource-icon" id="res-icon-energy">🕯️</span>
       <span class="resource-label pixel-font">Energy</span>
       <div class="resource-track" role="progressbar" aria-label="Energy" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="resource-fill res-green" id="fill-energy"></div>
@@ -24,7 +24,7 @@
       <span class="resource-threshold-label" id="lbl-energy">Light footprint</span>
     </div>
     <div class="resource-bar-item">
-      <span class="resource-icon">💧</span>
+      <span class="resource-icon" id="res-icon-water">🥤</span>
       <span class="resource-label pixel-font">Water</span>
       <div class="resource-track" role="progressbar" aria-label="Water" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="resource-fill res-green" id="fill-water"></div>
@@ -33,7 +33,7 @@
       <span class="resource-threshold-label" id="lbl-water">Light footprint</span>
     </div>
     <div class="resource-bar-item">
-      <span class="resource-icon">☁️</span>
+      <span class="resource-icon" id="res-icon-co2">🌳🌲🌳</span>
       <span class="resource-label pixel-font">CO₂</span>
       <div class="resource-track" role="progressbar" aria-label="CO2" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="resource-fill res-green" id="fill-co2"></div>
@@ -50,10 +50,12 @@
     <div class="scanlines"></div>
 
     <!-- Language switcher -->
-    <div class="lang-switcher" role="group" aria-label="Language">
-      <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
-      <button class="lang-btn" data-lang="es" onclick="setLanguage('es')">ES</button>
-      <button class="lang-btn" data-lang="ca" onclick="setLanguage('ca')">CA</button>
+    <div class="lang-switcher">
+      <select class="lang-select" id="lang-select" onchange="setLanguage(this.value)" aria-label="Language">
+        <option value="en" selected>English</option>
+        <option value="es">Castellano</option>
+        <option value="ca">Català</option>
+      </select>
     </div>
 
     <div class="idle-content">
@@ -193,25 +195,24 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="user-age" data-i18n="ui.ageLabel">Your age</label>
-        <select id="user-age" class="form-select" data-i18n-options="ageOpts">
+        <label class="form-label" for="user-age" data-i18n="ui.ageLabel">Your age <span class="required-star">*</span></label>
+        <select id="user-age" class="form-select" required>
           <option value="" data-i18n="ui.ageDefault">Select age range...</option>
-          <option value="Under 18" data-i18n-opt="under18">Under 18</option>
-          <option value="18-25" data-i18n-opt="r1825">18-25</option>
-          <option value="26-35" data-i18n-opt="r2635">26-35</option>
-          <option value="36-50" data-i18n-opt="r3650">36-50</option>
-          <option value="51-65" data-i18n-opt="r5165">51-65</option>
-          <option value="66+" data-i18n-opt="r66">66+</option>
+          <option value="0-12">0 – 12</option>
+          <option value="13-19">13 – 19</option>
+          <option value="20-39">20 – 39</option>
+          <option value="40-59">40 – 59</option>
+          <option value="60+">60+</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="user-gender" data-i18n="ui.genderLabel">Gender (optional)</label>
-        <select id="user-gender" class="form-select" data-i18n-options="genderOpts">
-          <option value="Prefer not to say" data-i18n-opt="prefer">Prefer not to say</option>
-          <option value="Female" data-i18n-opt="female">Female</option>
-          <option value="Male" data-i18n-opt="male">Male</option>
-          <option value="Non-binary" data-i18n-opt="nonbinary">Non-binary</option>
+        <label class="form-label" for="user-expertise" data-i18n="ui.expertiseLabel">AI Expertise Level <span class="required-star">*</span></label>
+        <select id="user-expertise" class="form-select" required>
+          <option value="" data-i18n="ui.expertiseDefault">Select expertise level...</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Average">Average</option>
+          <option value="Expert">Expert</option>
         </select>
       </div>
 
@@ -219,6 +220,8 @@
         🔒 Your information is used only for this session and is not stored or shared.
       </div>
     </div>
+
+    <div class="form-error hidden" id="userinfo-error" role="alert">Please select your age range and expertise level.</div>
 
     <button class="btn btn-primary btn-large" id="btn-userinfo-continue" data-i18n="ui.continueBtn">
       CONTINUE →
@@ -229,63 +232,138 @@
        SCREEN 1.1: ETHICS QUESTIONS
   ═══════════════════════════════════════════ -->
   <section id="screen-ethics" class="screen hidden">
-    <header class="screen-header">
-      <h2 class="pixel-font screen-title neon-yellow" data-i18n="ui.ethicsTitle">AI ETHICS CHECK</h2>
-      <p class="screen-subtitle" data-i18n="ui.ethicsSub">Answer 5 questions. Your choices shape your AI profile!</p>
-    </header>
-
-    <div class="ethics-progress">
-      <span class="ethics-progress-text pixel-font" id="ethics-progress-text">Question 1 of 9</span>
-      <div class="ethics-dots" id="ethics-dots" aria-hidden="true"></div>
+    <!-- Snake & Ladders path - vertical on left side -->
+    <div class="snake-path" id="snake-path" aria-label="Progress path">
+      <div class="snake-path-title">PROGRESS</div>
+      <div class="snake-track">
+        <div class="snake-node snake-start" id="snake-node-0">
+          <div class="snake-avatar" id="snake-avatar">
+            <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" width="50" height="38">
+              <rect x="20" y="15" width="40" height="25" rx="4" fill="#c8e8f5"/>
+              <rect x="14" y="21" width="52" height="15" rx="4" fill="#c8e8f5"/>
+              <rect x="15" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
+              <rect x="28" y="6" width="18" height="18" rx="2" fill="#eef8ff"/>
+              <rect x="44" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
+              <rect x="20" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
+              <rect x="50" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
+              <rect x="27" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
+              <rect x="46" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
+              <rect x="29" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
+              <rect x="48" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
+            </svg>
+          </div>
+          <span class="snake-node-label pixel-font">START</span>
+        </div>
+        <div class="snake-connector"></div>
+        <div class="snake-node" id="snake-node-1"><span class="snake-node-num pixel-font">1</span></div>
+        <div class="snake-connector"></div>
+        <div class="snake-node" id="snake-node-2"><span class="snake-node-num pixel-font">2</span></div>
+        <div class="snake-connector"></div>
+        <div class="snake-node" id="snake-node-3"><span class="snake-node-num pixel-font">3</span></div>
+        <div class="snake-connector"></div>
+        <div class="snake-node" id="snake-node-4"><span class="snake-node-num pixel-font">4</span></div>
+        <div class="snake-connector"></div>
+        <div class="snake-node snake-finish" id="snake-node-5"><span class="snake-node-num pixel-font">5</span></div>
+      </div>
     </div>
 
-    <div class="question-card" id="question-card">
-      <div class="question-text" id="question-text"></div>
-      <div class="answer-options" id="answer-options"></div>
-      <div class="why-card hidden" id="why-card">
-        <span class="why-card-label">WHY</span>
-        <p class="why-card-text" id="why-text"></p>
-      </div>
-      <button class="btn btn-primary btn-next-q hidden" id="btn-next-question">NEXT →</button>
-    </div>
+    <!-- Main content area -->
+    <div class="ethics-main">
+      <header class="screen-header">
+        <h2 class="pixel-font screen-title neon-yellow" data-i18n="ui.ethicsTitle">AI ETHICS CHECK</h2>
+      </header>
 
-    <!-- Shown after 5th question -->
-    <div class="ethics-summary hidden" id="ethics-summary">
-      <div class="persona-card">
-        <div class="persona-byte" id="persona-byte" aria-hidden="true"></div>
-        <div class="persona-name pixel-font" id="persona-name"></div>
-        <div class="persona-tagline" id="persona-tagline"></div>
-        <div class="persona-score-display pixel-font" id="persona-score-display"></div>
-        <div class="persona-scores" id="persona-scores"></div>
-        <p class="persona-description" id="persona-description"></p>
+      <div class="ethics-progress">
+        <span class="ethics-progress-text pixel-font" id="ethics-progress-text">Question 1 of 5</span>
+        <div class="ethics-dots" id="ethics-dots" aria-hidden="true"></div>
       </div>
-      <div class="summary-resources-wrap">
-        <div class="summary-resource-item">
-          <span class="summary-resource-icon">⚡</span>
-          <div class="summary-resource-body">
-            <span class="summary-resource-label">Energy used</span>
-            <span class="summary-resource-value pixel-font" id="summary-energy">0 Wh</span>
-            <span class="summary-resource-comparison" id="cmp-summary-energy"></span>
+
+      <div class="question-card" id="question-card">
+        <div class="question-text" id="question-text"></div>
+        <div class="answer-options" id="answer-options"></div>
+        <div class="answer-feedback hidden" id="answer-feedback">
+          <div class="feedback-metrics">
+            <div class="feedback-metric-row">
+              <span class="feedback-emoji">💧</span>
+              <span class="feedback-value" id="fb-water">—</span>
+              <span class="feedback-compare" id="fb-water-cmp"></span>
+            </div>
+            <div class="feedback-metric-row">
+              <span class="feedback-emoji">⚡</span>
+              <span class="feedback-value" id="fb-energy">—</span>
+              <span class="feedback-compare" id="fb-energy-cmp"></span>
+            </div>
+            <div class="feedback-metric-row">
+              <span class="feedback-emoji">☁️</span>
+              <span class="feedback-value" id="fb-co2">—</span>
+              <span class="feedback-compare" id="fb-co2-cmp"></span>
+            </div>
           </div>
         </div>
-        <div class="summary-resource-item">
-          <span class="summary-resource-icon">💧</span>
-          <div class="summary-resource-body">
-            <span class="summary-resource-label">Water used</span>
-            <span class="summary-resource-value pixel-font" id="summary-water">0 ml</span>
-            <span class="summary-resource-comparison" id="cmp-summary-water"></span>
-          </div>
+        <div class="why-card hidden" id="why-card">
+          <span class="why-card-label">WHY</span>
+          <p class="why-card-text" id="why-text"></p>
         </div>
-        <div class="summary-resource-item">
-          <span class="summary-resource-icon">☁️</span>
-          <div class="summary-resource-body">
-            <span class="summary-resource-label">CO₂ emitted</span>
-            <span class="summary-resource-value pixel-font" id="summary-co2">0 g</span>
-            <span class="summary-resource-comparison" id="cmp-summary-co2"></span>
-          </div>
-        </div>
+        <button class="btn btn-primary btn-next-q hidden" id="btn-next-question">NEXT →</button>
       </div>
-      <button class="btn btn-primary btn-large" id="btn-continue-ethics">SEE YOUR IMPACT →</button>
+
+      <!-- Shown after 5th question - FINAL RESULTS -->
+      <div class="ethics-summary hidden" id="ethics-summary">
+        <div class="persona-card">
+          <div class="persona-byte" id="persona-byte" aria-hidden="true"></div>
+          <div class="persona-name pixel-font" id="persona-name"></div>
+          <div class="persona-tagline" id="persona-tagline"></div>
+          <div class="persona-score-display pixel-font" id="persona-score-display"></div>
+          <div class="persona-scores" id="persona-scores"></div>
+          <p class="persona-description" id="persona-description"></p>
+          <div class="persona-tip-box" id="persona-tip-box">
+            <span class="persona-tip-label pixel-font">💡 YOUR TIP</span>
+            <p class="persona-tip-text" id="persona-tip-text"></p>
+          </div>
+        </div>
+
+        <div class="final-results-wrap">
+          <div class="final-results-title pixel-font">YOUR AI FOOTPRINT</div>
+
+          <div class="final-bar-item">
+            <div class="final-bar-header">
+              <span class="final-bar-icon" id="final-icon-energy">🕯️</span>
+              <span class="final-bar-name pixel-font">Energy</span>
+              <span class="final-bar-value pixel-font" id="summary-energy">0 Wh</span>
+            </div>
+            <div class="final-bar-track">
+              <div class="final-bar-fill final-fill-energy" id="final-fill-energy"></div>
+            </div>
+            <div class="final-bar-comparison" id="cmp-summary-energy">—</div>
+          </div>
+
+          <div class="final-bar-item">
+            <div class="final-bar-header">
+              <span class="final-bar-icon" id="final-icon-water">🥤</span>
+              <span class="final-bar-name pixel-font">Water</span>
+              <span class="final-bar-value pixel-font" id="summary-water">0 ml</span>
+            </div>
+            <div class="final-bar-track">
+              <div class="final-bar-fill final-fill-water" id="final-fill-water"></div>
+            </div>
+            <div class="final-bar-comparison" id="cmp-summary-water">—</div>
+          </div>
+
+          <div class="final-bar-item">
+            <div class="final-bar-header">
+              <span class="final-bar-icon" id="final-icon-co2">🌳🌲🌳</span>
+              <span class="final-bar-name pixel-font">CO₂</span>
+              <span class="final-bar-value pixel-font" id="summary-co2">0 g CO₂</span>
+            </div>
+            <div class="final-bar-track">
+              <div class="final-bar-fill final-fill-co2" id="final-fill-co2"></div>
+            </div>
+            <div class="final-bar-comparison" id="cmp-summary-co2">—</div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-large" id="btn-continue-ethics">GET TIPS →</button>
+      </div>
     </div>
   </section>
 
@@ -324,78 +402,15 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════
-       SCREEN 3: IMPACT INFOGRAPHIC
-  ═══════════════════════════════════════════ -->
-  <section id="screen-impact" class="screen hidden">
-    <header class="screen-header">
-      <h2 class="pixel-font screen-title neon-pink" data-i18n="ui.impactTitle">YOUR QUIZ FOOTPRINT</h2>
-    </header>
-
-    <div class="impact-layout">
-      <!-- Metrics -->
-      <div class="metrics-panel">
-        <div class="metric-row" id="metric-water">
-          <div class="metric-icon">💧</div>
-          <div class="metric-info">
-            <div class="metric-label" data-i18n="ui.waterLabel">Water</div>
-            <div class="metric-value" id="val-water">—</div>
-            <div class="metric-compare" id="cmp-water">—</div>
-          </div>
-          <div class="meter-track" aria-label="Water usage meter">
-            <div class="meter-fill meter-water" id="meter-water" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </div>
-
-        <div class="metric-row" id="metric-energy">
-          <div class="metric-icon">⚡</div>
-          <div class="metric-info">
-            <div class="metric-label" data-i18n="ui.energyLabel">Energy</div>
-            <div class="metric-value" id="val-energy">—</div>
-            <div class="metric-compare" id="cmp-energy">—</div>
-          </div>
-          <div class="meter-track" aria-label="Electricity usage meter">
-            <div class="meter-fill meter-energy" id="meter-energy" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </div>
-
-        <div class="metric-row" id="metric-co2">
-          <div class="metric-icon">☁️</div>
-          <div class="metric-info">
-            <div class="metric-label" data-i18n="ui.co2Label">CO₂</div>
-            <div class="metric-value" id="val-co2">—</div>
-            <div class="metric-compare" id="cmp-co2">—</div>
-          </div>
-          <div class="meter-track" aria-label="CO₂ pollution meter">
-            <div class="meter-fill meter-co2" id="meter-co2" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Did you know -->
-      <div class="did-you-know" id="did-you-know">
-        <div class="dyk-label pixel-font" data-i18n="ui.dykLabel">💡 DID YOU KNOW?</div>
-        <p class="dyk-text" id="dyk-text">...</p>
-      </div>
-    </div>
-
-    <button class="btn btn-primary btn-large" id="btn-go-greener" data-i18n="ui.greenerBtn">
-      HOW CAN I DO BETTER? →
-    </button>
-  </section>
 
   <!-- ═══════════════════════════════════════════
        SCREEN 4: GO GREENER
   ═══════════════════════════════════════════ -->
   <section id="screen-greener" class="screen hidden">
-    <header class="screen-header">
-      <h2 class="pixel-font screen-title neon-green" data-i18n="ui.greenerTitle">GO GREENER! 🌱</h2>
-      <p class="screen-subtitle" data-i18n="ui.greenerSub">Here's how to get the same stuff using less water &amp; electricity:</p>
-    </header>
 
-    <!-- Byte with sunglasses -->
-    <div class="byte-greener-wrapper" aria-hidden="true">
-      <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="byte-small">
+    <!-- Byte + heading row -->
+    <div class="greener-hero">
+      <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="byte-greener-svg" aria-hidden="true">
         <g class="byte-cloud-body">
           <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
           <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
@@ -412,14 +427,23 @@
         <rect x="51" y="43" width="22" height="16" rx="3" fill="#044a35"/>
         <rect x="87" y="43" width="22" height="16" rx="3" fill="#044a35"/>
         <rect x="54" y="46" width="7" height="5" rx="1" fill="white" opacity="0.25"/>
-        <!-- Big smile -->
         <path d="M 56 66 Q 80 80 104 66" stroke="#1a1a2e" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <!-- Thumbs up -->
         <text x="120" y="90" font-size="28">👍</text>
       </svg>
-      <div class="byte-speech-green" data-i18n="ui.byteGreen">You've got this! Smart choices add up! 🌱</div>
+      <div class="greener-hero-text">
+        <h2 class="pixel-font greener-title neon-green" data-i18n="ui.greenerTitle">GO GREENER! 🌱</h2>
+        <p class="greener-subtitle" data-i18n="ui.byteGreen">Smart choices add up. Here's how to shrink your footprint:</p>
+      </div>
     </div>
 
+    <!-- Personalized tip (based on highest-impact answer) -->
+    <div class="personal-tip-box hidden" id="personal-tip-box">
+      <div class="personal-tip-badge pixel-font">YOUR TIP</div>
+      <div class="personal-tip-scenario pixel-font" id="personal-tip-scenario"></div>
+      <p class="personal-tip-text" id="personal-tip-text"></p>
+    </div>
+
+    <!-- General tips -->
     <div class="tips-grid" id="tips-grid" role="list">
       <!-- Tips injected by JS -->
     </div>
@@ -520,6 +544,43 @@
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════
+       SUSPENSE SCREEN (between Q5 and persona)
+  ═══════════════════════════════════════════ -->
+  <div class="suspense-screen hidden" id="suspense-screen" role="status" aria-live="polite">
+    <div class="suspense-content">
+      <div class="suspense-cloud" aria-hidden="true">
+        <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" width="140" height="105">
+          <g class="byte-cloud-body">
+            <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
+            <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
+            <rect x="30" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+            <rect x="55" y="12" width="36" height="36" rx="4" fill="#eef8ff"/>
+            <rect x="88" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+            <rect x="40" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+            <rect x="100" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+          </g>
+          <!-- Wide thinking eyes -->
+          <rect x="50" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>
+          <rect x="92" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>
+          <rect x="54" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>
+          <rect x="96" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>
+          <!-- Thinking mouth -->
+          <path d="M 64 66 Q 80 72 96 66" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <!-- Question marks -->
+          <text x="18" y="44" font-size="20" fill="#ffbe0b" opacity="0.8" class="suspense-q1">?</text>
+          <text x="130" y="36" font-size="16" fill="#00f5ff" opacity="0.8" class="suspense-q2">?</text>
+          <text x="125" y="58" font-size="22" fill="#ff006e" opacity="0.8" class="suspense-q3">!</text>
+        </svg>
+      </div>
+      <p class="pixel-font suspense-text">CALCULATING YOUR IMPACT...</p>
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <p class="suspense-sub">Analysing your AI footprint</p>
+    </div>
+  </div>
+
   <!-- Error toast -->
   <div class="error-toast hidden" id="error-toast" role="alert" aria-live="assertive">
     <span id="error-msg">Something went wrong</span>
@@ -530,8 +591,10 @@
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <!-- App modules -->
+  <script src="sounds.js"></script>
   <script src="translations.js"></script>
   <script src="data.js"></script>
+  <script src="questionBank.js"></script>
   <script src="byte.js"></script>
   <script src="api.js"></script>
   <script src="print.js"></script>

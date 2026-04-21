@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check \"c:/Users/marts/Documents/10_IAAC/3_third term/AI for all/AIRCADE/data.js\")"
+    ]
+  }
+}

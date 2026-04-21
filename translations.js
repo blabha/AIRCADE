@@ -26,9 +26,8 @@ function t(path) {
 function setLanguage(lang) {
   if (!TRANSLATIONS[lang]) return;
   currentLang = lang;
-  document.querySelectorAll('.lang-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
+  const sel = document.getElementById('lang-select');
+  if (sel) sel.value = lang;
   applyTranslations();
 }
 
@@ -80,9 +79,11 @@ en: {
     welcomeSub:     'Tell us about yourself to personalize your experience',
     nameLabel:      'Your name (optional)',
     namePlaceholder:'Enter your name...',
-    ageLabel:       'Your age',
-    ageDefault:     'Select age range...',
-    genderLabel:    'Gender (optional)',
+    ageLabel:          'Your age',
+    ageDefault:        'Select age range...',
+    expertiseLabel:    'AI Expertise Level',
+    expertiseDefault:  'Select expertise level...',
+    genderLabel:       'Gender (optional)',
     privacyNote:    '🔒 Your information is used only for this session and is not stored or shared.',
     continueBtn:    'CONTINUE →',
     inputTitle:     'What should AI create for you?',
@@ -213,9 +214,11 @@ es: {
     welcomeSub:     'Cuéntanos sobre ti para personalizar tu experiencia',
     nameLabel:      'Tu nombre (opcional)',
     namePlaceholder:'Escribe tu nombre...',
-    ageLabel:       'Tu edad',
-    ageDefault:     'Selecciona tu rango de edad...',
-    genderLabel:    'Género (opcional)',
+    ageLabel:          'Tu edad',
+    ageDefault:        'Selecciona tu rango de edad...',
+    expertiseLabel:    'Nivel de experiencia con IA',
+    expertiseDefault:  'Selecciona tu nivel...',
+    genderLabel:       'Género (opcional)',
     privacyNote:    '🔒 Tu información solo se usa en esta sesión y no se guarda ni comparte.',
     continueBtn:    'CONTINUAR →',
     inputTitle:     '¿Qué debería crear la IA para ti?',
@@ -346,9 +349,11 @@ ca: {
     welcomeSub:     'Explica\'ns sobre tu per personalitzar la teva experiència',
     nameLabel:      'El teu nom (opcional)',
     namePlaceholder:'Escriu el teu nom...',
-    ageLabel:       'La teva edat',
-    ageDefault:     "Selecciona el teu rang d'edat...",
-    genderLabel:    'Gènere (opcional)',
+    ageLabel:          'La teva edat',
+    ageDefault:        "Selecciona el teu rang d'edat...",
+    expertiseLabel:    'Nivell d\'experiència amb IA',
+    expertiseDefault:  'Selecciona el teu nivell...',
+    genderLabel:       'Gènere (opcional)',
     privacyNote:    "🔒 La teva informació només s'utilitza durant aquesta sessió i no es guarda ni es comparteix.",
     continueBtn:    'CONTINUAR →',
     inputTitle:     'Què hauria de crear la IA per a tu?',
