@@ -1,0 +1,901 @@
+﻿Age Group,AI Expertise,Question Number,Scenario,Options,Mapping,Weight,Ethical Score
+0-12,Beginner,1,For homework help,A – Ask AI to explain what you don't understand.,Balanced AI use,3-4,1
+0-12,Beginner,1,For homework help,"B – Try yourself, ask your teacher if stuck.",Low-impact conscious use,5-6,2
+0-12,Beginner,1,For homework help,C – Ask AI to do all your homework.,High AI impact,1-2,0
+0-12,Beginner,2,For learning to read,A – Read books yourself with a parent.,Low-impact conscious use,5-6,2
+0-12,Beginner,2,For learning to read,B – Let AI read everything to you.,High AI impact,1-2,0
+0-12,Beginner,2,For learning to read,"C – Read along, ask AI to explain hard words.",Balanced AI use,3-4,1
+0-12,Beginner,3,For maths practice,A – Ask AI for every answer.,High AI impact,1-2,0
+0-12,Beginner,3,For maths practice,B – Use AI to explain how to solve problems.,Balanced AI use,3-4,1
+0-12,Beginner,3,For maths practice,"C – Work out sums yourself, check with a teacher.",Low-impact conscious use,5-6,2
+0-12,Beginner,4,For drawing and art,A – Let AI make all your pictures.,High AI impact,1-2,0
+0-12,Beginner,4,For drawing and art,"B – Use AI for ideas, draw everything yourself.",Balanced AI use,3-4,1
+0-12,Beginner,4,For drawing and art,C – Draw and colour everything by hand.,Low-impact conscious use,5-6,2
+0-12,Beginner,5,For bedtime stories,A – Co-create a story together with AI.,Balanced AI use,3-4,1
+0-12,Beginner,5,For bedtime stories,B – Ask AI to tell you a new story every night.,High AI impact,1-2,0
+0-12,Beginner,5,For bedtime stories,C – Ask a parent or read a book instead.,Low-impact conscious use,5-6,2
+0-12,Beginner,6,For learning a new language,A – Learn words with flashcards and apps.,Low-impact conscious use,5-6,2
+0-12,Beginner,6,For learning a new language,B – Let AI translate everything for you.,High AI impact,1-2,0
+0-12,Beginner,6,For learning a new language,C – Practise conversations with AI.,Balanced AI use,3-4,1
+0-12,Beginner,7,For spelling practice,A – Let AI correct all your spelling.,High AI impact,1-2,0
+0-12,Beginner,7,For spelling practice,"B – Try the spelling first, then use AI to check.",Balanced AI use,3-4,1
+0-12,Beginner,7,For spelling practice,C – Write it out and ask a teacher.,Low-impact conscious use,5-6,2
+0-12,Beginner,8,For science projects,A – Research using books and ask your teacher.,Low-impact conscious use,5-6,2
+0-12,Beginner,8,For science projects,B – Ask AI to design and explain your whole project.,High AI impact,1-2,0
+0-12,Beginner,8,For science projects,"C – Use AI to research one part, do the rest yourself.",Balanced AI use,3-4,1
+0-12,Beginner,9,For learning about animals,A – Use AI for facts about animals you're curious about.,Balanced AI use,3-4,1
+0-12,Beginner,9,For learning about animals,B – Ask AI every animal question.,High AI impact,1-2,0
+0-12,Beginner,9,For learning about animals,C – Visit the library or watch nature documentaries.,Low-impact conscious use,5-6,2
+0-12,Beginner,10,For asking questions about the world,"A – Ask parents, teachers, or look in books.",Low-impact conscious use,5-6,2
+0-12,Beginner,10,For asking questions about the world,B – Ask AI every question you have.,High AI impact,1-2,0
+0-12,Beginner,10,For asking questions about the world,"C – Ask AI some things, explore others yourself.",Balanced AI use,3-4,1
+0-12,Beginner,11,For creative storytelling,A – Make up the whole story in your head.,Low-impact conscious use,5-6,2
+0-12,Beginner,11,For creative storytelling,"B – Ask AI for ideas, write the story yourself.",Balanced AI use,3-4,1
+0-12,Beginner,11,For creative storytelling,C – Ask AI to write the whole story.,High AI impact,1-2,0
+0-12,Beginner,12,For learning maths concepts,"A – Use AI to explain a concept, then practise.",Balanced AI use,3-4,1
+0-12,Beginner,12,For learning maths concepts,B – Let AI solve all your maths problems.,High AI impact,1-2,0
+0-12,Beginner,12,For learning maths concepts,C – Work through examples in your textbook.,Low-impact conscious use,5-6,2
+0-12,Beginner,13,For learning about space,A – Use AI to answer specific space questions.,Balanced AI use,3-4,1
+0-12,Beginner,13,For learning about space,B – Watch space documentaries and read books.,Low-impact conscious use,5-6,2
+0-12,Beginner,13,For learning about space,C – Ask AI to tell you everything about space.,High AI impact,1-2,0
+0-12,Beginner,14,For educational games,A – Use AI games for all your learning.,High AI impact,1-2,0
+0-12,Beginner,14,For educational games,B – Play board games and read books to learn.,Low-impact conscious use,5-6,2
+0-12,Beginner,14,For educational games,C – Mix AI games with board games and books.,Balanced AI use,3-4,1
+0-12,Beginner,15,For exploring history,"A – Use AI to summarise events, read more yourself.",Balanced AI use,3-4,1
+0-12,Beginner,15,For exploring history,B – Read history books and visit museums.,Low-impact conscious use,5-6,2
+0-12,Beginner,15,For exploring history,C – Ask AI to write all your history notes.,High AI impact,1-2,0
+0-12,Beginner,16,For making music,A – Let AI create all your music.,High AI impact,1-2,0
+0-12,Beginner,16,For making music,B – Learn an instrument and practise yourself.,Low-impact conscious use,5-6,2
+0-12,Beginner,16,For making music,"C – Use AI to learn notes and theory, play yourself.",Balanced AI use,3-4,1
+0-12,Beginner,17,For drawing characters,"A – Use AI for inspiration, draw characters yourself.",Balanced AI use,3-4,1
+0-12,Beginner,17,For drawing characters,B – Sketch all characters entirely by hand.,Low-impact conscious use,5-6,2
+0-12,Beginner,17,For drawing characters,C – Generate all characters with AI.,High AI impact,1-2,0
+0-12,Beginner,18,For playing memory games,A – Use AI as a hint only when really stuck.,Balanced AI use,3-4,1
+0-12,Beginner,18,For playing memory games,B – Use AI to answer all memory games for you.,High AI impact,1-2,0
+0-12,Beginner,18,For playing memory games,C – Train your memory yourself without any help.,Low-impact conscious use,5-6,2
+0-12,Beginner,19,For learning numbers,A – Ask AI to do all counting for you.,High AI impact,1-2,0
+0-12,Beginner,19,For learning numbers,B – Count with toys and practise yourself.,Low-impact conscious use,5-6,2
+0-12,Beginner,19,For learning numbers,C – Use AI when confused about a number concept.,Balanced AI use,3-4,1
+0-12,Beginner,20,For understanding safety online,A – Let AI manage all your online safety.,High AI impact,1-2,0
+0-12,Beginner,20,For understanding safety online,B – Talk to parents and teachers about staying safe.,Low-impact conscious use,5-6,2
+0-12,Beginner,20,For understanding safety online,C – Use AI to learn about staying safe online.,Balanced AI use,3-4,1
+0-12,Intermediate,1,For research projects,"A – Use AI for research, write the report yourself.",Balanced AI use,3-4,2
+0-12,Intermediate,1,For research projects,B – Use AI to research and write the whole project.,High AI impact,1-2,0
+0-12,Intermediate,1,For research projects,"C – Research in books, AI only for structure check.",Low-impact conscious use,5-6,1
+0-12,Intermediate,2,For learning to code,A – Use AI to write all your code.,High AI impact,1-2,0
+0-12,Intermediate,2,For learning to code,"B – Use AI to explain concepts, write code yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,2,For learning to code,C – Write all code yourself from tutorials.,Low-impact conscious use,5-6,2
+0-12,Intermediate,3,For creating digital art,A – Create all artwork yourself in drawing apps.,Low-impact conscious use,5-6,2
+0-12,Intermediate,3,For creating digital art,B – Generate all artwork with AI.,High AI impact,1-2,0
+0-12,Intermediate,3,For creating digital art,"C – Use AI for references and ideas, create yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,4,For writing short stories,"A – Use AI for plot ideas, write the story yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,4,For writing short stories,B – Use AI to write the whole story.,High AI impact,1-2,0
+0-12,Intermediate,4,For writing short stories,C – Write the full story yourself.,Low-impact conscious use,5-6,2
+0-12,Intermediate,5,For making presentations,A – Let AI build the entire presentation.,High AI impact,1-2,0
+0-12,Intermediate,5,For making presentations,"B – Use AI for structure, add your own content.",Balanced AI use,3-4,1
+0-12,Intermediate,5,For making presentations,C – Build and design the whole presentation yourself.,Low-impact conscious use,5-6,2
+0-12,Intermediate,6,For music composition,"A – Use AI for chord ideas, compose the melody yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,6,For music composition,B – Use AI to compose all the music.,High AI impact,1-2,0
+0-12,Intermediate,6,For music composition,C – Compose everything yourself or on an instrument.,Low-impact conscious use,5-6,2
+0-12,Intermediate,7,For interactive learning games,A – Use AI games only for difficult subjects.,Balanced AI use,3-4,1
+0-12,Intermediate,7,For interactive learning games,B – Use AI games for all your studying.,High AI impact,1-2,0
+0-12,Intermediate,7,For interactive learning games,C – Use books and non-AI games most of the time.,Low-impact conscious use,5-6,2
+0-12,Intermediate,8,For creating animations,"A – Use AI for backgrounds, animate characters yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,8,For creating animations,B – Create all frames manually.,Low-impact conscious use,5-6,2
+0-12,Intermediate,8,For creating animations,C – Use AI to generate all animation frames.,High AI impact,1-2,0
+0-12,Intermediate,9,For building simple websites,A – Use AI to build and write the whole website.,High AI impact,1-2,0
+0-12,Intermediate,9,For building simple websites,B – Build the website from scratch with a guide.,Low-impact conscious use,5-6,2
+0-12,Intermediate,9,For building simple websites,"C – Use AI for code problems, design the site yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,10,For science experiments,"A – Use AI to understand the science, design it yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,10,For science experiments,B – Ask AI to plan and run the whole experiment.,High AI impact,1-2,0
+0-12,Intermediate,10,For science experiments,C – Plan and run the experiment independently.,Low-impact conscious use,5-6,2
+0-12,Intermediate,11,For geography learning,A – Study maps and atlases yourself.,Low-impact conscious use,5-6,1
+0-12,Intermediate,11,For geography learning,B – Use AI for interactive map exploration.,Balanced AI use,3-4,2
+0-12,Intermediate,11,For geography learning,C – Ask AI every geography question.,High AI impact,1-2,0
+0-12,Intermediate,12,For public speaking practice,A – Write and practise your speech completely yourself.,Low-impact conscious use,5-6,2
+0-12,Intermediate,12,For public speaking practice,"B – Use AI for structure, write and deliver yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,12,For public speaking practice,C – Ask AI to write all your speeches.,High AI impact,1-2,0
+0-12,Intermediate,13,For creating comic strips,A – Create all panels and dialogue yourself.,Low-impact conscious use,5-6,2
+0-12,Intermediate,13,For creating comic strips,B – Use AI to generate all panels and text.,High AI impact,1-2,0
+0-12,Intermediate,13,For creating comic strips,"C – Use AI for story ideas, draw all panels yourself.",Balanced AI use,3-4,1
+0-12,Intermediate,14,For problem-solving challenges,A – Ask AI for all the answers immediately.,High AI impact,1-2,0
+0-12,Intermediate,14,For problem-solving challenges,B – Work through all problems independently.,Low-impact conscious use,5-6,2
+0-12,Intermediate,14,For problem-solving challenges,"C – Try yourself first, use AI only as a hint.",Balanced AI use,3-4,1
+0-12,Intermediate,15,For book summaries,A – Ask AI to summarise every book.,High AI impact,1-2,0
+0-12,Intermediate,15,For book summaries,B – Read and summarise every book yourself.,Low-impact conscious use,5-6,2
+0-12,Intermediate,15,For book summaries,"C – Read the book, use AI to check key themes.",Balanced AI use,3-4,1
+0-12,Intermediate,16,For nature identification,A – Use AI to learn about specific things you found.,Balanced AI use,3-4,2
+0-12,Intermediate,16,For nature identification,B – Use field guides and observation to identify.,Low-impact conscious use,5-6,1
+0-12,Intermediate,16,For nature identification,C – Use AI to identify everything automatically.,High AI impact,1-2,0
+0-12,Intermediate,17,For environmental projects,A – Research with books and field visits.,Low-impact conscious use,5-6,1
+0-12,Intermediate,17,For environmental projects,B – Ask AI to plan and write the whole project.,High AI impact,1-2,0
+0-12,Intermediate,17,For environmental projects,"C – Use AI for research, plan and present yourself.",Balanced AI use,3-4,2
+0-12,Intermediate,18,For reading comprehension,"A – Read yourself, use AI for hard vocabulary.",Balanced AI use,3-4,1
+0-12,Intermediate,18,For reading comprehension,B – Use AI to answer all comprehension questions.,High AI impact,1-2,0
+0-12,Intermediate,18,For reading comprehension,C – Read and answer all questions independently.,Low-impact conscious use,5-6,2
+0-12,Intermediate,19,For creating videos,"A – Use AI to script, edit, and produce videos.",High AI impact,1-2,0
+0-12,Intermediate,19,For creating videos,"B – Script, film, and edit everything yourself.",Low-impact conscious use,5-6,2
+0-12,Intermediate,19,For creating videos,"C – Script and film yourself, use AI for editing.",Balanced AI use,3-4,1
+0-12,Intermediate,20,For learning geography,A – Use AI for specific places you're curious about.,Balanced AI use,3-4,2
+0-12,Intermediate,20,For learning geography,B – Ask AI to tell you everything about countries.,High AI impact,1-2,0
+0-12,Intermediate,20,For learning geography,C – Study maps and read books yourself.,Low-impact conscious use,5-6,1
+0-12,Expert,1,For building simple apps,A – Use AI to debug and explain tricky parts.,Balanced AI use,3-4,1
+0-12,Expert,1,For building simple apps,B – Use AI to generate all the app code.,High AI impact,1-2,0
+0-12,Expert,1,For building simple apps,C – Write all code yourself following documentation.,Low-impact conscious use,5-6,2
+0-12,Expert,2,For understanding how ai works,A – Ask AI for clarification after reading yourself.,Balanced AI use,3-4,1
+0-12,Expert,2,For understanding how ai works,B – Ask AI to explain everything about itself.,High AI impact,1-2,0
+0-12,Expert,2,For understanding how ai works,C – Study textbooks and run small experiments yourself.,Low-impact conscious use,5-6,2
+0-12,Expert,3,For training simple models,A – Build and train a basic model from scratch.,Low-impact conscious use,5-6,2
+0-12,Expert,3,For training simple models,B – Use a template and adjust parameters yourself.,Balanced AI use,3-4,1
+0-12,Expert,3,For training simple models,C – Use a pre-built model without customising.,High AI impact,1-2,0
+0-12,Expert,4,For image recognition basics,A – Write a basic recognition algorithm yourself.,Low-impact conscious use,5-6,2
+0-12,Expert,4,For image recognition basics,B – Use a cloud API without understanding it.,High AI impact,1-2,0
+0-12,Expert,4,For image recognition basics,C – Use TensorFlow.js and learn what each part does.,Balanced AI use,3-4,1
+0-12,Expert,5,For building a chatbot,A – Use a no-code builder for everything.,High AI impact,1-2,0
+0-12,Expert,5,For building a chatbot,"B – Use a simple API, write conversation logic yourself.",Balanced AI use,3-4,1
+0-12,Expert,5,For building a chatbot,C – Design all logic and responses from scratch.,Low-impact conscious use,5-6,2
+0-12,Expert,6,For pattern recognition,"A – Use AI for complex patterns, find simple ones yourself.",Balanced AI use,3-4,1
+0-12,Expert,6,For pattern recognition,B – Code the pattern-matching logic yourself.,Low-impact conscious use,5-6,2
+0-12,Expert,6,For pattern recognition,C – Use AI to find all patterns automatically.,High AI impact,1-2,0
+0-12,Expert,7,For coding a game,A – Code the entire game yourself.,Low-impact conscious use,5-6,2
+0-12,Expert,7,For coding a game,B – Use AI to generate all game code.,High AI impact,1-2,0
+0-12,Expert,7,For coding a game,C – Use AI to debug and explain logic.,Balanced AI use,3-4,1
+0-12,Expert,8,For data collection projects,A – Use AI to collect and analyse all data.,High AI impact,1-2,0
+0-12,Expert,8,For data collection projects,"B – Collect data yourself, use AI for cleaning.",Balanced AI use,3-4,1
+0-12,Expert,8,For data collection projects,C – Collect and organise all data manually.,Low-impact conscious use,5-6,2
+0-12,Expert,9,For making a robot move,A – Programme all robot movements manually.,Low-impact conscious use,5-6,2
+0-12,Expert,9,For making a robot move,B – Use AI to control all robot movements.,High AI impact,1-2,0
+0-12,Expert,9,For making a robot move,"C – Use AI for path planning, code basic movements yourself.",Balanced AI use,3-4,1
+0-12,Expert,10,For ai-powered art projects,A – Use AI to generate all artwork.,High AI impact,1-2,0
+0-12,Expert,10,For ai-powered art projects,"B – Create all art yourself, AI only for colour palette.",Low-impact conscious use,5-6,2
+0-12,Expert,10,For ai-powered art projects,"C – Use AI for style, create the piece yourself.",Balanced AI use,3-4,1
+0-12,Expert,11,For data visualisation,A – Create all visualisations manually.,Low-impact conscious use,5-6,2
+0-12,Expert,11,For data visualisation,B – Use AI to create all charts automatically.,High AI impact,1-2,0
+0-12,Expert,11,For data visualisation,C – Use a library and write the chart code yourself.,Balanced AI use,3-4,1
+0-12,Expert,12,For natural language basics,A – Use a large LLM API without understanding it.,High AI impact,1-2,0
+0-12,Expert,12,For natural language basics,B – Write basic text-processing from scratch.,Low-impact conscious use,5-6,2
+0-12,Expert,12,For natural language basics,C – Use a simple NLP library and learn what it does.,Balanced AI use,3-4,1
+0-12,Expert,13,For automation tasks,A – Use AI to automate everything without review.,High AI impact,1-2,0
+0-12,Expert,13,For automation tasks,"B – Automate repetitive tasks, understand each step.",Balanced AI use,3-4,1
+0-12,Expert,13,For automation tasks,C – Do tasks manually until you understand them fully.,Low-impact conscious use,5-6,2
+0-12,Expert,14,For voice commands programming,"A – Use a speech API, write the command logic yourself.",Balanced AI use,3-4,1
+0-12,Expert,14,For voice commands programming,B – Use a pre-built voice AI platform.,High AI impact,1-2,0
+0-12,Expert,14,For voice commands programming,C – Code basic voice recognition from scratch.,Low-impact conscious use,5-6,2
+0-12,Expert,15,For understanding algorithms,A – Ask AI to clarify things you can't understand yourself.,Balanced AI use,3-4,1
+0-12,Expert,15,For understanding algorithms,B – Ask AI to explain every algorithm.,High AI impact,1-2,0
+0-12,Expert,15,For understanding algorithms,C – Study algorithms in books and solve independently.,Low-impact conscious use,5-6,2
+0-12,Expert,16,For ai ethics for kids,"A – Read and discuss with adults, form views yourself.",Low-impact conscious use,5-6,2
+0-12,Expert,16,For ai ethics for kids,B – Use AI to write all your views on AI ethics.,High AI impact,1-2,0
+0-12,Expert,16,For ai ethics for kids,"C – Research with AI, then form your own opinions.",Balanced AI use,3-4,1
+0-12,Expert,17,For predicting simple outcomes,A – Use an AI model without understanding it.,High AI impact,1-2,0
+0-12,Expert,17,For predicting simple outcomes,B – Code a basic prediction rule yourself.,Low-impact conscious use,5-6,2
+0-12,Expert,17,For predicting simple outcomes,C – Use a simple tool and understand what it outputs.,Balanced AI use,3-4,1
+0-12,Expert,18,For image classification,A – Use a cloud API for all image classification.,High AI impact,1-2,0
+0-12,Expert,18,For image classification,B – Use a pre-trained model and evaluate its results.,Balanced AI use,3-4,1
+0-12,Expert,18,For image classification,C – Build and train a basic classifier yourself.,Low-impact conscious use,5-6,2
+0-12,Expert,19,For solving puzzles with code,A – Solve all puzzles independently.,Low-impact conscious use,5-6,2
+0-12,Expert,19,For solving puzzles with code,"B – Try yourself, use AI to check your approach.",Balanced AI use,3-4,1
+0-12,Expert,19,For solving puzzles with code,C – Use AI to solve all coding puzzles for you.,High AI impact,1-2,0
+0-12,Expert,20,For ai storytelling projects,A – Write the whole story yourself.,Low-impact conscious use,5-6,2
+0-12,Expert,20,For ai storytelling projects,B – Use AI to generate the entire story.,High AI impact,1-2,0
+0-12,Expert,20,For ai storytelling projects,"C – Co-write with AI, directing the story yourself.",Balanced AI use,3-4,1
+13-19,Beginner,1,For study help,A – Ask ChatGPT to write all your notes.,High AI impact,1-2,0
+13-19,Beginner,1,For study help,B – Study from textbooks and class notes yourself.,Low-impact conscious use,5-6,2
+13-19,Beginner,1,For study help,C – Use AI to explain topics you find hard.,Balanced AI use,3-4,1
+13-19,Beginner,2,For social media content,A – Use AI to create all your posts and captions.,High AI impact,1-2,0
+13-19,Beginner,2,For social media content,"B – Use AI for caption ideas, add your own voice.",Balanced AI use,3-4,1
+13-19,Beginner,2,For social media content,C – Write and create all your own content.,Low-impact conscious use,5-6,2
+13-19,Beginner,3,For managing stress,A – Use an AI wellbeing app for everything.,High AI impact,1-2,0
+13-19,Beginner,3,For managing stress,"B – Talk to a friend, counsellor, or family member.",Low-impact conscious use,5-6,2
+13-19,Beginner,3,For managing stress,C – Use AI for breathing exercises and tips.,Balanced AI use,3-4,1
+13-19,Beginner,4,For creative writing,A – Ask AI to write the full piece for you.,High AI impact,1-2,0
+13-19,Beginner,4,For creative writing,"B – Ask AI for a story starter, write the rest yourself.",Balanced AI use,3-4,1
+13-19,Beginner,4,For creative writing,C – Write the whole piece yourself.,Low-impact conscious use,5-6,2
+13-19,Beginner,5,For music discovery,A – Browse playlists and ask friends for recommendations.,Low-impact conscious use,5-6,2
+13-19,Beginner,5,For music discovery,"B – Use AI to find new artists, then explore yourself.",Balanced AI use,3-4,1
+13-19,Beginner,5,For music discovery,C – Let AI curate all your music automatically.,High AI impact,1-2,0
+13-19,Beginner,6,For gaming strategies,A – Figure out strategies yourself or watch gameplay.,Low-impact conscious use,5-6,2
+13-19,Beginner,6,For gaming strategies,B – Use AI for specific tips only when really stuck.,Balanced AI use,3-4,1
+13-19,Beginner,6,For gaming strategies,C – Ask AI for all strategies and walkthroughs.,High AI impact,1-2,0
+13-19,Beginner,7,For understanding the news,A – Ask AI to summarise all the news for you.,High AI impact,1-2,0
+13-19,Beginner,7,For understanding the news,B – Use AI to explain complex news stories.,Balanced AI use,3-4,2
+13-19,Beginner,7,For understanding the news,C – Read articles and form your own view.,Low-impact conscious use,5-6,1
+13-19,Beginner,8,For career exploration,A – Talk to people in jobs you're interested in.,Low-impact conscious use,5-6,2
+13-19,Beginner,8,For career exploration,"B – Use AI to research career options, decide yourself.",Balanced AI use,3-4,1
+13-19,Beginner,8,For career exploration,C – Let AI decide which career you should choose.,High AI impact,1-2,0
+13-19,Beginner,9,For language learning,"A – Use apps, take classes, practise with real people.",Low-impact conscious use,5-6,2
+13-19,Beginner,9,For language learning,B – Use AI to translate everything for you.,High AI impact,1-2,0
+13-19,Beginner,9,For language learning,C – Use AI to practise conversations.,Balanced AI use,3-4,1
+13-19,Beginner,10,For photography editing,A – Edit all your photos manually.,Low-impact conscious use,5-6,1
+13-19,Beginner,10,For photography editing,B – Use AI to automatically edit all your photos.,High AI impact,1-2,0
+13-19,Beginner,10,For photography editing,"C – Use AI presets, adjust them yourself.",Balanced AI use,3-4,2
+13-19,Beginner,11,For understanding ai safety,A – Read articles and talk to trusted adults.,Low-impact conscious use,5-6,2
+13-19,Beginner,11,For understanding ai safety,B – Ask AI to manage and explain all safety risks.,High AI impact,1-2,0
+13-19,Beginner,11,For understanding ai safety,C – Use AI to learn about digital safety topics.,Balanced AI use,3-4,1
+13-19,Beginner,12,For journalling prompts,A – Write freely in your journal without any prompts.,Low-impact conscious use,5-6,2
+13-19,Beginner,12,For journalling prompts,B – Ask AI to write all your journal entries.,High AI impact,1-2,0
+13-19,Beginner,12,For journalling prompts,"C – Use AI for prompts, write entries yourself.",Balanced AI use,3-4,1
+13-19,Beginner,13,For physical fitness,A – Follow a training plan from a coach or book.,Low-impact conscious use,5-6,1
+13-19,Beginner,13,For physical fitness,"B – Use AI for workout ideas, adjust to your own needs.",Balanced AI use,3-4,2
+13-19,Beginner,13,For physical fitness,C – Use AI to plan all your training automatically.,High AI impact,1-2,0
+13-19,Beginner,14,For managing screen time,A – Set your own screen limits with parental support.,Low-impact conscious use,5-6,2
+13-19,Beginner,14,For managing screen time,"B – Use AI to track time, set your own rules.",Balanced AI use,3-4,1
+13-19,Beginner,14,For managing screen time,C – Let AI manage and control all your screen time.,High AI impact,1-2,0
+13-19,Beginner,15,For cooking ideas,A – Use AI for recipe ideas when you have no inspiration.,Balanced AI use,3-4,2
+13-19,Beginner,15,For cooking ideas,B – Ask AI what to cook every single day.,High AI impact,1-2,0
+13-19,Beginner,15,For cooking ideas,C – Look up recipes in books or ask family.,Low-impact conscious use,5-6,1
+13-19,Beginner,16,For finding reliable information,A – Use AI as your only information source.,High AI impact,1-2,0
+13-19,Beginner,16,For finding reliable information,B – Search multiple sources and evaluate them yourself.,Low-impact conscious use,5-6,1
+13-19,Beginner,16,For finding reliable information,"C – Use AI to find sources, check them yourself.",Balanced AI use,3-4,2
+13-19,Beginner,17,For understanding relationships,"A – Use AI for general tips, trust your instincts.",Balanced AI use,3-4,1
+13-19,Beginner,17,For understanding relationships,B – Ask AI for all relationship advice.,High AI impact,1-2,0
+13-19,Beginner,17,For understanding relationships,"C – Talk to trusted friends, family, or a counsellor.",Low-impact conscious use,5-6,2
+13-19,Beginner,18,For exam preparation,A – Use AI to generate all your study materials.,High AI impact,1-2,0
+13-19,Beginner,18,For exam preparation,"B – Use AI for practice questions, study yourself.",Balanced AI use,3-4,2
+13-19,Beginner,18,For exam preparation,C – Prepare using past papers and your own notes.,Low-impact conscious use,5-6,1
+13-19,Beginner,19,For online safety,A – Let AI manage all your privacy settings.,High AI impact,1-2,0
+13-19,Beginner,19,For online safety,B – Use AI to learn about safe online practices.,Balanced AI use,3-4,1
+13-19,Beginner,19,For online safety,C – Follow school guidelines and talk to parents.,Low-impact conscious use,5-6,2
+13-19,Beginner,20,For travel planning,A – Ask AI to plan every detail of your trip.,High AI impact,1-2,0
+13-19,Beginner,20,For travel planning,"B – Use AI for destination ideas, plan the rest yourself.",Balanced AI use,3-4,2
+13-19,Beginner,20,For travel planning,C – Research and plan the trip yourself.,Low-impact conscious use,5-6,1
+13-19,Intermediate,1,For academic research,"A – Use AI to find sources, research and write yourself.",Balanced AI use,3-4,2
+13-19,Intermediate,1,For academic research,B – Use AI to research and write your full paper.,High AI impact,1-2,0
+13-19,Intermediate,1,For academic research,"C – Research using academic sources, AI for citations only.",Low-impact conscious use,5-6,1
+13-19,Intermediate,2,For creating digital content,A – Use AI to generate all content you post.,High AI impact,1-2,0
+13-19,Intermediate,2,For creating digital content,"B – Use AI for ideas, create all content yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,2,For creating digital content,C – Create all content from scratch yourself.,Low-impact conscious use,5-6,2
+13-19,Intermediate,3,For ai companion / mental health,A – Use an AI companion as your main emotional support.,High AI impact,1-2,0
+13-19,Intermediate,3,For ai companion / mental health,B – Journal yourself and talk to friends or a counsellor.,Low-impact conscious use,5-6,2
+13-19,Intermediate,3,For ai companion / mental health,"C – Use AI for mood tracking, talk to real people too.",Balanced AI use,3-4,1
+13-19,Intermediate,4,For college application essays,A – Ask AI to write your whole personal statement.,High AI impact,1-2,0
+13-19,Intermediate,4,For college application essays,B – Write the essay completely yourself.,Low-impact conscious use,5-6,2
+13-19,Intermediate,4,For college application essays,"C – Use AI for structure, write in your own voice.",Balanced AI use,3-4,1
+13-19,Intermediate,5,For learning to code,A – Use AI to write all your code.,High AI impact,1-2,0
+13-19,Intermediate,5,For learning to code,B – Use AI to explain concepts and fix bugs.,Balanced AI use,3-4,1
+13-19,Intermediate,5,For learning to code,"C – Write code yourself, AI only for documentation.",Low-impact conscious use,5-6,2
+13-19,Intermediate,6,For building a portfolio,"A – Use AI for layout ideas, write descriptions yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,6,For building a portfolio,B – Use AI to write all portfolio descriptions.,High AI impact,1-2,0
+13-19,Intermediate,6,For building a portfolio,C – Build and write everything yourself.,Low-impact conscious use,5-6,2
+13-19,Intermediate,7,For debate preparation,A – Research and develop all arguments yourself.,Low-impact conscious use,5-6,2
+13-19,Intermediate,7,For debate preparation,"B – Use AI for counterarguments, form your own views first.",Balanced AI use,3-4,1
+13-19,Intermediate,7,For debate preparation,C – Use AI to find all your arguments.,High AI impact,1-2,0
+13-19,Intermediate,8,For social media strategy,A – Manage your own social media entirely yourself.,Low-impact conscious use,5-6,1
+13-19,Intermediate,8,For social media strategy,"B – Use AI for analytics, create content yourself.",Balanced AI use,3-4,2
+13-19,Intermediate,8,For social media strategy,C – Use AI to run and post all your content.,High AI impact,1-2,0
+13-19,Intermediate,9,For mental health journalling,"A – Use AI for prompts, write reflections yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,9,For mental health journalling,B – Use AI to reflect and summarise for you.,High AI impact,1-2,0
+13-19,Intermediate,9,For mental health journalling,C – Journal freely without AI involvement.,Low-impact conscious use,5-6,2
+13-19,Intermediate,10,For exploring career paths,A – Let AI choose your career direction.,High AI impact,1-2,0
+13-19,Intermediate,10,For exploring career paths,B – Shadow professionals and talk to mentors.,Low-impact conscious use,5-6,2
+13-19,Intermediate,10,For exploring career paths,"C – Use AI to research options, decide yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,11,For learning new skills,A – Use AI to do the skill on your behalf.,High AI impact,1-2,0
+13-19,Intermediate,11,For learning new skills,"B – Use AI for lessons and guidance, practise yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,11,For learning new skills,"C – Learn through courses, books, and direct practice.",Low-impact conscious use,5-6,2
+13-19,Intermediate,12,For making music,A – Use AI to produce your entire track.,High AI impact,1-2,0
+13-19,Intermediate,12,For making music,"B – Compose, record, and produce entirely yourself.",Low-impact conscious use,5-6,2
+13-19,Intermediate,12,For making music,"C – Use AI for beats and effects, compose yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,13,For sports performance,"A – Train with your coach, no AI involved.",Low-impact conscious use,5-6,1
+13-19,Intermediate,13,For sports performance,"B – Use AI for data tracking, your coach decides training.",Balanced AI use,3-4,2
+13-19,Intermediate,13,For sports performance,C – Use AI to automate all your training plans.,High AI impact,1-2,0
+13-19,Intermediate,14,For environmental activism,A – Research and advocate entirely yourself.,Low-impact conscious use,5-6,1
+13-19,Intermediate,14,For environmental activism,"B – Use AI for research, write and speak yourself.",Balanced AI use,3-4,2
+13-19,Intermediate,14,For environmental activism,C – Use AI to write all your campaign content.,High AI impact,1-2,0
+13-19,Intermediate,15,For personal finance basics,"A – Use AI for budgeting tools, make your own choices.",Balanced AI use,3-4,2
+13-19,Intermediate,15,For personal finance basics,B – Budget and plan manually with a parent or book.,Low-impact conscious use,5-6,1
+13-19,Intermediate,15,For personal finance basics,C – Let AI make all your financial decisions.,High AI impact,1-2,0
+13-19,Intermediate,16,For art and design projects,"A – Use AI for colour and composition ideas, create yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,16,For art and design projects,B – Create all artwork completely yourself.,Low-impact conscious use,5-6,2
+13-19,Intermediate,16,For art and design projects,C – Use AI to generate all your artwork.,High AI impact,1-2,0
+13-19,Intermediate,17,For managing online identity,A – Use AI to manage all your profiles.,High AI impact,1-2,0
+13-19,Intermediate,17,For managing online identity,"B – Use AI for privacy tips, manage accounts yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,17,For managing online identity,C – Handle all your accounts and privacy yourself.,Low-impact conscious use,5-6,2
+13-19,Intermediate,18,For creative business ideas,A – Use AI to generate and plan the whole business.,High AI impact,1-2,0
+13-19,Intermediate,18,For creative business ideas,B – Brainstorm and plan the business yourself.,Low-impact conscious use,5-6,2
+13-19,Intermediate,18,For creative business ideas,"C – Use AI to research similar ideas, plan yourself.",Balanced AI use,3-4,1
+13-19,Intermediate,19,For peer support tools,A – Engage with real peer support communities.,Low-impact conscious use,5-6,2
+13-19,Intermediate,19,For peer support tools,"B – Use AI to find resources, connect with real people.",Balanced AI use,3-4,1
+13-19,Intermediate,19,For peer support tools,C – Use an AI for all peer support.,High AI impact,1-2,0
+13-19,Intermediate,20,For learning a new language,A – Learn through classes and real conversations.,Low-impact conscious use,5-6,2
+13-19,Intermediate,20,For learning a new language,B – Use AI to translate everything all the time.,High AI impact,1-2,0
+13-19,Intermediate,20,For learning a new language,C – Use AI for practice and corrections.,Balanced AI use,3-4,1
+13-19,Expert,1,For building apps and tools,"A – Use AI to accelerate specific parts, code logic yourself.",Balanced AI use,3-4,2
+13-19,Expert,1,For building apps and tools,B – Use AI to generate all code for the app.,High AI impact,1-2,0
+13-19,Expert,1,For building apps and tools,C – Build the entire app from scratch yourself.,Low-impact conscious use,5-6,1
+13-19,Expert,2,For exploring llms,A – Experiment with LLMs and learn how they actually work.,Balanced AI use,3-4,1
+13-19,Expert,2,For exploring llms,B – Use an LLM for every task without understanding it.,High AI impact,1-2,0
+13-19,Expert,2,For exploring llms,C – Study transformer architecture from first principles.,Low-impact conscious use,5-6,2
+13-19,Expert,3,For training simple models,A – Train a model from scratch on your own dataset.,Low-impact conscious use,5-6,2
+13-19,Expert,3,For training simple models,B – Use pre-trained models for everything.,High AI impact,1-2,0
+13-19,Expert,3,For training simple models,C – Fine-tune a pre-trained model for your use case.,Balanced AI use,3-4,1
+13-19,Expert,4,For prompt engineering,A – Design systematic prompts with clear objectives.,Balanced AI use,3-4,1
+13-19,Expert,4,For prompt engineering,B – Use random prompts with no structure.,High AI impact,1-2,0
+13-19,Expert,4,For prompt engineering,C – Build structured prompt pipelines with evaluation.,Low-impact conscious use,5-6,2
+13-19,Expert,5,For computer vision basics,A – Use OpenCV and understand the processing pipeline.,Balanced AI use,3-4,2
+13-19,Expert,5,For computer vision basics,B – Implement a vision algorithm from scratch.,Low-impact conscious use,5-6,1
+13-19,Expert,5,For computer vision basics,C – Use a cloud vision API without understanding it.,High AI impact,1-2,0
+13-19,Expert,6,For automating tasks,A – Use AI to automate everything without review.,High AI impact,1-2,0
+13-19,Expert,6,For automating tasks,B – Automate only after fully understanding the manual steps.,Low-impact conscious use,5-6,2
+13-19,Expert,6,For automating tasks,C – Script specific automations you understand and monitor.,Balanced AI use,3-4,1
+13-19,Expert,7,For data analysis projects,"A – Use Python/pandas for analysis, AI for clarification.",Balanced AI use,3-4,2
+13-19,Expert,7,For data analysis projects,B – Write all analysis code and interpretation yourself.,Low-impact conscious use,5-6,1
+13-19,Expert,7,For data analysis projects,C – Use AI to run and interpret all analysis.,High AI impact,1-2,0
+13-19,Expert,8,For building recommendation systems,A – Build a collaborative filtering model with guidance.,Balanced AI use,3-4,1
+13-19,Expert,8,For building recommendation systems,B – Use an off-the-shelf AI recommender.,High AI impact,1-2,0
+13-19,Expert,8,For building recommendation systems,C – Implement a recommendation algorithm from scratch.,Low-impact conscious use,5-6,2
+13-19,Expert,9,For neural network basics,A – Use a black-box deep learning framework.,High AI impact,1-2,0
+13-19,Expert,9,For neural network basics,B – Build a simple neural network using Keras or PyTorch.,Balanced AI use,3-4,1
+13-19,Expert,9,For neural network basics,C – Implement backpropagation from scratch in code.,Low-impact conscious use,5-6,2
+13-19,Expert,10,For ai-generated music,"A – Use AI tools for specific layers, compose the rest.",Balanced AI use,3-4,1
+13-19,Expert,10,For ai-generated music,B – Use AI to produce all music automatically.,High AI impact,1-2,0
+13-19,Expert,10,For ai-generated music,C – Compose and produce the full track yourself.,Low-impact conscious use,5-6,2
+13-19,Expert,11,For api use and integration,A – Use AI to write all API integration code.,High AI impact,1-2,0
+13-19,Expert,11,For api use and integration,B – Build the API client from scratch.,Low-impact conscious use,5-6,1
+13-19,Expert,11,For api use and integration,"C – Learn the API docs, write the integration yourself.",Balanced AI use,3-4,2
+13-19,Expert,12,For ai for competitive gaming,A – Use AI to analyse game data and improve strategy.,Balanced AI use,3-4,1
+13-19,Expert,12,For ai for competitive gaming,B – Analyse your own performance without AI tools.,Low-impact conscious use,5-6,2
+13-19,Expert,12,For ai for competitive gaming,C – Use AI to play the game for you.,High AI impact,1-2,0
+13-19,Expert,13,For ai ethics discussions,A – Study AI ethics from multiple sources independently.,Low-impact conscious use,5-6,2
+13-19,Expert,13,For ai ethics discussions,"B – Research AI ethics, form your own views.",Balanced AI use,3-4,1
+13-19,Expert,13,For ai ethics discussions,C – Ask AI to write all your ethics arguments.,High AI impact,1-2,0
+13-19,Expert,14,For creating ai-powered art,"A – Use AI for one element, create the rest yourself.",Balanced AI use,3-4,1
+13-19,Expert,14,For creating ai-powered art,B – Use a generative AI tool for all artwork.,High AI impact,1-2,0
+13-19,Expert,14,For creating ai-powered art,"C – Create entirely original work, no AI generation.",Low-impact conscious use,5-6,2
+13-19,Expert,15,For ai for social causes,A – Plan and run the campaign entirely yourself.,Low-impact conscious use,5-6,1
+13-19,Expert,15,For ai for social causes,"B – Use AI for data analysis, lead the campaign yourself.",Balanced AI use,3-4,2
+13-19,Expert,15,For ai for social causes,C – Use AI to run the entire campaign.,High AI impact,1-2,0
+13-19,Expert,16,For ai in scientific projects,A – Use AI to run and interpret all experiments.,High AI impact,1-2,0
+13-19,Expert,16,For ai in scientific projects,B – Design and run all experiments independently.,Low-impact conscious use,5-6,1
+13-19,Expert,16,For ai in scientific projects,"C – Use AI for literature review, run experiments yourself.",Balanced AI use,3-4,2
+13-19,Expert,17,For building simple datasets,A – Use AI to generate all synthetic data.,High AI impact,1-2,0
+13-19,Expert,17,For building simple datasets,B – Collect and clean all data entirely yourself.,Low-impact conscious use,5-6,2
+13-19,Expert,17,For building simple datasets,C – Collect real data and use AI to clean it.,Balanced AI use,3-4,1
+13-19,Expert,18,For fine-tuning basics,A – Fine-tune using a public framework you understand.,Balanced AI use,3-4,2
+13-19,Expert,18,For fine-tuning basics,B – Implement fine-tuning from scratch.,Low-impact conscious use,5-6,1
+13-19,Expert,18,For fine-tuning basics,C – Use a base model with no fine-tuning.,High AI impact,1-2,0
+13-19,Expert,19,For ai career exploration,"A – Use AI for job market research, decide yourself.",Balanced AI use,3-4,1
+13-19,Expert,19,For ai career exploration,B – Let AI map your entire career path.,High AI impact,1-2,0
+13-19,Expert,19,For ai career exploration,C – Research through interviews and self-reflection.,Low-impact conscious use,5-6,2
+13-19,Expert,20,For ai journalism and media,A – Research and write all journalism yourself.,Low-impact conscious use,5-6,1
+13-19,Expert,20,For ai journalism and media,B – Use AI to write all your articles.,High AI impact,1-2,0
+13-19,Expert,20,For ai journalism and media,"C – Use AI for research, write all articles yourself.",Balanced AI use,3-4,2
+20-39,Beginner,1,For email writing,A – Write all your own emails.,Low-impact conscious use,5-6,2
+20-39,Beginner,1,For email writing,"B – Use AI to draft, then edit in your own words.",Balanced AI use,3-4,1
+20-39,Beginner,1,For email writing,C – Ask AI to write all your emails.,High AI impact,1-2,0
+20-39,Beginner,2,For daily planning,"A – Use AI to suggest tasks, make decisions yourself.",Balanced AI use,3-4,1
+20-39,Beginner,2,For daily planning,B – Plan your day yourself.,Low-impact conscious use,5-6,2
+20-39,Beginner,2,For daily planning,C – Let AI plan your whole day.,High AI impact,1-2,0
+20-39,Beginner,3,For fitness and health,A – Let AI plan all your workouts and diet.,High AI impact,1-2,0
+20-39,Beginner,3,For fitness and health,B – Follow a plan from a trainer or fitness book.,Low-impact conscious use,5-6,1
+20-39,Beginner,3,For fitness and health,"C – Use AI for workout ideas, adapt to your own needs.",Balanced AI use,3-4,2
+20-39,Beginner,4,For cooking recipes,A – Ask AI what to cook for every meal.,High AI impact,1-2,0
+20-39,Beginner,4,For cooking recipes,B – Use AI for recipe ideas when you're uninspired.,Balanced AI use,3-4,2
+20-39,Beginner,4,For cooking recipes,C – Use cookbooks and ask friends for recipes.,Low-impact conscious use,5-6,1
+20-39,Beginner,5,For travel planning,A – Ask AI to plan every detail of your trip.,High AI impact,1-2,0
+20-39,Beginner,5,For travel planning,B – Research and book everything yourself.,Low-impact conscious use,5-6,1
+20-39,Beginner,5,For travel planning,"C – Use AI for destination research, plan yourself.",Balanced AI use,3-4,2
+20-39,Beginner,6,For budget management,A – Track finances in a spreadsheet yourself.,Low-impact conscious use,5-6,1
+20-39,Beginner,6,For budget management,B – Let AI manage all your finances.,High AI impact,1-2,0
+20-39,Beginner,6,For budget management,"C – Use AI budgeting tools, make your own decisions.",Balanced AI use,3-4,2
+20-39,Beginner,7,For job applications,A – Write all applications yourself.,Low-impact conscious use,5-6,2
+20-39,Beginner,7,For job applications,"B – Use AI for structure, write in your own voice.",Balanced AI use,3-4,1
+20-39,Beginner,7,For job applications,C – Ask AI to write all your CVs and cover letters.,High AI impact,1-2,0
+20-39,Beginner,8,For social media,A – Use AI to create and post all your content.,High AI impact,1-2,0
+20-39,Beginner,8,For social media,B – Create and manage all content yourself.,Low-impact conscious use,5-6,2
+20-39,Beginner,8,For social media,"C – Use AI for ideas, create the content yourself.",Balanced AI use,3-4,1
+20-39,Beginner,9,For learning new skills,A – Use AI to do the skill for you.,High AI impact,1-2,0
+20-39,Beginner,9,For learning new skills,B – Learn through courses and hands-on practice.,Low-impact conscious use,5-6,2
+20-39,Beginner,9,For learning new skills,"C – Use AI for explanations, practise yourself.",Balanced AI use,3-4,1
+20-39,Beginner,10,For home organisation,A – Let AI plan all your home routines.,High AI impact,1-2,0
+20-39,Beginner,10,For home organisation,"B – Use AI for ideas, implement everything yourself.",Balanced AI use,3-4,2
+20-39,Beginner,10,For home organisation,C – Plan and organise your home yourself.,Low-impact conscious use,5-6,1
+20-39,Beginner,11,For entertainment choices,A – Let AI pick all your films and shows.,High AI impact,1-2,0
+20-39,Beginner,11,For entertainment choices,"B – Use AI for recommendations, choose yourself.",Balanced AI use,3-4,2
+20-39,Beginner,11,For entertainment choices,C – Browse reviews and ask friends what to watch.,Low-impact conscious use,5-6,1
+20-39,Beginner,12,For starting a side hustle,"A – Use AI for market research, build it yourself.",Balanced AI use,3-4,2
+20-39,Beginner,12,For starting a side hustle,B – Research and start the business yourself.,Low-impact conscious use,5-6,1
+20-39,Beginner,12,For starting a side hustle,C – Ask AI to build and run your whole business.,High AI impact,1-2,0
+20-39,Beginner,13,For managing anxiety,A – Use an AI therapy app as your only support.,High AI impact,1-2,0
+20-39,Beginner,13,For managing anxiety,B – Talk to a therapist or trusted person.,Low-impact conscious use,5-6,2
+20-39,Beginner,13,For managing anxiety,"C – Use AI for coping techniques, talk to people too.",Balanced AI use,3-4,1
+20-39,Beginner,14,For language learning,A – Take a class and practise with real speakers.,Low-impact conscious use,5-6,2
+20-39,Beginner,14,For language learning,B – Use AI to translate everything for you.,High AI impact,1-2,0
+20-39,Beginner,14,For language learning,C – Use AI for practice and corrections.,Balanced AI use,3-4,1
+20-39,Beginner,15,For parenting support,"A – Talk to your GP, health visitor, and other parents.",Low-impact conscious use,5-6,2
+20-39,Beginner,15,For parenting support,B – Ask AI for all parenting decisions.,High AI impact,1-2,0
+20-39,Beginner,15,For parenting support,"C – Use AI for tips, trust your own instincts.",Balanced AI use,3-4,1
+20-39,Beginner,16,For understanding news,A – Ask AI to summarise all news for you.,High AI impact,1-2,0
+20-39,Beginner,16,For understanding news,B – Use AI to explain complex stories.,Balanced AI use,3-4,2
+20-39,Beginner,16,For understanding news,C – Read multiple news sources yourself.,Low-impact conscious use,5-6,1
+20-39,Beginner,17,For online dating / relationships,A – Let AI write all your messages.,High AI impact,1-2,0
+20-39,Beginner,17,For online dating / relationships,"B – Use AI for icebreaker ideas, be yourself after.",Balanced AI use,3-4,1
+20-39,Beginner,17,For online dating / relationships,C – Write your own authentic messages.,Low-impact conscious use,5-6,2
+20-39,Beginner,18,For home decoration ideas,"A – Use AI for style ideas, design yourself.",Balanced AI use,3-4,2
+20-39,Beginner,18,For home decoration ideas,B – Use AI to design your entire home.,High AI impact,1-2,0
+20-39,Beginner,18,For home decoration ideas,C – Browse magazines and plan yourself.,Low-impact conscious use,5-6,1
+20-39,Beginner,19,For car maintenance advice,"A – Use AI to understand a problem, get it checked.",Balanced AI use,3-4,1
+20-39,Beginner,19,For car maintenance advice,B – Ask AI for all car maintenance decisions.,High AI impact,1-2,0
+20-39,Beginner,19,For car maintenance advice,C – Take your car directly to a professional mechanic.,Low-impact conscious use,5-6,2
+20-39,Beginner,20,For shopping decisions,A – Let AI decide all your purchases.,High AI impact,1-2,0
+20-39,Beginner,20,For shopping decisions,"B – Use AI for product comparisons, decide yourself.",Balanced AI use,3-4,2
+20-39,Beginner,20,For shopping decisions,C – Read reviews and decide yourself.,Low-impact conscious use,5-6,1
+20-39,Intermediate,1,For work productivity,A – Handle all work tasks with your own systems.,Low-impact conscious use,5-6,1
+20-39,Intermediate,1,For work productivity,"B – Use AI for repetitive tasks, lead the important work.",Balanced AI use,3-4,2
+20-39,Intermediate,1,For work productivity,C – Automate all your work tasks with AI.,High AI impact,1-2,0
+20-39,Intermediate,2,For creative projects,A – Use AI to generate all creative output.,High AI impact,1-2,0
+20-39,Intermediate,2,For creative projects,"B – Use AI for ideas, create everything yourself.",Balanced AI use,3-4,1
+20-39,Intermediate,2,For creative projects,C – Create entirely without AI involvement.,Low-impact conscious use,5-6,2
+20-39,Intermediate,3,For financial planning,"A – Use AI for analysis, make all decisions yourself.",Balanced AI use,3-4,2
+20-39,Intermediate,3,For financial planning,B – Let AI make all financial decisions.,High AI impact,1-2,0
+20-39,Intermediate,3,For financial planning,C – Plan your finances with a professional or yourself.,Low-impact conscious use,5-6,1
+20-39,Intermediate,4,For learning to code,"A – Use AI to explain concepts, write the code yourself.",Balanced AI use,3-4,1
+20-39,Intermediate,4,For learning to code,B – Code everything yourself from documentation.,Low-impact conscious use,5-6,2
+20-39,Intermediate,4,For learning to code,C – Use AI to write all your code.,High AI impact,1-2,0
+20-39,Intermediate,5,For content creation,A – Use AI to write all your content.,High AI impact,1-2,0
+20-39,Intermediate,5,For content creation,B – Write all content from scratch yourself.,Low-impact conscious use,5-6,2
+20-39,Intermediate,5,For content creation,"C – Use AI for outlines, write in your own voice.",Balanced AI use,3-4,1
+20-39,Intermediate,6,For freelance work,A – Complete all client work yourself.,Low-impact conscious use,5-6,2
+20-39,Intermediate,6,For freelance work,"B – Use AI for research and drafting, deliver in your voice.",Balanced AI use,3-4,1
+20-39,Intermediate,6,For freelance work,C – Use AI to complete all client work.,High AI impact,1-2,0
+20-39,Intermediate,7,For starting a business,A – Let AI build and run your whole business.,High AI impact,1-2,0
+20-39,Intermediate,7,For starting a business,B – Start and run the business entirely yourself.,Low-impact conscious use,5-6,1
+20-39,Intermediate,7,For starting a business,"C – Use AI for market research, build the business yourself.",Balanced AI use,3-4,2
+20-39,Intermediate,8,For data analysis basics,A – Use AI to run all analysis automatically.,High AI impact,1-2,0
+20-39,Intermediate,8,For data analysis basics,"B – Use AI for complex queries, interpret results yourself.",Balanced AI use,3-4,2
+20-39,Intermediate,8,For data analysis basics,C – Learn SQL or Excel and run all analysis yourself.,Low-impact conscious use,5-6,1
+20-39,Intermediate,9,For career growth,"A – Use AI for job market research, make choices yourself.",Balanced AI use,3-4,1
+20-39,Intermediate,9,For career growth,B – Ask AI to plan your entire career.,High AI impact,1-2,0
+20-39,Intermediate,9,For career growth,C – Network with mentors and plan your career yourself.,Low-impact conscious use,5-6,2
+20-39,Intermediate,10,For building a personal brand,"A – Use AI for content ideas, create and post yourself.",Balanced AI use,3-4,1
+20-39,Intermediate,10,For building a personal brand,B – Use AI to create all your brand content.,High AI impact,1-2,0
+20-39,Intermediate,10,For building a personal brand,C – Build your brand through authentic self-expression.,Low-impact conscious use,5-6,2
+20-39,Intermediate,11,For project management,A – Manage projects with your own tools and experience.,Low-impact conscious use,5-6,1
+20-39,Intermediate,11,For project management,"B – Use AI for scheduling, lead the project yourself.",Balanced AI use,3-4,2
+20-39,Intermediate,11,For project management,C – Let AI manage all your project decisions.,High AI impact,1-2,0
+20-39,Intermediate,12,For market research,"A – Use AI for data collection, analyse and decide yourself.",Balanced AI use,3-4,2
+20-39,Intermediate,12,For market research,B – Use AI to do all market research.,High AI impact,1-2,0
+20-39,Intermediate,12,For market research,C – Conduct research through interviews and direct analysis.,Low-impact conscious use,5-6,1
+20-39,Intermediate,13,For mental wellness tools,A – Use an AI wellness app as your only tool.,High AI impact,1-2,0
+20-39,Intermediate,13,For mental wellness tools,B – Focus on human connection and professional support.,Low-impact conscious use,5-6,2
+20-39,Intermediate,13,For mental wellness tools,"C – Use AI for tracking, engage with real people too.",Balanced AI use,3-4,1
+20-39,Intermediate,14,For remote work tools,A – Work without AI using your own systems.,Low-impact conscious use,5-6,1
+20-39,Intermediate,14,For remote work tools,"B – Use AI for meeting summaries, work independently.",Balanced AI use,3-4,2
+20-39,Intermediate,14,For remote work tools,C – Use AI to automate all remote work tasks.,High AI impact,1-2,0
+20-39,Intermediate,15,For skill development,A – Build skills through deliberate practice only.,Low-impact conscious use,5-6,2
+20-39,Intermediate,15,For skill development,B – Use AI to shortcut all skill-building.,High AI impact,1-2,0
+20-39,Intermediate,15,For skill development,"C – Use AI for guidance, put in the practice yourself.",Balanced AI use,3-4,1
+20-39,Intermediate,16,For property research,"A – Use AI for market data, decide yourself.",Balanced AI use,3-4,2
+20-39,Intermediate,16,For property research,B – Research independently and consult a professional.,Low-impact conscious use,5-6,1
+20-39,Intermediate,16,For property research,C – Use AI to make all property decisions.,High AI impact,1-2,0
+20-39,Intermediate,17,For educational content creation,A – Use AI to write all your course material.,High AI impact,1-2,0
+20-39,Intermediate,17,For educational content creation,B – Create all educational content entirely yourself.,Low-impact conscious use,5-6,2
+20-39,Intermediate,17,For educational content creation,"C – Use AI for structure, write the content yourself.",Balanced AI use,3-4,1
+20-39,Intermediate,18,For environmental footprint tracking,A – Track your impact manually and make informed choices.,Low-impact conscious use,5-6,1
+20-39,Intermediate,18,For environmental footprint tracking,B – Use AI to manage all your sustainability choices.,High AI impact,1-2,0
+20-39,Intermediate,18,For environmental footprint tracking,"C – Use AI to calculate footprint, make changes yourself.",Balanced AI use,3-4,2
+20-39,Intermediate,19,For relationship and life coaching,"A – Use AI for reflection prompts, seek human support.",Balanced AI use,3-4,1
+20-39,Intermediate,19,For relationship and life coaching,B – Use AI as your sole life coach.,High AI impact,1-2,0
+20-39,Intermediate,19,For relationship and life coaching,C – Work with a real coach or trusted person.,Low-impact conscious use,5-6,2
+20-39,Intermediate,20,For managing personal health data,A – Share all health data with AI for decisions.,High AI impact,1-2,0
+20-39,Intermediate,20,For managing personal health data,"B – Use AI for tracking, consult a doctor for decisions.",Balanced AI use,3-4,2
+20-39,Intermediate,20,For managing personal health data,C – Track health manually and consult your GP.,Low-impact conscious use,5-6,1
+20-39,Expert,1,For building ai-powered apps,A – Use AI only where it clearly outperforms simpler methods.,Low-impact conscious use,5-6,1
+20-39,Expert,1,For building ai-powered apps,B – Use the right-sized model for each specific task.,Balanced AI use,3-4,2
+20-39,Expert,1,For building ai-powered apps,C – Use the largest model available for everything.,High AI impact,1-2,0
+20-39,Expert,2,For working with llms,A – Use LLMs for specific steps with clear evaluation.,Balanced AI use,3-4,2
+20-39,Expert,2,For working with llms,B – Use LLMs only where they outperform simpler approaches.,Low-impact conscious use,5-6,1
+20-39,Expert,2,For working with llms,C – Use LLMs for all text tasks without evaluation.,High AI impact,1-2,0
+20-39,Expert,3,For training ml models,A – Train a targeted model with minimum required data.,Balanced AI use,3-4,2
+20-39,Expert,3,For training ml models,B – Train the largest model possible on all data.,High AI impact,1-2,0
+20-39,Expert,3,For training ml models,C – Use rule-based systems until ML is clearly justified.,Low-impact conscious use,5-6,1
+20-39,Expert,4,For prompt engineering at scale,A – Design and systematically evaluate prompt pipelines.,Balanced AI use,3-4,2
+20-39,Expert,4,For prompt engineering at scale,B – Use structured templates with rigorous benchmarking.,Low-impact conscious use,5-6,1
+20-39,Expert,4,For prompt engineering at scale,C – Run thousands of prompts without evaluation.,High AI impact,1-2,0
+20-39,Expert,5,For computer vision projects,A – Implement the minimum viable vision solution.,Low-impact conscious use,5-6,1
+20-39,Expert,5,For computer vision projects,B – Use a large cloud model for all inference.,High AI impact,1-2,0
+20-39,Expert,5,For computer vision projects,C – Use a pre-trained model fine-tuned for your use case.,Balanced AI use,3-4,2
+20-39,Expert,6,For nlp projects,A – Use a smaller model suited to the specific task.,Balanced AI use,3-4,2
+20-39,Expert,6,For nlp projects,B – Use GPT-4 for all text processing.,High AI impact,1-2,0
+20-39,Expert,6,For nlp projects,C – Build a targeted rule-based or small-model solution.,Low-impact conscious use,5-6,1
+20-39,Expert,7,For building recommendation systems,A – Use a simple rule-based recommender and iterate.,Low-impact conscious use,5-6,1
+20-39,Expert,7,For building recommendation systems,B – Deploy a massive system without clear metrics.,High AI impact,1-2,0
+20-39,Expert,7,For building recommendation systems,C – Build a targeted recommender with clear success criteria.,Balanced AI use,3-4,2
+20-39,Expert,8,For automating workflows,A – Automate only after deeply understanding the manual flow.,Low-impact conscious use,5-6,1
+20-39,Expert,8,For automating workflows,B – Automate everything immediately with AI.,High AI impact,1-2,0
+20-39,Expert,8,For automating workflows,C – Automate specific bottlenecks after manual testing.,Balanced AI use,3-4,2
+20-39,Expert,9,For model evaluation,A – Build custom evaluation datasets for your use case.,Low-impact conscious use,5-6,2
+20-39,Expert,9,For model evaluation,B – Evaluate on standard benchmarks for your task.,Balanced AI use,3-4,1
+20-39,Expert,9,For model evaluation,C – Skip evaluation and trust the model.,High AI impact,1-2,0
+20-39,Expert,10,For fine-tuning models,A – Fine-tune the largest available model.,High AI impact,1-2,0
+20-39,Expert,10,For fine-tuning models,B – Evaluate whether fine-tuning is needed vs prompting.,Low-impact conscious use,5-6,2
+20-39,Expert,10,For fine-tuning models,C – Fine-tune a base model on a minimal representative dataset.,Balanced AI use,3-4,1
+20-39,Expert,11,For deploying ai models,A – Deploy with full observability and rollback plans.,Low-impact conscious use,5-6,2
+20-39,Expert,11,For deploying ai models,B – Deploy with basic logging and performance monitoring.,Balanced AI use,3-4,1
+20-39,Expert,11,For deploying ai models,C – Deploy immediately with no monitoring.,High AI impact,1-2,0
+20-39,Expert,12,For data pipeline creation,A – Define minimum data requirements before building.,Low-impact conscious use,5-6,2
+20-39,Expert,12,For data pipeline creation,B – Ingest relevant data with quality checks.,Balanced AI use,3-4,1
+20-39,Expert,12,For data pipeline creation,C – Ingest all available data without filtering.,High AI impact,1-2,0
+20-39,Expert,13,For ai for product design,A – Make product decisions from direct user research.,Low-impact conscious use,5-6,1
+20-39,Expert,13,For ai for product design,B – Use AI for all product decisions.,High AI impact,1-2,0
+20-39,Expert,13,For ai for product design,"C – Use AI for user research synthesis, you set direction.",Balanced AI use,3-4,2
+20-39,Expert,14,For multimodal ai use,A – Use multimodal only where text alone is insufficient.,Balanced AI use,3-4,1
+20-39,Expert,14,For multimodal ai use,B – Use multimodal AI for every task.,High AI impact,1-2,0
+20-39,Expert,14,For multimodal ai use,C – Use the simplest input modality that solves the problem.,Low-impact conscious use,5-6,2
+20-39,Expert,15,For ai ethics in practice,A – Conduct full ethical review before every deployment.,Low-impact conscious use,5-6,2
+20-39,Expert,15,For ai ethics in practice,B – Review for bias and fairness at key milestones.,Balanced AI use,3-4,1
+20-39,Expert,15,For ai ethics in practice,C – Ship features without ethical review.,High AI impact,1-2,0
+20-39,Expert,16,For ai-assisted creative work,"A – Create entirely yourself, AI only for technical checks.",Low-impact conscious use,5-6,2
+20-39,Expert,16,For ai-assisted creative work,B – Let AI do all the creative work.,High AI impact,1-2,0
+20-39,Expert,16,For ai-assisted creative work,"C – Use AI for exploration, direct the creative output.",Balanced AI use,3-4,1
+20-39,Expert,17,For integrating ai into teams,A – Introduce AI incrementally with full team understanding.,Low-impact conscious use,5-6,1
+20-39,Expert,17,For integrating ai into teams,B – Integrate AI for specific team pain points.,Balanced AI use,3-4,2
+20-39,Expert,17,For integrating ai into teams,C – Replace as many team processes as possible.,High AI impact,1-2,0
+20-39,Expert,18,For object detection projects,A – Select a model sized to your inference constraints.,Balanced AI use,3-4,2
+20-39,Expert,18,For object detection projects,B – Implement a minimal detection pipeline for your task.,Low-impact conscious use,5-6,1
+20-39,Expert,18,For object detection projects,C – Use the largest detection model on all data.,High AI impact,1-2,0
+20-39,Expert,19,For ai for research,"A – Use AI for literature review, conduct research yourself.",Balanced AI use,3-4,1
+20-39,Expert,19,For ai for research,B – Use AI to generate all research findings.,High AI impact,1-2,0
+20-39,Expert,19,For ai for research,"C – Use AI only for search, conduct all analysis yourself.",Low-impact conscious use,5-6,2
+20-39,Expert,20,For ai for business strategy,A – Let AI make all strategic decisions.,High AI impact,1-2,0
+20-39,Expert,20,For ai for business strategy,"B – Use your expertise to strategise, AI only for data.",Low-impact conscious use,5-6,2
+20-39,Expert,20,For ai for business strategy,"C – Use AI for market and data analysis, strategise yourself.",Balanced AI use,3-4,1
+40-59,Beginner,1,For health information,"A – Consult your GP or pharmacist directly, no AI.",Low-impact conscious use,5-6,2
+40-59,Beginner,1,For health information,B – Ask AI for all health diagnoses and advice.,High AI impact,1-2,0
+40-59,Beginner,1,For health information,"C – Use AI to understand symptoms, then call your GP.",Balanced AI use,3-4,1
+40-59,Beginner,2,For email assistance,A – Write all your own emails.,Low-impact conscious use,5-6,2
+40-59,Beginner,2,For email assistance,B – Ask AI to write all your emails.,High AI impact,1-2,0
+40-59,Beginner,2,For email assistance,"C – Use AI for difficult emails, write simple ones yourself.",Balanced AI use,3-4,1
+40-59,Beginner,3,For understanding medical info,A – Let AI explain and make all medical decisions.,High AI impact,1-2,0
+40-59,Beginner,3,For understanding medical info,B – Discuss everything directly with your doctor.,Low-impact conscious use,5-6,2
+40-59,Beginner,3,For understanding medical info,"C – Use AI to understand medical terms, then discuss with your doctor.",Balanced AI use,3-4,1
+40-59,Beginner,4,For recipes and cooking,A – Use cookbooks and family recipes you know well.,Low-impact conscious use,5-6,1
+40-59,Beginner,4,For recipes and cooking,B – Use AI when you need cooking inspiration.,Balanced AI use,3-4,2
+40-59,Beginner,4,For recipes and cooking,C – Ask AI what to cook for every meal.,High AI impact,1-2,0
+40-59,Beginner,5,For learning new technology,A – Ask a family member or attend a local class.,Low-impact conscious use,5-6,1
+40-59,Beginner,5,For learning new technology,B – Use AI for step-by-step explanations.,Balanced AI use,3-4,2
+40-59,Beginner,5,For learning new technology,C – Ask AI to handle all technology tasks for you.,High AI impact,1-2,0
+40-59,Beginner,6,For staying connected with family,"A – Call, text, and visit family directly.",Low-impact conscious use,5-6,2
+40-59,Beginner,6,For staying connected with family,B – Use AI to write all family messages.,High AI impact,1-2,0
+40-59,Beginner,6,For staying connected with family,"C – Use AI to suggest topics, write messages yourself.",Balanced AI use,3-4,1
+40-59,Beginner,7,For travel planning,A – Ask AI to plan every detail of your trip.,High AI impact,1-2,0
+40-59,Beginner,7,For travel planning,B – Use a travel agent or plan yourself.,Low-impact conscious use,5-6,1
+40-59,Beginner,7,For travel planning,"C – Use AI for destination ideas, book yourself.",Balanced AI use,3-4,2
+40-59,Beginner,8,For shopping assistance,A – Read reviews and ask family for recommendations.,Low-impact conscious use,5-6,1
+40-59,Beginner,8,For shopping assistance,B – Let AI make all your shopping decisions.,High AI impact,1-2,0
+40-59,Beginner,8,For shopping assistance,"C – Use AI for product comparisons, decide yourself.",Balanced AI use,3-4,2
+40-59,Beginner,9,For managing finances,A – Work with a financial advisor.,Low-impact conscious use,5-6,2
+40-59,Beginner,9,For managing finances,"B – Use AI for budgeting tools, make decisions yourself.",Balanced AI use,3-4,1
+40-59,Beginner,9,For managing finances,C – Let AI handle all your financial decisions.,High AI impact,1-2,0
+40-59,Beginner,10,For navigation help,A – Use GPS with AI traffic updates.,Balanced AI use,3-4,2
+40-59,Beginner,10,For navigation help,B – Use a map and your own judgement.,Low-impact conscious use,5-6,1
+40-59,Beginner,10,For navigation help,C – Use full AI-powered autonomous navigation.,High AI impact,1-2,0
+40-59,Beginner,11,For home repair advice,A – Ask AI for all home repair solutions.,High AI impact,1-2,0
+40-59,Beginner,11,For home repair advice,"B – Use AI to understand the problem, hire a professional.",Balanced AI use,3-4,1
+40-59,Beginner,11,For home repair advice,C – Call a tradesperson directly.,Low-impact conscious use,5-6,2
+40-59,Beginner,12,For managing work emails,"A – Use AI to draft difficult replies, review and send yourself.",Balanced AI use,3-4,1
+40-59,Beginner,12,For managing work emails,B – Write and manage all emails yourself.,Low-impact conscious use,5-6,2
+40-59,Beginner,12,For managing work emails,C – Let AI write and respond to all emails.,High AI impact,1-2,0
+40-59,Beginner,13,For fitness tracking,"A – Use a fitness app for tracking, set your own goals.",Balanced AI use,3-4,2
+40-59,Beginner,13,For fitness tracking,B – Let AI plan all exercise and diet for you.,High AI impact,1-2,0
+40-59,Beginner,13,For fitness tracking,C – Track exercise yourself with a notebook.,Low-impact conscious use,5-6,1
+40-59,Beginner,14,For understanding the news,A – Read trusted newspapers and watch news channels.,Low-impact conscious use,5-6,1
+40-59,Beginner,14,For understanding the news,B – Ask AI to summarise all news.,High AI impact,1-2,0
+40-59,Beginner,14,For understanding the news,C – Use AI to explain complex news stories.,Balanced AI use,3-4,2
+40-59,Beginner,15,For gardening advice,A – Ask AI for all gardening decisions.,High AI impact,1-2,0
+40-59,Beginner,15,For gardening advice,"B – Use AI for plant care tips, apply your own judgement.",Balanced AI use,3-4,2
+40-59,Beginner,15,For gardening advice,C – Join a local gardening club and learn hands-on.,Low-impact conscious use,5-6,1
+40-59,Beginner,16,For managing stress,A – Talk to your GP or a trusted friend.,Low-impact conscious use,5-6,2
+40-59,Beginner,16,For managing stress,"B – Use AI for relaxation techniques, also talk to people.",Balanced AI use,3-4,1
+40-59,Beginner,16,For managing stress,C – Use an AI app as your sole stress management.,High AI impact,1-2,0
+40-59,Beginner,17,For learning new digital skills,A – Use AI to handle all digital tasks for you.,High AI impact,1-2,0
+40-59,Beginner,17,For learning new digital skills,B – Take a local IT course or ask family for help.,Low-impact conscious use,5-6,1
+40-59,Beginner,17,For learning new digital skills,C – Use AI for step-by-step guidance.,Balanced AI use,3-4,2
+40-59,Beginner,18,For home organisation,A – Let AI plan all your home routines.,High AI impact,1-2,0
+40-59,Beginner,18,For home organisation,B – Organise your home your own way.,Low-impact conscious use,5-6,1
+40-59,Beginner,18,For home organisation,"C – Use AI for organisation ideas, implement yourself.",Balanced AI use,3-4,2
+40-59,Beginner,19,For understanding ai safety,A – Ask AI to manage all your online safety.,High AI impact,1-2,0
+40-59,Beginner,19,For understanding ai safety,B – Use AI to learn about digital safety topics.,Balanced AI use,3-4,2
+40-59,Beginner,19,For understanding ai safety,C – Attend a local digital safety workshop.,Low-impact conscious use,5-6,1
+40-59,Beginner,20,For entertainment choices,A – Let AI choose everything you watch and read.,High AI impact,1-2,0
+40-59,Beginner,20,For entertainment choices,B – Ask friends and read reviews.,Low-impact conscious use,5-6,1
+40-59,Beginner,20,For entertainment choices,"C – Use AI for recommendations, choose yourself.",Balanced AI use,3-4,2
+40-59,Intermediate,1,For work automation,A – Automate all work processes with AI.,High AI impact,1-2,0
+40-59,Intermediate,1,For work automation,B – Handle all work processes with your own expertise.,Low-impact conscious use,5-6,1
+40-59,Intermediate,1,For work automation,"C – Use AI to automate routine tasks, lead strategic work.",Balanced AI use,3-4,2
+40-59,Intermediate,2,For financial planning,A – Let AI make all investment and saving decisions.,High AI impact,1-2,0
+40-59,Intermediate,2,For financial planning,"B – Use AI for market analysis, make all decisions yourself.",Balanced AI use,3-4,1
+40-59,Intermediate,2,For financial planning,C – Work with a financial advisor for all planning.,Low-impact conscious use,5-6,2
+40-59,Intermediate,3,For managing a team,"A – Use AI for scheduling and data, lead the team yourself.",Balanced AI use,3-4,1
+40-59,Intermediate,3,For managing a team,B – Use AI to manage all team communication.,High AI impact,1-2,0
+40-59,Intermediate,3,For managing a team,C – Manage the team entirely with your own judgement.,Low-impact conscious use,5-6,2
+40-59,Intermediate,4,For business strategy,A – Let AI generate all your business strategy.,High AI impact,1-2,0
+40-59,Intermediate,4,For business strategy,"B – Use AI for market data, apply your own expertise.",Balanced AI use,3-4,1
+40-59,Intermediate,4,For business strategy,C – Develop strategy entirely from your own experience.,Low-impact conscious use,5-6,2
+40-59,Intermediate,5,For training new staff,A – Train staff personally from your own experience.,Low-impact conscious use,5-6,2
+40-59,Intermediate,5,For training new staff,B – Use AI to deliver all staff training.,High AI impact,1-2,0
+40-59,Intermediate,5,For training new staff,"C – Use AI for content, deliver training yourself.",Balanced AI use,3-4,1
+40-59,Intermediate,6,For managing projects,"A – Use AI for timelines and reporting, you lead.",Balanced AI use,3-4,2
+40-59,Intermediate,6,For managing projects,B – Manage all projects with your own tools.,Low-impact conscious use,5-6,1
+40-59,Intermediate,6,For managing projects,C – Use AI to manage all project decisions.,High AI impact,1-2,0
+40-59,Intermediate,7,For professional development,"A – Use AI for course recommendations, decide yourself.",Balanced AI use,3-4,1
+40-59,Intermediate,7,For professional development,B – Plan your development through mentors and experience.,Low-impact conscious use,5-6,2
+40-59,Intermediate,7,For professional development,C – Let AI plan all your professional growth.,High AI impact,1-2,0
+40-59,Intermediate,8,For understanding market trends,A – Use AI to interpret all market data for you.,High AI impact,1-2,0
+40-59,Intermediate,8,For understanding market trends,B – Read industry reports and talk to peers.,Low-impact conscious use,5-6,1
+40-59,Intermediate,8,For understanding market trends,"C – Use AI for data gathering, interpret the data yourself.",Balanced AI use,3-4,2
+40-59,Intermediate,9,For managing chronic conditions,"A – Use AI to track symptoms, consult your doctor.",Balanced AI use,3-4,1
+40-59,Intermediate,9,For managing chronic conditions,B – Manage with your doctor and established routines.,Low-impact conscious use,5-6,2
+40-59,Intermediate,9,For managing chronic conditions,C – Use AI to make all health management decisions.,High AI impact,1-2,0
+40-59,Intermediate,10,For community involvement,"A – Use AI for draft communications, review and personalise.",Balanced AI use,3-4,1
+40-59,Intermediate,10,For community involvement,"B – Engage with your community authentically, no AI.",Low-impact conscious use,5-6,2
+40-59,Intermediate,10,For community involvement,C – Use AI to write all community communications.,High AI impact,1-2,0
+40-59,Intermediate,11,For career transitions,"A – Use AI for job market research, decide yourself.",Balanced AI use,3-4,1
+40-59,Intermediate,11,For career transitions,B – Work with a career coach and trusted mentors.,Low-impact conscious use,5-6,2
+40-59,Intermediate,11,For career transitions,C – Let AI plan your entire career change.,High AI impact,1-2,0
+40-59,Intermediate,12,For small business management,A – Run the business using your expertise and judgement.,Low-impact conscious use,5-6,1
+40-59,Intermediate,12,For small business management,B – Automate all business operations with AI.,High AI impact,1-2,0
+40-59,Intermediate,12,For small business management,"C – Use AI for admin tasks, lead the business yourself.",Balanced AI use,3-4,2
+40-59,Intermediate,13,For elder care planning,A – Let AI make all elder care decisions.,High AI impact,1-2,0
+40-59,Intermediate,13,For elder care planning,"B – Use AI to research care options, decide with family.",Balanced AI use,3-4,1
+40-59,Intermediate,13,For elder care planning,C – Consult specialists and decide with your family.,Low-impact conscious use,5-6,2
+40-59,Intermediate,14,For retirement planning,"A – Use AI for projections, decide with a financial advisor.",Balanced AI use,3-4,1
+40-59,Intermediate,14,For retirement planning,B – Plan retirement with a professional advisor.,Low-impact conscious use,5-6,2
+40-59,Intermediate,14,For retirement planning,C – Let AI manage all your retirement finances.,High AI impact,1-2,0
+40-59,Intermediate,15,For wellbeing and mindfulness,"A – Use AI for guided practices, prioritise human connection.",Balanced AI use,3-4,1
+40-59,Intermediate,15,For wellbeing and mindfulness,B – Focus on relationships and professional guidance.,Low-impact conscious use,5-6,2
+40-59,Intermediate,15,For wellbeing and mindfulness,C – Use an AI wellness app as your only approach.,High AI impact,1-2,0
+40-59,Intermediate,16,For real estate decisions,"A – Use AI for market data, decide with an estate agent.",Balanced AI use,3-4,2
+40-59,Intermediate,16,For real estate decisions,B – Work with a trusted agent and decide yourself.,Low-impact conscious use,5-6,1
+40-59,Intermediate,16,For real estate decisions,C – Let AI make all property decisions.,High AI impact,1-2,0
+40-59,Intermediate,17,For parenting teenagers,A – Use AI for all parenting guidance.,High AI impact,1-2,0
+40-59,Intermediate,17,For parenting teenagers,B – Talk directly to your teenager and seek family support.,Low-impact conscious use,5-6,2
+40-59,Intermediate,17,For parenting teenagers,"C – Use AI for tips, apply your own judgement.",Balanced AI use,3-4,1
+40-59,Intermediate,18,For content creation for work,A – Create all work content yourself.,Low-impact conscious use,5-6,2
+40-59,Intermediate,18,For content creation for work,"B – Use AI for structure, write in your own words.",Balanced AI use,3-4,1
+40-59,Intermediate,18,For content creation for work,C – Use AI to create all work presentations.,High AI impact,1-2,0
+40-59,Intermediate,19,For learning new digital tools,A – Attend a training session or learn with a colleague.,Low-impact conscious use,5-6,1
+40-59,Intermediate,19,For learning new digital tools,"B – Use AI for tutorials, learn the tools yourself.",Balanced AI use,3-4,2
+40-59,Intermediate,19,For learning new digital tools,C – Use AI to handle all new tools for you.,High AI impact,1-2,0
+40-59,Intermediate,20,For exploring new career options,A – Let AI decide your next career move.,High AI impact,1-2,0
+40-59,Intermediate,20,For exploring new career options,B – Talk to mentors and people working in the field.,Low-impact conscious use,5-6,2
+40-59,Intermediate,20,For exploring new career options,"C – Use AI for research, trust your own instincts.",Balanced AI use,3-4,1
+40-59,Expert,1,For ai strategy for business,A – Deploy AI across all operations immediately.,High AI impact,1-2,0
+40-59,Expert,1,For ai strategy for business,B – Define clear outcomes before any AI adoption.,Low-impact conscious use,5-6,2
+40-59,Expert,1,For ai strategy for business,C – Identify high-value use cases and pilot carefully.,Balanced AI use,3-4,1
+40-59,Expert,2,For data-driven decision making,A – Use data as one input alongside expertise and judgement.,Low-impact conscious use,5-6,2
+40-59,Expert,2,For data-driven decision making,"B – Use AI for analysis, you make the final call.",Balanced AI use,3-4,1
+40-59,Expert,2,For data-driven decision making,C – Let AI make all business decisions.,High AI impact,1-2,0
+40-59,Expert,3,For building ai workflows,A – Automate every workflow with AI immediately.,High AI impact,1-2,0
+40-59,Expert,3,For building ai workflows,B – Map manual workflows fully before automating any.,Low-impact conscious use,5-6,2
+40-59,Expert,3,For building ai workflows,C – Automate specific workflows where ROI is clear.,Balanced AI use,3-4,1
+40-59,Expert,4,For leading ai adoption,A – Pilot with a willing team and learn before scaling.,Balanced AI use,3-4,1
+40-59,Expert,4,For leading ai adoption,B – Build AI literacy across the organisation first.,Low-impact conscious use,5-6,2
+40-59,Expert,4,For leading ai adoption,C – Roll out AI to every team at once.,High AI impact,1-2,0
+40-59,Expert,5,For machine learning for business,A – Use the largest ML model for every problem.,High AI impact,1-2,0
+40-59,Expert,5,For machine learning for business,B – Use ML only where simpler methods clearly fall short.,Low-impact conscious use,5-6,2
+40-59,Expert,5,For machine learning for business,C – Select the minimal model that solves the business need.,Balanced AI use,3-4,1
+40-59,Expert,6,For automating business processes,A – Automate every process without reviewing them.,High AI impact,1-2,0
+40-59,Expert,6,For automating business processes,"B – Automate high-volume, low-judgement processes first.",Balanced AI use,3-4,1
+40-59,Expert,6,For automating business processes,C – Audit every process thoroughly before any automation.,Low-impact conscious use,5-6,2
+40-59,Expert,7,For ai in product management,A – Set roadmap from direct customer insight and strategy.,Low-impact conscious use,5-6,2
+40-59,Expert,7,For ai in product management,"B – Use AI for customer data analysis, you set direction.",Balanced AI use,3-4,1
+40-59,Expert,7,For ai in product management,C – Use AI to make all product roadmap decisions.,High AI impact,1-2,0
+40-59,Expert,8,For evaluating ai tools,A – Test rigorously against your current benchmark first.,Low-impact conscious use,5-6,2
+40-59,Expert,8,For evaluating ai tools,B – Adopt every new AI tool as it launches.,High AI impact,1-2,0
+40-59,Expert,8,For evaluating ai tools,C – Evaluate tools against specific business criteria.,Balanced AI use,3-4,1
+40-59,Expert,9,For managing ai ethics,A – Develop and enforce internal AI ethics principles.,Low-impact conscious use,5-6,2
+40-59,Expert,9,For managing ai ethics,B – Delegate all AI ethics to a third party.,High AI impact,1-2,0
+40-59,Expert,9,For managing ai ethics,C – Embed ethical review into your own product process.,Balanced AI use,3-4,1
+40-59,Expert,10,For large-scale data analysis,A – Run AI on all data without curation.,High AI impact,1-2,0
+40-59,Expert,10,For large-scale data analysis,B – Curate relevant datasets and validate AI outputs.,Balanced AI use,3-4,1
+40-59,Expert,10,For large-scale data analysis,C – Perform targeted analysis with expert interpretation.,Low-impact conscious use,5-6,2
+40-59,Expert,11,For predictive analytics,A – Validate predictions against domain expertise before acting.,Low-impact conscious use,5-6,2
+40-59,Expert,11,For predictive analytics,B – Run AI predictions on everything automatically.,High AI impact,1-2,0
+40-59,Expert,11,For predictive analytics,C – Use predictive models for specific high-value decisions.,Balanced AI use,3-4,1
+40-59,Expert,12,For customer segmentation,A – Use AI to segment all customers automatically.,High AI impact,1-2,0
+40-59,Expert,12,For customer segmentation,B – Segment manually based on your customer understanding.,Low-impact conscious use,5-6,1
+40-59,Expert,12,For customer segmentation,"C – Use AI for initial clustering, validate with domain knowledge.",Balanced AI use,3-4,2
+40-59,Expert,13,For ai governance,A – Outsource all AI governance to a third party.,High AI impact,1-2,0
+40-59,Expert,13,For ai governance,B – Establish governance before any AI system goes live.,Low-impact conscious use,5-6,2
+40-59,Expert,13,For ai governance,C – Build an internal governance framework with clear ownership.,Balanced AI use,3-4,1
+40-59,Expert,14,For financial modelling with ai,"A – Build all models yourself, AI only for sense-checking.",Low-impact conscious use,5-6,2
+40-59,Expert,14,For financial modelling with ai,"B – Use AI to accelerate modelling, validate every assumption.",Balanced AI use,3-4,1
+40-59,Expert,14,For financial modelling with ai,C – Let AI run all financial models.,High AI impact,1-2,0
+40-59,Expert,15,For training internal ai systems,A – Define success criteria rigorously before training.,Low-impact conscious use,5-6,2
+40-59,Expert,15,For training internal ai systems,B – Train on all available company data.,High AI impact,1-2,0
+40-59,Expert,15,For training internal ai systems,C – Identify minimum data needed to solve the specific problem.,Balanced AI use,3-4,1
+40-59,Expert,16,For ai in healthcare management,A – Automate all clinical decision support.,High AI impact,1-2,0
+40-59,Expert,16,For ai in healthcare management,"B – Clinician-led decisions, AI as a documentation tool only.",Low-impact conscious use,5-6,2
+40-59,Expert,16,For ai in healthcare management,"C – Use AI for admin and scheduling, clinicians lead clinical decisions.",Balanced AI use,3-4,1
+40-59,Expert,17,For supply chain optimisation,"A – Use AI for demand forecasting, managers handle disruptions.",Balanced AI use,3-4,1
+40-59,Expert,17,For supply chain optimisation,B – Use expertise and supplier relationships to manage supply.,Low-impact conscious use,5-6,2
+40-59,Expert,17,For supply chain optimisation,C – Use AI to make all supply chain decisions.,High AI impact,1-2,0
+40-59,Expert,18,For building ai teams,"A – Build teams with deep domain expertise first, AI skills second.",Low-impact conscious use,5-6,2
+40-59,Expert,18,For building ai teams,B – Hire for AI literacy across diverse roles with human oversight.,Balanced AI use,3-4,1
+40-59,Expert,18,For building ai teams,C – Replace as many roles as possible with AI.,High AI impact,1-2,0
+40-59,Expert,19,For ai for risk management,A – Use expert frameworks and stress-test with AI scenarios.,Low-impact conscious use,5-6,2
+40-59,Expert,19,For ai for risk management,B – Automate all risk decisions with AI.,High AI impact,1-2,0
+40-59,Expert,19,For ai for risk management,"C – Use AI for risk scanning, human judgement for assessment.",Balanced AI use,3-4,1
+40-59,Expert,20,For digital transformation leadership,"A – Change management first, technology second.",Low-impact conscious use,5-6,2
+40-59,Expert,20,For digital transformation leadership,B – Automate all business processes at once.,High AI impact,1-2,0
+40-59,Expert,20,For digital transformation leadership,C – Sequence transformation around business-critical areas.,Balanced AI use,3-4,1
+60+,Beginner,1,For staying in touch with family,"A – Use AI to help draft a message, send it yourself.",Balanced AI use,3-4,1
+60+,Beginner,1,For staying in touch with family,"B – Call, text, and visit family directly.",Low-impact conscious use,5-6,2
+60+,Beginner,1,For staying in touch with family,C – Use AI to write and send all your messages.,High AI impact,1-2,0
+60+,Beginner,2,For getting health information,A – Call your GP or pharmacist directly.,Low-impact conscious use,5-6,2
+60+,Beginner,2,For getting health information,B – Ask AI for all health diagnoses.,High AI impact,1-2,0
+60+,Beginner,2,For getting health information,"C – Use AI to understand symptoms, then call your GP.",Balanced AI use,3-4,1
+60+,Beginner,3,For understanding medication,A – Ask your pharmacist or doctor directly.,Low-impact conscious use,5-6,2
+60+,Beginner,3,For understanding medication,B – Ask AI for all medication advice.,High AI impact,1-2,0
+60+,Beginner,3,For understanding medication,"C – Use AI to understand what medications do, confirm with your pharmacist.",Balanced AI use,3-4,1
+60+,Beginner,4,For finding recipes,A – Use AI when you can't think of anything to cook.,Balanced AI use,3-4,2
+60+,Beginner,4,For finding recipes,B – Ask AI for every meal every day.,High AI impact,1-2,0
+60+,Beginner,4,For finding recipes,C – Use cookbooks and family recipes you know.,Low-impact conscious use,5-6,1
+60+,Beginner,5,For managing daily reminders,A – Let AI manage all your reminders.,High AI impact,1-2,0
+60+,Beginner,5,For managing daily reminders,B – Write reminders on paper or in a diary.,Low-impact conscious use,5-6,1
+60+,Beginner,5,For managing daily reminders,C – Use an AI assistant alongside your own methods.,Balanced AI use,3-4,2
+60+,Beginner,6,For understanding the news,A – Use AI to explain a complex story you've seen.,Balanced AI use,3-4,2
+60+,Beginner,6,For understanding the news,B – Ask AI to summarise all news.,High AI impact,1-2,0
+60+,Beginner,6,For understanding the news,C – Watch the news on TV or read a trusted newspaper.,Low-impact conscious use,5-6,1
+60+,Beginner,7,For watching videos and entertainment,"A – Use AI for suggestions, choose what interests you.",Balanced AI use,3-4,2
+60+,Beginner,7,For watching videos and entertainment,B – Ask family or friends what to watch.,Low-impact conscious use,5-6,1
+60+,Beginner,7,For watching videos and entertainment,C – Let AI choose everything you watch.,High AI impact,1-2,0
+60+,Beginner,8,For shopping assistance,"A – Use AI for price comparisons, decide yourself.",Balanced AI use,3-4,2
+60+,Beginner,8,For shopping assistance,B – Let AI make all your shopping decisions.,High AI impact,1-2,0
+60+,Beginner,8,For shopping assistance,"C – Shop as you always have, ask for help when needed.",Low-impact conscious use,5-6,1
+60+,Beginner,9,For learning basic smartphone use,A – Use AI to learn how to do things step by step.,Balanced AI use,3-4,2
+60+,Beginner,9,For learning basic smartphone use,B – Ask a family member or go to a digital help session.,Low-impact conscious use,5-6,1
+60+,Beginner,9,For learning basic smartphone use,C – Let AI control your phone for you.,High AI impact,1-2,0
+60+,Beginner,10,For simple language translation,A – Use a phrasebook or ask someone who speaks the language.,Low-impact conscious use,5-6,1
+60+,Beginner,10,For simple language translation,B – Use AI to translate all conversations.,High AI impact,1-2,0
+60+,Beginner,10,For simple language translation,C – Use AI for a key phrase or word when needed.,Balanced AI use,3-4,2
+60+,Beginner,11,For listening to audiobooks,A – Let AI summarise all books for you.,High AI impact,1-2,0
+60+,Beginner,11,For listening to audiobooks,B – Ask your library or local bookshop for suggestions.,Low-impact conscious use,5-6,1
+60+,Beginner,11,For listening to audiobooks,C – Use AI to find audiobooks you'll enjoy.,Balanced AI use,3-4,2
+60+,Beginner,12,For managing finances simply,A – Use AI to understand a bill or statement.,Balanced AI use,3-4,1
+60+,Beginner,12,For managing finances simply,B – Let AI make all your financial decisions.,High AI impact,1-2,0
+60+,Beginner,12,For managing finances simply,"C – Work with your bank, family, or a financial advisor.",Low-impact conscious use,5-6,2
+60+,Beginner,13,For remembering important dates,A – Let AI track all important dates for you.,High AI impact,1-2,0
+60+,Beginner,13,For remembering important dates,B – Use AI as a reminder tool alongside your own calendar.,Balanced AI use,3-4,2
+60+,Beginner,13,For remembering important dates,C – Write important dates in a paper diary.,Low-impact conscious use,5-6,1
+60+,Beginner,14,For understanding government services,"A – Use AI to understand a letter or form, confirm with the office.",Balanced AI use,3-4,1
+60+,Beginner,14,For understanding government services,B – Ask AI for all government service information.,High AI impact,1-2,0
+60+,Beginner,14,For understanding government services,C – Call or visit the relevant government office directly.,Low-impact conscious use,5-6,2
+60+,Beginner,15,For getting emergency help,A – Rely on AI for all emergency guidance.,High AI impact,1-2,0
+60+,Beginner,15,For getting emergency help,B – Know the emergency numbers and call directly.,Low-impact conscious use,5-6,2
+60+,Beginner,15,For getting emergency help,"C – Use AI for non-urgent help, know emergency numbers.",Balanced AI use,3-4,1
+60+,Beginner,16,For learning about current events,A – Ask AI for a full daily news briefing.,High AI impact,1-2,0
+60+,Beginner,16,For learning about current events,B – Watch local news or read a newspaper.,Low-impact conscious use,5-6,1
+60+,Beginner,16,For learning about current events,C – Use AI to explain a specific story.,Balanced AI use,3-4,2
+60+,Beginner,17,For tracking fitness,A – Let AI control all your exercise routines.,High AI impact,1-2,0
+60+,Beginner,17,For tracking fitness,B – Walk daily and use your own judgement.,Low-impact conscious use,5-6,1
+60+,Beginner,17,For tracking fitness,"C – Use a step counter app, set your own goals.",Balanced AI use,3-4,2
+60+,Beginner,18,For staying mentally active,"A – Do crosswords, read books, and socialise regularly.",Low-impact conscious use,5-6,2
+60+,Beginner,18,For staying mentally active,B – Use AI for one new challenge each week.,Balanced AI use,3-4,1
+60+,Beginner,18,For staying mentally active,C – Use AI for all puzzles and mental exercises.,High AI impact,1-2,0
+60+,Beginner,19,For weather and travel info,A – Ask AI for a fully planned travel route.,High AI impact,1-2,0
+60+,Beginner,19,For weather and travel info,B – Ask AI for the forecast and transport options.,Balanced AI use,3-4,2
+60+,Beginner,19,For weather and travel info,C – Check weather on TV and ring for transport info.,Low-impact conscious use,5-6,1
+60+,Beginner,20,For online safety for seniors,A – Attend a local digital safety session with family.,Low-impact conscious use,5-6,2
+60+,Beginner,20,For online safety for seniors,B – Use AI to learn about staying safe online.,Balanced AI use,3-4,1
+60+,Beginner,20,For online safety for seniors,C – Let AI manage all your online security.,High AI impact,1-2,0
+60+,Intermediate,1,For managing health conditions,A – Work with your healthcare team and manage yourself.,Low-impact conscious use,5-6,2
+60+,Intermediate,1,For managing health conditions,"B – Use AI for tracking and research, consult your doctor.",Balanced AI use,3-4,1
+60+,Intermediate,1,For managing health conditions,C – Use AI to manage all health decisions.,High AI impact,1-2,0
+60+,Intermediate,2,For learning new digital skills,A – Take a local digital skills course.,Low-impact conscious use,5-6,1
+60+,Intermediate,2,For learning new digital skills,B – Use AI to do all digital tasks for you.,High AI impact,1-2,0
+60+,Intermediate,2,For learning new digital skills,"C – Use AI for guided learning, practise yourself.",Balanced AI use,3-4,2
+60+,Intermediate,3,For staying socially connected,"A – Use AI to help initiate contact, maintain real relationships.",Balanced AI use,3-4,1
+60+,Intermediate,3,For staying socially connected,B – Use AI for all social interaction.,High AI impact,1-2,0
+60+,Intermediate,3,For staying socially connected,"C – Call, meet, and write to people directly.",Low-impact conscious use,5-6,2
+60+,Intermediate,4,For life memoir writing,"A – Use AI for structure and prompts, write in your own voice.",Balanced AI use,3-4,1
+60+,Intermediate,4,For life memoir writing,B – Write your memoir entirely yourself.,Low-impact conscious use,5-6,2
+60+,Intermediate,4,For life memoir writing,C – Use AI to write your entire memoir.,High AI impact,1-2,0
+60+,Intermediate,5,For learning a new language,A – Take a language class and practise with real speakers.,Low-impact conscious use,5-6,2
+60+,Intermediate,5,For learning a new language,B – Use AI for practice and pronunciation correction.,Balanced AI use,3-4,1
+60+,Intermediate,5,For learning a new language,C – Use AI to translate everything for you.,High AI impact,1-2,0
+60+,Intermediate,6,For genealogy research,"A – Use AI for database searches, interpret findings yourself.",Balanced AI use,3-4,2
+60+,Intermediate,6,For genealogy research,B – Search family records and archives yourself.,Low-impact conscious use,5-6,1
+60+,Intermediate,6,For genealogy research,C – Use AI to find and interpret all family history.,High AI impact,1-2,0
+60+,Intermediate,7,For creative hobbies,"A – Use AI for inspiration, create everything yourself.",Balanced AI use,3-4,1
+60+,Intermediate,7,For creative hobbies,B – Follow your creative instincts without AI.,Low-impact conscious use,5-6,2
+60+,Intermediate,7,For creative hobbies,C – Use AI to create all your hobby outputs.,High AI impact,1-2,0
+60+,Intermediate,8,For grandchildren education support,A – Ask AI to provide all educational help.,High AI impact,1-2,0
+60+,Intermediate,8,For grandchildren education support,"B – Use AI for resources, explain and support directly.",Balanced AI use,3-4,1
+60+,Intermediate,8,For grandchildren education support,C – Support grandchildren directly from your own knowledge.,Low-impact conscious use,5-6,2
+60+,Intermediate,9,For managing multiple medications,A – Use a digital pill organiser with reminders.,Balanced AI use,3-4,2
+60+,Intermediate,9,For managing multiple medications,B – Use a physical pill organiser and your own routine.,Low-impact conscious use,5-6,1
+60+,Intermediate,9,For managing multiple medications,C – Use AI to manage all medication schedules.,High AI impact,1-2,0
+60+,Intermediate,10,For cognitive health activities,A – Use AI for one new challenge regularly.,Balanced AI use,3-4,1
+60+,Intermediate,10,For cognitive health activities,"B – Do puzzles, read, and socialise for brain health.",Low-impact conscious use,5-6,2
+60+,Intermediate,10,For cognitive health activities,C – Use AI for all brain training.,High AI impact,1-2,0
+60+,Intermediate,11,For travel research,A – Use a travel agent and plan the trip yourself.,Low-impact conscious use,5-6,1
+60+,Intermediate,11,For travel research,"B – Use AI for destination options, plan the details yourself.",Balanced AI use,3-4,2
+60+,Intermediate,11,For travel research,C – Let AI plan your entire trip.,High AI impact,1-2,0
+60+,Intermediate,12,For volunteering and community,"A – Use AI for drafting messages, show up and engage yourself.",Balanced AI use,3-4,1
+60+,Intermediate,12,For volunteering and community,B – Engage with your community entirely in person.,Low-impact conscious use,5-6,2
+60+,Intermediate,12,For volunteering and community,C – Use AI to do all volunteering communications.,High AI impact,1-2,0
+60+,Intermediate,13,For religious and spiritual content,"A – Use AI to find texts and resources, practise yourself.",Balanced AI use,3-4,1
+60+,Intermediate,13,For religious and spiritual content,B – Engage with your faith community directly.,Low-impact conscious use,5-6,2
+60+,Intermediate,13,For religious and spiritual content,C – Use AI for all religious study and practice.,High AI impact,1-2,0
+60+,Intermediate,14,For housing and downsizing,A – Consult a property professional and your family.,Low-impact conscious use,5-6,2
+60+,Intermediate,14,For housing and downsizing,"B – Use AI for market information, decide with family.",Balanced AI use,3-4,1
+60+,Intermediate,14,For housing and downsizing,C – Let AI make all housing decisions.,High AI impact,1-2,0
+60+,Intermediate,15,For legacy planning,"A – Use AI for information, work with a solicitor.",Balanced AI use,3-4,1
+60+,Intermediate,15,For legacy planning,B – Work entirely with a solicitor and your family.,Low-impact conscious use,5-6,2
+60+,Intermediate,15,For legacy planning,C – Let AI draft all your estate and legacy documents.,High AI impact,1-2,0
+60+,Intermediate,16,For understanding investment basics,"A – Use AI for information, decide with a financial advisor.",Balanced AI use,3-4,1
+60+,Intermediate,16,For understanding investment basics,B – Let AI make all investment decisions.,High AI impact,1-2,0
+60+,Intermediate,16,For understanding investment basics,C – Work with a trusted financial advisor.,Low-impact conscious use,5-6,2
+60+,Intermediate,17,For small business consulting,A – Apply your expertise without AI assistance.,Low-impact conscious use,5-6,1
+60+,Intermediate,17,For small business consulting,"B – Use AI for research, apply your own expertise.",Balanced AI use,3-4,2
+60+,Intermediate,17,For small business consulting,C – Use AI for all client advice.,High AI impact,1-2,0
+60+,Intermediate,18,For environmental awareness,A – Use AI to manage all your sustainability choices.,High AI impact,1-2,0
+60+,Intermediate,18,For environmental awareness,B – Make changes based on your own research and values.,Low-impact conscious use,5-6,1
+60+,Intermediate,18,For environmental awareness,"C – Use AI for information, make your own choices.",Balanced AI use,3-4,2
+60+,Intermediate,19,For teaching and mentoring,A – Use AI to deliver all mentoring content.,High AI impact,1-2,0
+60+,Intermediate,19,For teaching and mentoring,B – Mentor entirely from your own knowledge and experience.,Low-impact conscious use,5-6,2
+60+,Intermediate,19,For teaching and mentoring,"C – Use AI for resources, mentor from your own experience.",Balanced AI use,3-4,1
+60+,Intermediate,20,For ai for physical accessibility,A – Use full AI accessibility tools for everything.,High AI impact,1-2,0
+60+,Intermediate,20,For ai for physical accessibility,B – Use established accessibility tools and human support.,Low-impact conscious use,5-6,1
+60+,Intermediate,20,For ai for physical accessibility,C – Use AI tools for specific accessibility needs.,Balanced AI use,3-4,2
+60+,Expert,1,For exploring ai tools professionally,A – Test tools rigorously using your expertise as the standard.,Low-impact conscious use,5-6,2
+60+,Expert,1,For exploring ai tools professionally,B – Use every new AI tool without evaluation.,High AI impact,1-2,0
+60+,Expert,1,For exploring ai tools professionally,C – Evaluate AI tools against your professional criteria.,Balanced AI use,3-4,1
+60+,Expert,2,For writing and publishing,"A – Use AI for research and structure, write yourself.",Balanced AI use,3-4,1
+60+,Expert,2,For writing and publishing,B – Use AI to write and publish everything.,High AI impact,1-2,0
+60+,Expert,2,For writing and publishing,"C – Write entirely in your own voice, AI only for fact-checking.",Low-impact conscious use,5-6,2
+60+,Expert,3,For research and analysis,"A – Use AI for literature search, conduct analysis yourself.",Balanced AI use,3-4,1
+60+,Expert,3,For research and analysis,B – Use your expertise for all research and interpretation.,Low-impact conscious use,5-6,2
+60+,Expert,3,For research and analysis,C – Use AI to conduct and interpret all research.,High AI impact,1-2,0
+60+,Expert,4,For mentoring with ai,"A – Use AI to find resources, mentor from your own experience.",Balanced AI use,3-4,1
+60+,Expert,4,For mentoring with ai,B – Let AI do all the mentoring.,High AI impact,1-2,0
+60+,Expert,4,For mentoring with ai,C – Mentor entirely from your own knowledge and relationships.,Low-impact conscious use,5-6,2
+60+,Expert,5,For understanding llms,A – Learn how LLMs work and use them deliberately.,Balanced AI use,3-4,1
+60+,Expert,5,For understanding llms,B – Use LLMs for all tasks without understanding.,High AI impact,1-2,0
+60+,Expert,5,For understanding llms,C – Understand the architecture before using any LLM tools.,Low-impact conscious use,5-6,2
+60+,Expert,6,For contributing to ai ethics,A – Use AI to write all your ethics positions.,High AI impact,1-2,0
+60+,Expert,6,For contributing to ai ethics,"B – Research positions and think them through, write yourself.",Balanced AI use,3-4,1
+60+,Expert,6,For contributing to ai ethics,C – Develop positions independently from your own values and experience.,Low-impact conscious use,5-6,2
+60+,Expert,7,For community ai education,A – Use AI to deliver all community education.,High AI impact,1-2,0
+60+,Expert,7,For community ai education,B – Teach entirely from your experience and prepared materials.,Low-impact conscious use,5-6,2
+60+,Expert,7,For community ai education,"C – Use AI for resources, teach from your own knowledge.",Balanced AI use,3-4,1
+60+,Expert,8,For digital archiving,"A – Use AI for metadata generation, review each entry yourself.",Balanced AI use,3-4,1
+60+,Expert,8,For digital archiving,B – Organise and describe archives using your own expertise.,Low-impact conscious use,5-6,2
+60+,Expert,8,For digital archiving,C – Use AI to organise and describe all archives.,High AI impact,1-2,0
+60+,Expert,9,For health data analysis,A – Discuss all health data directly with your healthcare team.,Low-impact conscious use,5-6,2
+60+,Expert,9,For health data analysis,B – Use AI to interpret all personal health data.,High AI impact,1-2,0
+60+,Expert,9,For health data analysis,"C – Use AI for pattern recognition, interpret with your doctor.",Balanced AI use,3-4,1
+60+,Expert,10,For building simple automations,A – Automate everything without understanding steps.,High AI impact,1-2,0
+60+,Expert,10,For building simple automations,B – Automate specific repetitive tasks you fully understand.,Balanced AI use,3-4,1
+60+,Expert,10,For building simple automations,C – Only automate tasks where you could explain each step.,Low-impact conscious use,5-6,2
+60+,Expert,11,For teaching ai basics,A – Use AI to deliver all your AI teaching.,High AI impact,1-2,0
+60+,Expert,11,For teaching ai basics,B – Develop and teach all content from your own understanding.,Low-impact conscious use,5-6,2
+60+,Expert,11,For teaching ai basics,"C – Use AI for examples, teach the concepts yourself.",Balanced AI use,3-4,1
+60+,Expert,12,For ai for professional legacy work,A – Use AI to recreate and publish all past work.,High AI impact,1-2,0
+60+,Expert,12,For ai for professional legacy work,"B – Use AI for organisation and formatting, write yourself.",Balanced AI use,3-4,1
+60+,Expert,12,For ai for professional legacy work,C – Present your work entirely in your own words.,Low-impact conscious use,5-6,2
+60+,Expert,13,For understanding ai policy,A – Ask AI for all your policy positions.,High AI impact,1-2,0
+60+,Expert,13,For understanding ai policy,B – Engage with policy debates from your own expertise.,Low-impact conscious use,5-6,2
+60+,Expert,13,For understanding ai policy,"C – Research multiple sources, form views independently.",Balanced AI use,3-4,1
+60+,Expert,14,For contributing to open knowledge,"A – Use AI for structure, write content from your knowledge.",Balanced AI use,3-4,1
+60+,Expert,14,For contributing to open knowledge,B – Use AI to write all your contributions.,High AI impact,1-2,0
+60+,Expert,14,For contributing to open knowledge,C – Contribute entirely from your own expertise.,Low-impact conscious use,5-6,2
+60+,Expert,15,For creative ai projects,"A – Create entirely yourself, AI only for technical tasks.",Low-impact conscious use,5-6,2
+60+,Expert,15,For creative ai projects,B – Use AI to generate all creative output.,High AI impact,1-2,0
+60+,Expert,15,For creative ai projects,"C – Co-create with AI, directing all the creative choices.",Balanced AI use,3-4,1
+60+,Expert,16,For sharing expertise via ai,A – Let AI represent your expertise entirely.,High AI impact,1-2,0
+60+,Expert,16,For sharing expertise via ai,B – Share your expertise directly through writing and speaking.,Low-impact conscious use,5-6,2
+60+,Expert,16,For sharing expertise via ai,"C – Use AI for reach and formatting, your knowledge is the content.",Balanced AI use,3-4,1
+60+,Expert,17,For evaluating ai tools critically,A – Adopt tools based on marketing claims.,High AI impact,1-2,0
+60+,Expert,17,For evaluating ai tools critically,B – Test tools rigorously using your domain expertise.,Low-impact conscious use,5-6,2
+60+,Expert,17,For evaluating ai tools critically,C – Evaluate tools against your own professional benchmarks.,Balanced AI use,3-4,1
+60+,Expert,18,For intergenerational ai collaboration,A – Collaborate directly with no AI mediation.,Low-impact conscious use,5-6,2
+60+,Expert,18,For intergenerational ai collaboration,B – Use AI as a substitute for collaboration.,High AI impact,1-2,0
+60+,Expert,18,For intergenerational ai collaboration,C – Use AI to facilitate intergenerational knowledge sharing.,Balanced AI use,3-4,1
+60+,Expert,19,For understanding ai risks,A – Ask AI to explain all AI risks.,High AI impact,1-2,0
+60+,Expert,19,For understanding ai risks,B – Develop your risk assessment from first principles.,Low-impact conscious use,5-6,2
+60+,Expert,19,For understanding ai risks,C – Read widely and form your own risk assessment.,Balanced AI use,3-4,1
+60+,Expert,20,For ai in retirement communities,A – Keep all community relationships fully human-led.,Low-impact conscious use,5-6,2
+60+,Expert,20,For ai in retirement communities,B – Deploy AI for all community operations.,High AI impact,1-2,0
+60+,Expert,20,For ai in retirement communities,"C – Pilot AI for specific admin tasks, keep relationships human.",Balanced AI use,3-4,1
