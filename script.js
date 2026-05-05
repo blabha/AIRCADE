@@ -179,8 +179,18 @@ document.getElementById('error-close').addEventListener('click', () => {
   errorToast.classList.add('hidden');
 });
 
+// ── Load question bank from CSV before enabling the start button ──────────────
+const btnStart = document.getElementById('btn-start');
+btnStart.disabled = true;
+loadQuestionBank()
+  .then(() => { btnStart.disabled = false; })
+  .catch(err => {
+    console.error('Failed to load question bank:', err);
+    btnStart.disabled = false; // let the player try anyway; error surfaces later
+  });
+
 // ── SCREEN IDLE ──────────────────────────────
-document.getElementById('btn-start').addEventListener('click', () => {
+btnStart.addEventListener('click', () => {
   overlayInstructions.classList.remove('hidden');
   Byte.say('Here\'s how to play! 🎮');
 });
