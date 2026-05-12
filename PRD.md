@@ -1,5 +1,5 @@
 # A(I)RCADE — Product Requirements Document
-### Status: **IMPLEMENTED** — Last updated March 2026
+### Status: **IMPLEMENTED** — Last updated May 2026
 
 ---
 
@@ -11,7 +11,7 @@
 | **Tagline** | "Every prompt has a footprint. Leave a positive one." |
 | **Format** | Interactive web application (tablet-optimized) |
 | **Duration** | 2–3 minutes per session |
-| **Audience** | General public (age 14+), no technical background assumed |
+| **Audience** | General public (age 0+), no technical background assumed |
 | **Installation** | Laser-cut arcade cabinet with touchscreen |
 
 ---
@@ -35,25 +35,28 @@ A playful, educational arcade-style experience that teaches people about the env
 | **AI generation** | Pre-generated offline (no live API) |
 | **Backend** | None — fully static, runs as local HTML file |
 | **Deployment** | Static file, no server required |
+| **i18n** | Built-in translation system (English, Castilian, Catalan) |
+| **Sound** | Web Audio API via `sounds.js` |
 
 ### File Structure
 ```
-AI-for-ALL-main/
+AIRCADE/
 ├── index.html                    # All screen HTML
 ├── styles.css                    # All styles
 ├── script.js                     # Screen logic, state, events
-├── data.js                       # Questions, tips, personas, metrics, DYK
+├── data.js                       # Resource thresholds, metrics, tips, DYK facts
+├── questionBank.js               # Age × expertise question bank (15 sets × 20 questions)
+├── translations.js               # i18n strings (en / es / ca)
+├── sounds.js                     # Sound effects (Web Audio API)
 ├── api.js                        # Mock AI responses (offline)
 ├── byte.js                       # Byte mascot speech logic
 ├── print.js                      # Receipt card population + download
-├── assets/
-│   ├── cat-astronaut.jpg         # Pre-generated image (cat prompt)
-│   └── bakery-logo.jpg           # Pre-generated image (bakery prompt)
-├── questions-database.json       # Source of truth for ethics questions
-├── personalized-tips-database.json
-├── did-you-know-database.json
-└── prompt-results-examples.json
+└── assets/
+    ├── cat-astronaut.jpg         # Pre-generated image (cat prompt)
+    └── bakery-logo.jpg           # Pre-generated image (bakery prompt)
 ```
+
+> **Removed from earlier design:** `questions-database.json`, `personalized-tips-database.json`, `did-you-know-database.json`, `prompt-results-examples.json`. All question and tips data is now inline in `questionBank.js` and `data.js`.
 
 ---
 
@@ -62,16 +65,22 @@ AI-for-ALL-main/
 ```javascript
 const state = {
   screen: 'idle',
-  prompt: '',
-  taskType: 'text-short',       // 'image' | 'text-short' | 'text-long'
-  generatedText: '',             // text content OR image file path
+  prompt: '',                    // randomly assigned after user info
+  taskType: 'text-short',        // 'image' | 'text-short' | 'text-long'
   metrics: null,
   sessionId: generateSessionId(),
-  stamina: 100,
+  // Resource accumulators (grow with each ethics answer)
+  resources: { energy: 0, water: 0, co2: 0 },
+  mindfulness: 0,
+  score: 0,                      // cumulative score (-15 to +20)
+  totalScore: 0,                 // alias used for icon meters
+  // User info
   userName: '',
-  userAge: '',
-  userGender: '',
-  ethicsAnswers: [],             // [{ category, color, impact }]
+  userAge: '',                   // e.g. '13-19'
+  userExpertise: '',             // 'Beginner' | 'Average' | 'Expert'
+  userGender: '',                // kept for legacy, not collected
+  // Ethics
+  ethicsAnswers: [],             // [{ category, letter, color, type, energy_wh, water_ml, co2_g, score }]
   currentQuestions: [],          // 5 selected for this session
   currentQuestionIndex: 0,
   persona: null                  // assigned after ethics questions
@@ -80,30 +89,39 @@ const state = {
 
 ---
 
-## Stamina Bar System
+## Resource Bar System (replaces old Stamina bar)
 
-**Visual:** Fixed bar at top of screen, retro game health bar style
-**Range:** 0–100%
-**Visibility:** Hidden on idle screen; shown on all other screens via `body.stamina-visible` class
+**Visual:** 3 fixed bars at top of screen — Energy (Wh), Water (ml), CO₂ (g)
+**Behaviour:** Bars accumulate as the player answers ethics questions. Each answer adds resource values based on its type (H/B/L).
+**Visibility:** Hidden on idle, userinfo, greener, and print screens. Shown only during the 5 ethics questions via `RESOURCE_SCREENS = new Set(['ethics'])`.
 
-| Range | Color | Meaning |
-|---|---|---|
-| 80–100% | Green | Healthy AI usage |
-| 50–79% | Yellow | Moderate impact |
-| 0–49% | Red | High impact |
+### Resource Thresholds (4-tier)
 
-**Stamina impacts:**
+| Resource | Green | Yellow | Orange | Red |
+|---|---|---|---|---|
+| Energy (Wh) | ≤15 | 15–50 | 50–120 | >120 |
+| Water (ml) | ≤75 | 75–300 | 300–800 | >800 |
+| CO₂ (g) | ≤5 | 5–20 | 20–60 | >60 |
 
-| Event | Impact |
+Labels: Light footprint / Notable usage / Heavy usage / Very heavy usage
+
+### Max display scale (bar fill %)
+
+| Resource | Max |
 |---|---|
-| Select image prompt | −15 |
-| Select text-long prompt | −8 |
-| Select text-short prompt | −3 |
-| Green ethics answer | +8 |
-| Yellow ethics answer | 0 |
-| Red ethics answer | −8 |
+| Energy | 250 Wh |
+| Water | 1500 ml |
+| CO₂ | 75 g |
 
-Stamina is clamped to 0–100 at all times.
+### Per-answer resource costs
+
+| Answer type | Energy (Wh) | Water (ml) | CO₂ (g) |
+|---|---|---|---|
+| H (High impact) | 50 | 500 | 15 |
+| B (Balanced) | 15 | 150 | 5 |
+| L (Low / conscious) | 2 | 20 | 1 |
+
+Icons on each resource bar are dynamic — they update based on `totalScore` via `getIconStep()`.
 
 ---
 
@@ -111,11 +129,12 @@ Stamina is clamped to 0–100 at all times.
 
 ```
 [Idle] → [Instructions overlay] → [Screen 0.5: User Info]
-       → [Screen 1: Prompt Select] → [Screen 1.1: Ethics × 5]
-       → [Ethics Summary + Persona] → [Loading]
-       → [Screen 2: Impact] → [Screen 3: Go Greener]
+       → [Screen 1.1: Ethics × 5] → [Suspense screen (2.5s)]
+       → [Ethics Summary + Persona] → [Screen 3: Go Greener]
        → [Screen 4: Print/Download]
 ```
+
+> **Removed:** Screen 1 (Prompt Selection) no longer exists. The prompt is randomly assigned when the user clicks CONTINUE on the User Info screen.
 
 ---
 
@@ -123,7 +142,8 @@ Stamina is clamped to 0–100 at all times.
 
 **State:** No user interaction
 **Elements:**
-- Game title: `A(I)RCADE`
+- Language switcher (English / Castilian / Catalan) — top right dropdown
+- Game title: `(AI)RCADE`
 - Subtitle: `INSERT COIN TO PLAY`
 - Tagline: `Every prompt has a footprint.`
 - Byte mascot (floating cloud SVG) with rotating speech bubbles
@@ -131,7 +151,7 @@ Stamina is clamped to 0–100 at all times.
 - `© A(I)RCADE 2025 | ☁ FREE PLAY ☁`
 
 **On PRESS START:** Instructions overlay appears
-**Stamina bar:** Hidden
+**Resource bars:** Hidden
 
 ---
 
@@ -146,7 +166,7 @@ Appears over the idle screen after pressing Start.
 4. See the footprint — water, energy & CO₂ used
 5. Go greener! — personalized tips & downloadable card
 
-**CTA:** `LET'S GO! →` → closes overlay, shows Screen 0.5, resets stamina to 100%
+**CTA:** `LET'S GO! →` → closes overlay, resets resources to 0, shows Screen 0.5
 
 ---
 
@@ -156,176 +176,115 @@ Appears over the idle screen after pressing Start.
 
 **Form fields:**
 
-| Field | Type | Options |
-|---|---|---|
-| Name | Text input | Optional, max 30 chars |
-| Age | Dropdown | Under 18, 18–25, 26–35, 36–50, 51–65, 66+ |
-| Gender | Dropdown | Prefer not to say, Female, Male, Non-binary |
+| Field | Type | Options | Required |
+|---|---|---|---|
+| Name | Text input | Optional, max 30 chars | No |
+| Age | Dropdown | 0–12, 13–19, 20–39, 40–59, 60+ | Yes |
+| AI Expertise Level | Dropdown | Beginner, Average, Expert | Yes |
+
+> **Changed from earlier design:** Gender field removed. AI Expertise Level added. Age ranges updated (previously: Under 18, 18–25, 26–35, 36–50, 51–65, 66+).
+
+**Validation:** Both Age and Expertise Level must be selected. Error shown inline: "Please select your age range and expertise level."
 
 **Privacy note:** "🔒 Your information is used only for this session and is not stored or shared."
 
-**CTA:** `CONTINUE →` → navigates to Screen 1
-**Stamina bar:** Visible at 100% (green)
-
----
-
-## Screen 1: PROMPT SELECTION
-
-**Header:** "What should AI create for you?"
-**Subheader:** "Pick one — your choice affects your AI Stamina!"
-
-**5 prompt buttons** (no custom input):
-
-| # | Icon | Label | Prompt text | Task type |
-|---|---|---|---|---|
-| 1 | 🎨 | A cat astronaut on Mars | "A cat astronaut on Mars" | image |
-| 2 | ✍️ | Birthday poem for my friend turning 30 | "Birthday poem for my friend turning 30" | text-short |
-| 3 | 🎨 | Modern bakery logo with a croissant | "Design ideas for a modern bakery logo with a croissant" | image |
-| 4 | 📖 | How to make tiramisu | "How to make tiramisu step by step" | text-short |
-| 5 | 📝 | Dream beach vacation for two weeks | "Plan a dream beach vacation for two weeks" | text-long |
-
-**On select:**
-1. Button highlights briefly
-2. Stamina drops by task type impact (see table above)
-3. After 500ms → navigates to Screen 1.1 (Ethics)
-
-**No stamina delta shown on buttons** — prevents gaming the quiz
+**On CONTINUE:** A prompt is randomly selected from the 5-prompt pool. The player goes directly to the ethics screen (no prompt selection step).
 
 ---
 
 ## Screen 1.1: ETHICS QUESTIONS
 
 **Header:** "AI ETHICS CHECK"
-**Total questions:** 5 (one per category, randomly selected per session)
+**Total questions:** 5 (randomly selected per session from the age × expertise bank)
 
-### Question Pool
+### Question Bank
 
-**Source:** `questions-database.json` — 40 questions total
-**Categories (8 questions each):**
+**Source:** `questionBank.js`
+**Structure:** 15 combinations — 5 age groups × 3 expertise levels, 20 questions each
 
-| Category key | Theme |
+| Age group | Expertise levels |
 |---|---|
-| `everyday_use` | Practical habits, efficiency, resource sharing |
-| `privacy` | Personal data, consent, surveillance |
-| `environmental` | Energy use, sustainability, water consumption |
-| `critical_thinking` | Verification, learning vs copying, media literacy |
-| `social_ethics` | Fairness, authorship, community impact |
+| 0–12 | Beginner, Average, Expert |
+| 13–19 | Beginner, Average, Expert |
+| 20–39 | Beginner, Average, Expert |
+| 40–59 | Beginner, Average, Expert |
+| 60+ | Beginner, Average, Expert |
 
-**Selection:** 1 question randomly picked per category → 5 questions, shuffled
+**Selection:** `selectQuestionsFromBank(userAge, userExpertise)` picks 5 random questions from the matching bank.
 
 **Answer format (each question):**
-- 3 options shuffled randomly (so position never reveals correct answer)
-- Green = +8 stamina | Yellow = 0 | Red = −8
-- Impact NOT shown on buttons — color revealed only after selection
-- All hover states use uniform neon cyan (no color hints)
+- 3 options (A/B/C) shuffled randomly before display
+- Each option has type H, B, or L
+- Resource costs and score are hidden until after selection
+- After selection: color highlight on clicked button, "WHY" card explanation shown, per-question resource feedback panel shown
 
-**Progress:** 5 dots indicator + "Question X of 5" text
+### Scoring
 
-### After Question 5: Persona Summary
+| Answer type | Score | Meaning |
+|---|---|---|
+| H (High impact) | −3 | Uncritical / high-resource AI use |
+| B (Balanced) | +1 | Moderate / thoughtful use |
+| L (Low / conscious) | +4 | Minimal AI use, independent effort |
 
-Displays the player's **AI User Persona** (see Personas section) with:
-- Byte cloud SVG variant for the persona
-- Persona name, tagline, description
-- Current stamina score
-- `🚀 CREATE IT!` button → triggers loading + Screen 2
+**Total score range:** −15 to +20 (5 questions × max spread)
+
+### Progress UI
+
+- 5-node Snake & Ladders path on the left side — Byte cloud avatar moves along the path after each answer with FLIP animation
+- Dot indicator + "Question X of 5" text
+- HP stamina bars (3 bars, top-left) visible during ethics only
+
+### After Question 5
+
+1. Snake path and stamina bars hidden
+2. **Suspense screen** shown for 2.5 seconds: Byte with thinking eyes, "CALCULATING YOUR IMPACT..." and animated dots
+3. Suspense screen dismissed → Ethics Summary + Persona card revealed
+
+---
+
+## Ethics Summary + Persona
+
+Shown within the ethics screen after Q5. Contains:
+
+### Persona Card
+
+- Persona-specific Byte SVG (with accessory)
+- Persona name and tagline
+- Score display: `Score: X/20`
+- Impact level + score range: `Impact: Low/Medium/High · Score: X (range -15 to +20)`
+- Persona description
+- Persona-specific tip box
+
+### AI Footprint Summary
+
+Animated fill bars for Energy, Water, CO₂ (using accumulated resource values). Each bar shows: value, reference comparison.
+
+**CTA:** `GET TIPS →` → Screen 3
 
 ---
 
 ## AI User Personas
 
-6 MBTI-style personas assigned based on ethics answers. Each has a unique Byte cloud SVG accessory.
+6 personas assigned based on cumulative score via `getPersonaFromScore(score)`. Each has a unique Byte cloud SVG accessory.
 
-**Assignment logic:**
+> **Changed from earlier design:** Persona assignment is now purely score-based, not category-based.
 
-| Condition | Persona |
-|---|---|
-| ≥4 green answers | The AI Guardian |
-| ≥3 red answers | The Speed Seeker |
-| ≥2 green AND `environmental` category green | The Conscious Creator |
-| ≥2 green AND `social_ethics` category green | The Fairness Advocate |
-| ≥2 green AND `privacy` category green | The Privacy Champion |
-| 1 green with `environmental` | The Conscious Creator |
-| 1 green with `social_ethics` | The Fairness Advocate |
-| 1 green with `privacy` | The Privacy Champion |
-| Default (mixed/low) | The Pragmatic Explorer |
-
-| Persona | SVG Accessory | Tagline |
+| Score range | Persona | SVG Accessory |
 |---|---|---|
-| The AI Guardian | Crown (cyan + gems) | Thoughtful, responsible, planet-aware |
-| The Conscious Creator | Sprout / plant | Creative and growing in awareness |
-| The Fairness Advocate | Scales of justice | Champion of equal and fair AI |
-| The Privacy Champion | Shield + padlock | Data-savvy and rights-aware |
-| The Pragmatic Explorer | Compass | Practical, curious, finding the way |
-| The Speed Seeker | Lightning bolts | Full throttle and loving it |
+| ≥15 | The AI Guardian | Crown (cyan + gems) |
+| 10–14 | The Conscious Creator | Sprout / plant |
+| 5–9 | The Fairness Advocate | Scales of justice |
+| 0–4 | The Privacy Champion | Shield + padlock |
+| −5 to −1 | The Pragmatic Explorer | Compass |
+| ≤−6 | The Speed Seeker | Lightning bolts + excited eyes |
 
 ---
 
 ## Loading Screen
 
-**Appears between:** Ethics summary → Screen 2
-**Content:** Animated Byte with wide excited eyes + lightning bolt, "Byte is working! ⚡", prompt preview text
+**Appears between:** Greener tips → (not used in current flow for mock content; mock delay in `api.js`)
+**Content:** Animated Byte with wide excited eyes + lightning bolt, "Byte is working! ⚡", animated dots, prompt preview text
 **Duration:** ~1.2 seconds (mock delay)
-
----
-
-## Screen 2: IMPACT INFOGRAPHIC
-
-**Header:** "WHAT IT COST THE PLANET"
-
-### Generated Result Card
-
-Displays the AI output above the metrics:
-
-| Task type | Display |
-|---|---|
-| `image` | `<img>` tag showing actual pre-generated image file |
-| `text-short` / `text-long` | Full text, `white-space: pre-wrap`, no truncation |
-
-Type badge shown: `🎨 IMAGE` / `📝 LONG TEXT` / `✍️ SHORT TEXT`
-
-### Environmental Metrics
-
-| Task type | Water | Energy | CO₂ |
-|---|---|---|---|
-| image | 0.5 L | 35 Wh | 15 g |
-| text-long | 0.05 L | 8 Wh | 3.5 g |
-| text-short | 0.01 L | 2 Wh | 0.8 g |
-
-Each metric shows:
-- Value + human comparison (dynamically computed)
-- Animated horizontal fill bar (animates in 400ms after screen loads)
-- Highlight pulse animation on each row (600ms delay)
-
-**Meter fill % (relative to image = 100%):**
-
-| | Water | Energy | CO₂ |
-|---|---|---|---|
-| image | 95% | 95% | 95% |
-| text-long | 28% | 40% | 35% |
-| text-short | 12% | 18% | 15% |
-
-### Did You Know? Box
-
-**Source:** `did-you-know-database.json` — 21 facts
-**Selection:** Personalised by ethics answers + prompt type + stamina (see below)
-**Display:** One fact per session, randomly picked from a matching pool of 3
-
-**Selection logic:**
-1. Check green answer categories (overrides prompt-type defaults):
-   - `privacy` green → facts about privacy + planet (16, 12, 20)
-   - `environmental` green → collective impact facts (20, 12, 21)
-   - `critical_thinking` green → learning/verification facts (17, 14, 18)
-   - `social_ethics` or `everyday_use` green → creative teamwork facts (19, 8, 15)
-   - ≥3 red answers → "good enough" / reuse facts (13, 9, 10)
-2. Else → prompt type × stamina matrix:
-
-| | High stamina (≥80%) | Medium (50–79%) | Low (<50%) |
-|---|---|---|---|
-| image | 1, 4, 20 | 1, 3, 11 | 2, 3, 13 |
-| text-short | 6, 12, 20 | 5, 8, 15 | 5, 9, 14 |
-| text-long | 7, 12, 21 | 7, 10, 15 | 7, 9, 13 |
-
-**CTA:** `HOW CAN I DO BETTER? →` → Screen 3
 
 ---
 
@@ -334,28 +293,18 @@ Each metric shows:
 **Header:** "GO GREENER! 🌱"
 **Byte variant:** Sunglasses + thumbs up + big smile
 
-**Shows 3 personalised tip cards** from `personalized-tips-database.json` (21 tips total)
+### Personalized tip (based on worst-impact answer)
 
-### Tip Selection Logic
+Box shown at top: scenario label "⚡ PERSONALISED FOR YOU" + dynamically generated tip text based on answer type:
+- H: encourages doing one step offline next time
+- B: challenges player to go one step further
+- L: encourages sharing the habit
 
-**Priority 1 — Ethics category overrides:**
+### General Tips Grid
 
-| Category with ≥2 red answers | Tips shown |
-|---|---|
-| `privacy` | 12, 18, 20 — privacy protection tips |
-| `critical_thinking` | 13, 14, 19 — verification & learning tips |
-| `social_ethics` | 15, 18, 21 — responsibility & community tips |
-| `environmental` | 7, 8, 9 — energy timing & efficiency tips |
+3 tip cards from `data.js` selected by `selectPersonalizedTips(taskType, resources, ethicsAnswers)`.
 
-**Priority 2 — Prompt type × stamina matrix:**
-
-| | High (≥80%) | Medium (50–79%) | Low (<50%) |
-|---|---|---|---|
-| image | 2, 4, 10 | 2, 3, 8 | 2, 8, 11 |
-| text-short | 5, 6, 9 | 4, 6, 11 | 3, 6, 11 |
-| text-long | 5, 9, 10 | 4, 9, 11 | 3, 9, 11 |
-
-Each tip card shows: icon, title, description, savings label
+Each tip card shows: icon, title, description, savings label.
 
 **CTA:** `📄 PRINT MY CARD →` → Screen 4
 
@@ -371,14 +320,14 @@ Each tip card shows: icon, title, description, savings label
 | Field | Source |
 |---|---|
 | Session ID | Random 6-char alphanumeric |
-| Player | `userName | userAge` |
+| Player | `userName` |
 | AI Persona | `state.persona.name` |
-| Prompt used | `state.prompt` |
-| Water / Energy / CO₂ | Formatted metrics |
-| AI Stamina score | `state.stamina + '%'` |
+| Energy / Water / CO₂ | Accumulated from ethics answers |
+| Score | `state.totalScore` |
 | Smart tip | First tip from `selectPersonalizedTips()` |
 | Quote | *"Every prompt has a footprint. Leave a positive one."* |
 | QR placeholder | Mock QR grid |
+| URL | `aircade.app` |
 
 **Download:** `html2canvas` captures `#receipt-card` as PNG at 2× scale
 **Filename:** `aircade-{sessionId}.png`
@@ -389,6 +338,38 @@ Each tip card shows: icon, title, description, savings label
 
 ---
 
+## Multilingual Support
+
+**New feature.** Language switcher on idle screen.
+
+| Code | Language |
+|---|---|
+| `en` | English (default) |
+| `es` | Castilian |
+| `ca` | Catalan |
+
+Implemented via `translations.js`. All UI strings use `data-i18n` attributes and `t('key.path')` helper. Falls back to English if a key is missing in the target language.
+
+---
+
+## Sound Effects
+
+**New feature.** `sounds.js` uses Web Audio API (no audio files required — synthesized tones).
+
+| Event | Sound |
+|---|---|
+| Any button click | `click` |
+| Green (L) answer selected | `goodChoice` |
+| Red (H) answer selected | `damage` |
+| NEXT → pressed (path advance) | `coin` + `levelComplete` |
+| After Q5 results | `print` |
+| Persona revealed (score ≤−7) | `turbo` |
+| Persona revealed (score 1–4) | `casual` |
+| Persona revealed (score 5–14) | `mindful` |
+| Persona revealed (score ≥15) | `green` |
+
+---
+
 ## Byte Mascot
 
 **Character:** Pixel cloud SVG (`160×120` viewBox)
@@ -396,7 +377,7 @@ Each tip card shows: icon, title, description, savings label
 **States:** idle, generating, impact, greener, print
 **Speech:** Rotating phrases per state, 4-second interval, pop scale animation
 
-**Persona variants** (unique SVG accessories in upper-right):
+**Persona variants** (unique SVG accessories):
 - Guardian: cyan pixel crown
 - Conscious Creator: sprouting plant
 - Fairness Advocate: balance scales
@@ -409,28 +390,27 @@ Each tip card shows: icon, title, description, savings label
 ## Pre-Generated AI Content
 
 All responses are offline/hardcoded in `api.js`. No API key required.
+The prompt is randomly assigned — players do not choose their prompt.
 
 | Prompt | Response type | File/content |
 |---|---|---|
-| Cat astronaut on Mars | Image | `assets/cat-astronaut.jpg` |
-| Birthday poem | Text | Pre-written poem |
-| Bakery logo | Image | `assets/bakery-logo.jpg` |
-| Tiramisu recipe | Text | Pre-written recipe |
-| Dream vacation | Text | Pre-written description |
+| A cat astronaut on Mars | Image | `assets/cat-astronaut.jpg` |
+| Birthday poem for my friend turning 30 | Text | Pre-written poem |
+| Design ideas for a modern bakery logo with a croissant | Image | `assets/bakery-logo.jpg` |
+| How to make tiramisu step by step | Text | Pre-written recipe |
+| Plan a dream beach vacation for two weeks | Text | Pre-written description |
 
 Mock delay: 1.2 seconds (theatrical loading experience)
 
 ---
 
-## Data Files
+## Data Files (inline in JS)
 
-| File | Purpose | Records |
+| Module | Purpose | Records |
 |---|---|---|
-| `questions-database.json` | Ethics question pool | 40 questions, 5 categories |
-| `personalized-tips-database.json` | Go Greener tips | 21 tips |
-| `did-you-know-database.json` | Impact screen facts | 21 facts |
-| `prompt-results-examples.json` | Reference for mock content | 5 prompts |
-| `screen2-visual-mockups.md` | Design reference for Screen 2 | — |
+| `questionBank.js` | Age × expertise ethics question bank | 15 sets × 20 questions = 300 questions |
+| `data.js` | Resource thresholds, metrics, tips, DYK facts, comparisons | — |
+| `translations.js` | All UI strings in en / es / ca | — |
 
 ---
 
@@ -442,7 +422,7 @@ Mock delay: 1.2 seconds (theatrical loading experience)
 | Idle timeout (30s reset) | Deferred | Low priority for installation |
 | Thermal printer integration | Out of scope (hardware) | — |
 | PWA / offline caching | Not implemented | Runs fine as local file |
-| Repeat-question prevention | Not implemented | 5 questions from 40 makes repeats rare |
+| Repeat-question prevention | Not implemented | 5 questions from 20 makes repeats rare |
 
 ---
 
@@ -451,5 +431,6 @@ Mock delay: 1.2 seconds (theatrical loading experience)
 - **Never preachy** — facts not lectures; "you could" not "you should"
 - **Playful tone** — arcade energy, Byte is a cheerful guide
 - **No shame** — persona descriptions are warm even for high-impact players
-- **No gaming** — stamina impacts hidden until answer selected; answer order shuffled
+- **No gaming** — resource costs hidden until answer selected; answer order shuffled
 - **Accessible** — ARIA roles on progress bars, error toast for failures
+- **Multilingual** — full UI available in English, Castilian, and Catalan

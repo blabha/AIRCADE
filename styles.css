@@ -2285,6 +2285,184 @@ body.stamina-visible .ethics-main {
   line-height: 1.4;
 }
 
+/* ════════════════════════════════════════
+   CHANGE 1 — GREENER SCREEN: tip-only layout
+   Hide hero and tips grid; center the personalized tip.
+════════════════════════════════════════ */
+#screen-greener .greener-hero,
+#screen-greener .tips-grid {
+  display: none;
+}
+
+#screen-greener {
+  justify-content: center;
+  padding: 40px 32px;
+}
+
+#screen-greener #personal-tip-box {
+  max-width: 720px;
+  font-size: 18px;
+  padding: 28px 36px;
+}
+
+#screen-greener .personal-tip-text {
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* ════════════════════════════════════════
+   CHANGE 2 — STAMINA HUD: 3 stacked bars, top-left
+════════════════════════════════════════ */
+.stamina-hud {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.stamina-hud.hidden {
+  display: none;
+}
+
+.stamina-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stamina-bar-label {
+  font-family: var(--pixel-font);
+  font-size: 6px;
+  color: var(--neon-cyan);
+  letter-spacing: 0.08em;
+  width: 20px;
+  text-align: right;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.stamina-bar-track {
+  width: 72px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(0, 245, 255, 0.35);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.stamina-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue));
+  transition: width 0.4s ease;
+}
+
+/* ════════════════════════════════════════
+   CHANGE 3 — RUNNER BACKGROUND + GLASSY QUESTION CARD
+════════════════════════════════════════ */
+
+/* Make ethics-main a positioning context for the runner layer */
+.ethics-main {
+  position: relative;
+}
+
+/* Side-scrolling path layer — sits behind all .ethics-main children */
+.runner-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ground line — wide repeating dash, scrolls left */
+.runner-bg::before {
+  content: '';
+  position: absolute;
+  bottom: 48px;
+  left: 0;
+  width: 200%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--neon-cyan) 0px,
+    var(--neon-cyan) 32px,
+    transparent 32px,
+    transparent 56px
+  );
+  opacity: 0.28;
+  animation: runner-scroll 2.2s linear infinite;
+}
+
+/* Elevated platform strip — slightly higher, slower, more sparse */
+.runner-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  width: 200%;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 90px,
+    var(--neon-cyan) 90px,
+    var(--neon-cyan) 120px,
+    transparent 120px,
+    transparent 190px
+  );
+  opacity: 0.15;
+  animation: runner-scroll 4s linear infinite;
+}
+
+@keyframes runner-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Ensure all real content sits above the runner layer */
+.ethics-progress,
+.question-card,
+.ethics-summary {
+  position: relative;
+  z-index: 1;
+}
+
+/* Glassy/frosted finish on the question card */
+.question-card {
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  background: rgba(15, 15, 46, 0.78);
+  border-color: rgba(0, 245, 255, 0.25);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ════════════════════════════════════════
+   CHANGE 4 — SINGLE SELECTION COLOR (--neon-cyan)
+   Replace red/yellow/green states with one class.
+════════════════════════════════════════ */
+.answer-btn.selected-green,
+.answer-btn.selected-yellow,
+.answer-btn.selected-red {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 245, 255, 0.10);
+  box-shadow: 0 0 8px rgba(0, 245, 255, 0.18);
+}
+
+/* Why-card border: single accent color regardless of answer type */
+.why-card.why-border-green,
+.why-card.why-border-yellow,
+.why-card.why-border-red {
+  border-left-color: var(--neon-cyan);
+}
+
 /* ── Form validation helpers ────────────── */
 .required-star {
   color: var(--neon-pink);

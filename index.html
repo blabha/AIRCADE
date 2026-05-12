@@ -231,6 +231,22 @@
   <!-- ═══════════════════════════════════════════
        SCREEN 1.1: ETHICS QUESTIONS
   ═══════════════════════════════════════════ -->
+  <!-- Stamina HUD (3 bars, top-left, shown only during ethics/gameplay) -->
+  <div class="stamina-hud hidden" id="stamina-hud" aria-hidden="true">
+    <div class="stamina-bar-wrap">
+      <span class="stamina-bar-label">HP</span>
+      <div class="stamina-bar-track"><div class="stamina-bar-fill" id="stamina-fill-1" style="width:100%"></div></div>
+    </div>
+    <div class="stamina-bar-wrap">
+      <span class="stamina-bar-label">HP</span>
+      <div class="stamina-bar-track"><div class="stamina-bar-fill" id="stamina-fill-2" style="width:100%"></div></div>
+    </div>
+    <div class="stamina-bar-wrap">
+      <span class="stamina-bar-label">HP</span>
+      <div class="stamina-bar-track"><div class="stamina-bar-fill" id="stamina-fill-3" style="width:100%"></div></div>
+    </div>
+  </div>
+
   <section id="screen-ethics" class="screen hidden">
     <!-- Snake & Ladders path - vertical on left side -->
     <div class="snake-path" id="snake-path" aria-label="Progress path">
@@ -269,6 +285,8 @@
 
     <!-- Main content area -->
     <div class="ethics-main">
+      <!-- Side-scrolling runner path background (Change 3) -->
+      <div class="runner-bg" aria-hidden="true"></div>
       <header class="screen-header">
         <h2 class="pixel-font screen-title neon-yellow" data-i18n="ui.ethicsTitle">AI ETHICS CHECK</h2>
       </header>

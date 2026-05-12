@@ -85,16 +85,20 @@ function getQComparison(key, value) {
 function hideGameChrome() {
   const barsEl = document.getElementById('resource-bars');
   const pathEl = document.getElementById('snake-path');
+  const hudEl  = document.getElementById('stamina-hud');
   if (barsEl) barsEl.classList.add('game-chrome-hidden');
   if (pathEl) pathEl.classList.add('game-chrome-hidden');
+  if (hudEl)  hudEl.classList.add('hidden');
   document.body.classList.remove('stamina-visible');
 }
 
 function showGameChrome() {
   const barsEl = document.getElementById('resource-bars');
   const pathEl = document.getElementById('snake-path');
+  const hudEl  = document.getElementById('stamina-hud');
   if (barsEl) barsEl.classList.remove('game-chrome-hidden');
   if (pathEl) pathEl.classList.remove('game-chrome-hidden');
+  if (hudEl)  hudEl.classList.remove('hidden');
 }
 
 // ── Resource Bar Management ───────────────────
@@ -139,12 +143,15 @@ function updateResourceBars(resources) {
 
 // ── Screen Navigation ────────────────────────
 function showScreen(name) {
+  const staminaHud = document.getElementById('stamina-hud');
   if (RESOURCE_SCREENS.has(name)) {
     resourceBarsEl.classList.remove('hidden');
     document.body.classList.add('stamina-visible'); // keeps existing padding offset
+    if (staminaHud) staminaHud.classList.remove('hidden');
   } else {
     resourceBarsEl.classList.add('hidden');
     document.body.classList.remove('stamina-visible');
+    if (staminaHud) staminaHud.classList.add('hidden');
   }
 
   Object.values(screens).forEach(s => {
