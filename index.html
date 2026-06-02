@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>(AI)RCADE — Every prompt has a footprint</title>
+  <title>A(I)RCADE — Every prompt has a footprint</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
@@ -11,40 +11,7 @@
 <body>
 
   <!-- ═══════════════════════════════════════════
-       STAMINA BAR (persistent, screens 0.5 → print)
-  ═══════════════════════════════════════════ -->
-  <div id="resource-bars" class="resource-bars hidden" aria-label="AI resource meters">
-    <div class="resource-bar-item">
-      <span class="resource-icon" id="res-icon-energy">🕯️</span>
-      <span class="resource-label pixel-font">Energy</span>
-      <div class="resource-track" role="progressbar" aria-label="Energy" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="resource-fill res-green" id="fill-energy"></div>
-      </div>
-      <span class="resource-value pixel-font" id="val-energy-bar">0 Wh</span>
-      <span class="resource-threshold-label" id="lbl-energy">Light footprint</span>
-    </div>
-    <div class="resource-bar-item">
-      <span class="resource-icon" id="res-icon-water">🥤</span>
-      <span class="resource-label pixel-font">Water</span>
-      <div class="resource-track" role="progressbar" aria-label="Water" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="resource-fill res-green" id="fill-water"></div>
-      </div>
-      <span class="resource-value pixel-font" id="val-water-bar">0 ml</span>
-      <span class="resource-threshold-label" id="lbl-water">Light footprint</span>
-    </div>
-    <div class="resource-bar-item">
-      <span class="resource-icon" id="res-icon-co2">🌳🌲🌳</span>
-      <span class="resource-label pixel-font">CO₂</span>
-      <div class="resource-track" role="progressbar" aria-label="CO2" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div class="resource-fill res-green" id="fill-co2"></div>
-      </div>
-      <span class="resource-value pixel-font" id="val-co2-bar">0 g</span>
-      <span class="resource-threshold-label" id="lbl-co2">Light footprint</span>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════
-       SCREEN 1: IDLE / START
+       SCREEN 0: IDLE / ATTRACT MODE
   ═══════════════════════════════════════════ -->
   <section id="screen-idle" class="screen active">
     <div class="scanlines"></div>
@@ -61,64 +28,31 @@
     <div class="idle-content">
       <div class="title-block">
         <div class="title-sub pixel-font" data-i18n="ui.insertCoin">INSERT COIN TO PLAY</div>
-        <h1 class="game-title pixel-font"><span class="title-paren">(AI)</span>RCADE</h1>
+        <h1 class="game-title pixel-font"><span class="title-paren">A(I)</span>RCADE</h1>
         <div class="title-tagline" data-i18n="ui.tagline">Every prompt has a footprint.</div>
       </div>
 
       <!-- Byte mascot -->
       <div class="byte-wrapper" id="byte-idle">
         <div class="byte-mascot" id="byte">
-          <!-- Byte SVG pixel cloud -->
           <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-label="Byte the cloud mascot">
-            <!-- Cloud body -->
             <g class="byte-cloud-body">
               <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
               <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
-              <!-- Cloud puffs (pixel style) -->
               <rect x="30" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
               <rect x="55" y="12" width="36" height="36" rx="4" fill="#eef8ff"/>
               <rect x="88" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
-              <!-- Cloud bottom -->
               <rect x="40" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
               <rect x="100" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
             </g>
-            <!-- Eyes -->
             <rect class="byte-eye byte-eye-left" x="54" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
             <rect class="byte-eye byte-eye-right" x="92" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
-            <!-- Eye shine -->
             <rect x="58" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
             <rect x="96" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
-            <!-- Mouth (smile) -->
             <path class="byte-mouth" d="M 62 64 Q 80 74 98 64" stroke="#1a1a2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-            <!-- Lightning bolt (shown when generating) -->
-            <g class="byte-lightning" opacity="0">
-              <polygon points="128,14 118,40 128,40 112,70 136,34 124,34 138,14" fill="#ffbe0b" stroke="#ff9900" stroke-width="1"/>
-            </g>
-            <!-- Water drops (shown on impact screen) -->
-            <g class="byte-water" opacity="0">
-              <ellipse cx="20" cy="50" rx="6" ry="8" fill="#00b4d8"/>
-              <ellipse cx="140" cy="55" rx="6" ry="8" fill="#00b4d8"/>
-              <ellipse cx="30" cy="80" rx="5" ry="7" fill="#00b4d8" opacity="0.7"/>
-            </g>
-            <!-- Sunglasses (shown on greener screen) -->
-            <g class="byte-sunglasses" opacity="0">
-              <rect x="48" y="42" width="26" height="20" rx="4" fill="#06d6a0" opacity="0.9"/>
-              <rect x="86" y="42" width="26" height="20" rx="4" fill="#06d6a0" opacity="0.9"/>
-              <line x1="74" y1="52" x2="86" y2="52" stroke="#06d6a0" stroke-width="3"/>
-              <rect x="50" y="44" width="22" height="16" rx="3" fill="#044a35" opacity="0.95"/>
-              <rect x="88" y="44" width="22" height="16" rx="3" fill="#044a35" opacity="0.95"/>
-              <!-- Lens shine -->
-              <rect x="53" y="46" width="6" height="5" rx="1" fill="white" opacity="0.3"/>
-              <rect x="91" y="46" width="6" height="5" rx="1" fill="white" opacity="0.3"/>
-            </g>
-            <!-- Leaf (shown on print screen) -->
-            <g class="byte-leaf" opacity="0">
-              <ellipse cx="138" cy="35" rx="10" ry="14" fill="#06d6a0" transform="rotate(-30 138 35)"/>
-              <line x1="130" y1="45" x2="148" y2="25" stroke="#03a87c" stroke-width="2"/>
-            </g>
           </svg>
         </div>
-        <div class="byte-speech" id="byte-speech">Hi! I'm Byte! ⚡</div>
+        <div class="byte-speech" id="byte-speech">Ready to play? Tap START! ⚡</div>
       </div>
 
       <div class="idle-buttons">
@@ -147,29 +81,29 @@
           <li>
             <span class="step-num">02</span>
             <div>
-              <strong data-i18n="ui.step2title">Pick a task</strong>
-              <p data-i18n="ui.step2desc">Choose what you want AI to create</p>
+              <strong data-i18n="ui.step2title">Answer 5 ethics questions</strong>
+              <p data-i18n="ui.step2desc">Shape your AI profile &amp; watch your stamina tree grow</p>
             </div>
           </li>
           <li>
             <span class="step-num">03</span>
             <div>
-              <strong data-i18n="ui.step3title">Answer 5 ethics questions</strong>
-              <p data-i18n="ui.step3desc">Shape your AI profile &amp; watch your Stamina bar</p>
+              <strong data-i18n="ui.step3title">Discover your persona</strong>
+              <p data-i18n="ui.step3desc">See what kind of AI user you are</p>
             </div>
           </li>
           <li>
             <span class="step-num">04</span>
             <div>
-              <strong data-i18n="ui.step4title">See the footprint</strong>
-              <p data-i18n="ui.step4desc">Find out water, energy &amp; CO₂ used</p>
+              <strong data-i18n="ui.step4title">Get your personalized tip</strong>
+              <p data-i18n="ui.step4desc">Learn how to go greener</p>
             </div>
           </li>
           <li>
             <span class="step-num">05</span>
             <div>
-              <strong data-i18n="ui.step5title">Go greener!</strong>
-              <p data-i18n="ui.step5desc">Get your personalized tips &amp; grab your card</p>
+              <strong data-i18n="ui.step5title">Print your ticket</strong>
+              <p data-i18n="ui.step5desc">Take home your journey card</p>
             </div>
           </li>
         </ol>
@@ -184,7 +118,7 @@
   <section id="screen-userinfo" class="screen hidden">
     <header class="screen-header">
       <div class="byte-mini" aria-hidden="true">☁</div>
-      <h2 class="pixel-font screen-title" data-i18n="ui.welcomeTitle">Welcome, Player!</h2>
+      <h2 class="pixel-font screen-title" data-i18n="ui.welcomeTitle">TELL US ABOUT YOU</h2>
       <p class="screen-subtitle" data-i18n="ui.welcomeSub">Tell us about yourself to personalize your experience</p>
     </header>
 
@@ -216,6 +150,17 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label class="form-label" for="user-gender">Gender (optional)</label>
+        <select id="user-gender" class="form-select">
+          <option value="">Prefer not to say</option>
+          <option value="Female">Female</option>
+          <option value="Male">Male</option>
+          <option value="Non-binary">Non-binary</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
       <div class="privacy-note" data-i18n="ui.privacyNote">
         🔒 Your information is used only for this session and is not stored or shared.
       </div>
@@ -231,202 +176,121 @@
   <!-- ═══════════════════════════════════════════
        SCREEN 1.1: ETHICS QUESTIONS
   ═══════════════════════════════════════════ -->
-  <!-- Stamina HUD (3 bars, top-left, shown only during ethics/gameplay) -->
-  <div class="stamina-hud hidden" id="stamina-hud" aria-hidden="true">
-    <div class="stamina-bar-wrap">
-      <span class="stamina-bar-label">HP</span>
-      <div class="stamina-bar-track"><div class="stamina-bar-fill" id="stamina-fill-1" style="width:100%"></div></div>
-    </div>
-    <div class="stamina-bar-wrap">
-      <span class="stamina-bar-label">HP</span>
-      <div class="stamina-bar-track"><div class="stamina-bar-fill" id="stamina-fill-2" style="width:100%"></div></div>
-    </div>
-    <div class="stamina-bar-wrap">
-      <span class="stamina-bar-label">HP</span>
-      <div class="stamina-bar-track"><div class="stamina-bar-fill" id="stamina-fill-3" style="width:100%"></div></div>
-    </div>
-  </div>
-
   <section id="screen-ethics" class="screen hidden">
-    <!-- Snake & Ladders path - vertical on left side -->
-    <div class="snake-path" id="snake-path" aria-label="Progress path">
-      <div class="snake-path-title">PROGRESS</div>
-      <div class="snake-track">
-        <div class="snake-node snake-start" id="snake-node-0">
-          <div class="snake-avatar" id="snake-avatar">
-            <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" width="50" height="38">
-              <rect x="20" y="15" width="40" height="25" rx="4" fill="#c8e8f5"/>
-              <rect x="14" y="21" width="52" height="15" rx="4" fill="#c8e8f5"/>
-              <rect x="15" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
-              <rect x="28" y="6" width="18" height="18" rx="2" fill="#eef8ff"/>
-              <rect x="44" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
-              <rect x="20" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
-              <rect x="50" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
-              <rect x="27" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
-              <rect x="46" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
-              <rect x="29" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
-              <rect x="48" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
-            </svg>
-          </div>
-          <span class="snake-node-label pixel-font">START</span>
+
+    <!-- Mario HUD: 3 stamina bars -->
+    <div class="mario-hud" id="mario-hud" aria-label="Resource stamina bars">
+      <div class="mario-bar-item">
+        <span class="mario-bar-icon">💧</span>
+        <span class="mario-bar-label pixel-font">WATER</span>
+        <div class="mario-segments" id="bar-water">
+          <div class="mario-seg mario-seg-water"></div>
+          <div class="mario-seg mario-seg-water"></div>
+          <div class="mario-seg mario-seg-water"></div>
+          <div class="mario-seg mario-seg-water"></div>
+          <div class="mario-seg mario-seg-water"></div>
         </div>
-        <div class="snake-connector"></div>
-        <div class="snake-node" id="snake-node-1"><span class="snake-node-num pixel-font">1</span></div>
-        <div class="snake-connector"></div>
-        <div class="snake-node" id="snake-node-2"><span class="snake-node-num pixel-font">2</span></div>
-        <div class="snake-connector"></div>
-        <div class="snake-node" id="snake-node-3"><span class="snake-node-num pixel-font">3</span></div>
-        <div class="snake-connector"></div>
-        <div class="snake-node" id="snake-node-4"><span class="snake-node-num pixel-font">4</span></div>
-        <div class="snake-connector"></div>
-        <div class="snake-node snake-finish" id="snake-node-5"><span class="snake-node-num pixel-font">5</span></div>
+      </div>
+      <div class="mario-bar-item">
+        <span class="mario-bar-icon">🌿</span>
+        <span class="mario-bar-label pixel-font">CO₂</span>
+        <div class="mario-segments" id="bar-co2">
+          <div class="mario-seg mario-seg-co2"></div>
+          <div class="mario-seg mario-seg-co2"></div>
+          <div class="mario-seg mario-seg-co2"></div>
+          <div class="mario-seg mario-seg-co2"></div>
+          <div class="mario-seg mario-seg-co2"></div>
+        </div>
+      </div>
+      <div class="mario-bar-item">
+        <span class="mario-bar-icon">⚡</span>
+        <span class="mario-bar-label pixel-font">ENERGY</span>
+        <div class="mario-segments" id="bar-energy">
+          <div class="mario-seg mario-seg-energy"></div>
+          <div class="mario-seg mario-seg-energy"></div>
+          <div class="mario-seg mario-seg-energy"></div>
+          <div class="mario-seg mario-seg-energy"></div>
+          <div class="mario-seg mario-seg-energy"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Main content area -->
-    <div class="ethics-main">
-      <!-- Side-scrolling runner path background (Change 3) -->
-      <div class="runner-bg" aria-hidden="true"></div>
-      <header class="screen-header">
-        <h2 class="pixel-font screen-title neon-yellow" data-i18n="ui.ethicsTitle">AI ETHICS CHECK</h2>
-      </header>
-
-      <div class="ethics-progress">
-        <span class="ethics-progress-text pixel-font" id="ethics-progress-text">Question 1 of 5</span>
-        <div class="ethics-dots" id="ethics-dots" aria-hidden="true"></div>
+    <!-- Cloud path: Byte travels along this track -->
+    <div class="cloud-path-wrap" id="cloud-path-wrap" aria-hidden="true">
+      <div class="cloud-deco cloud-deco-1"></div>
+      <div class="cloud-deco cloud-deco-2"></div>
+      <div class="cloud-deco cloud-deco-3"></div>
+      <div class="path-marker path-start pixel-font">START</div>
+      <div class="path-marker path-finish pixel-font">FINISH</div>
+      <!-- Byte cloud traveler -->
+      <div class="byte-traveler" id="byte-traveler">
+        <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" width="56" height="42">
+          <rect x="20" y="15" width="40" height="25" rx="4" fill="#c8e8f5"/>
+          <rect x="14" y="21" width="52" height="15" rx="4" fill="#c8e8f5"/>
+          <rect x="15" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
+          <rect x="28" y="6"  width="18" height="18" rx="2" fill="#eef8ff"/>
+          <rect x="44" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
+          <rect x="20" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
+          <rect x="50" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
+          <rect x="27" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
+          <rect x="46" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
+          <rect x="29" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
+          <rect x="48" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
+          <path d="M 30 33 Q 40 39 50 33" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
       </div>
+    </div>
 
-      <div class="question-card" id="question-card">
-        <div class="question-text" id="question-text"></div>
-        <div class="answer-options" id="answer-options"></div>
-        <div class="answer-feedback hidden" id="answer-feedback">
-          <div class="feedback-metrics">
-            <div class="feedback-metric-row">
-              <span class="feedback-emoji">💧</span>
-              <span class="feedback-value" id="fb-water">—</span>
-              <span class="feedback-compare" id="fb-water-cmp"></span>
-            </div>
-            <div class="feedback-metric-row">
-              <span class="feedback-emoji">⚡</span>
-              <span class="feedback-value" id="fb-energy">—</span>
-              <span class="feedback-compare" id="fb-energy-cmp"></span>
-            </div>
-            <div class="feedback-metric-row">
-              <span class="feedback-emoji">☁️</span>
-              <span class="feedback-value" id="fb-co2">—</span>
-              <span class="feedback-compare" id="fb-co2-cmp"></span>
-            </div>
-          </div>
-        </div>
-        <div class="why-card hidden" id="why-card">
-          <span class="why-card-label">WHY</span>
-          <p class="why-card-text" id="why-text"></p>
-        </div>
-        <button class="btn btn-primary btn-next-q hidden" id="btn-next-question">NEXT →</button>
+    <!-- Progress indicator -->
+    <div class="ethics-progress">
+      <span class="ethics-progress-text pixel-font" id="ethics-progress-text">Question 1 of 5</span>
+      <div class="ethics-dots" id="ethics-dots" aria-hidden="true"></div>
+    </div>
+
+    <!-- Question card -->
+    <div class="question-card glass-panel" id="question-card">
+      <div class="question-category pixel-font" id="question-category"></div>
+      <div class="question-text" id="question-text"></div>
+      <div class="answer-options" id="answer-options"></div>
+      <div class="why-card hidden" id="why-card">
+        <span class="why-card-label pixel-font">WHY THIS MATTERS</span>
+        <p class="why-card-text" id="why-text"></p>
       </div>
-
-      <!-- Shown after 5th question - FINAL RESULTS -->
-      <div class="ethics-summary hidden" id="ethics-summary">
-        <div class="persona-card">
-          <div class="persona-byte" id="persona-byte" aria-hidden="true"></div>
-          <div class="persona-name pixel-font" id="persona-name"></div>
-          <div class="persona-tagline" id="persona-tagline"></div>
-          <div class="persona-score-display pixel-font" id="persona-score-display"></div>
-          <div class="persona-scores" id="persona-scores"></div>
-          <p class="persona-description" id="persona-description"></p>
-          <div class="persona-tip-box" id="persona-tip-box">
-            <span class="persona-tip-label pixel-font">💡 YOUR TIP</span>
-            <p class="persona-tip-text" id="persona-tip-text"></p>
-          </div>
-        </div>
-
-        <div class="final-results-wrap">
-          <div class="final-results-title pixel-font">YOUR AI FOOTPRINT</div>
-
-          <div class="final-bar-item">
-            <div class="final-bar-header">
-              <span class="final-bar-icon" id="final-icon-energy">🕯️</span>
-              <span class="final-bar-name pixel-font">Energy</span>
-              <span class="final-bar-value pixel-font" id="summary-energy">0 Wh</span>
-            </div>
-            <div class="final-bar-track">
-              <div class="final-bar-fill final-fill-energy" id="final-fill-energy"></div>
-            </div>
-            <div class="final-bar-comparison" id="cmp-summary-energy">—</div>
-          </div>
-
-          <div class="final-bar-item">
-            <div class="final-bar-header">
-              <span class="final-bar-icon" id="final-icon-water">🥤</span>
-              <span class="final-bar-name pixel-font">Water</span>
-              <span class="final-bar-value pixel-font" id="summary-water">0 ml</span>
-            </div>
-            <div class="final-bar-track">
-              <div class="final-bar-fill final-fill-water" id="final-fill-water"></div>
-            </div>
-            <div class="final-bar-comparison" id="cmp-summary-water">—</div>
-          </div>
-
-          <div class="final-bar-item">
-            <div class="final-bar-header">
-              <span class="final-bar-icon" id="final-icon-co2">🌳🌲🌳</span>
-              <span class="final-bar-name pixel-font">CO₂</span>
-              <span class="final-bar-value pixel-font" id="summary-co2">0 g CO₂</span>
-            </div>
-            <div class="final-bar-track">
-              <div class="final-bar-fill final-fill-co2" id="final-fill-co2"></div>
-            </div>
-            <div class="final-bar-comparison" id="cmp-summary-co2">—</div>
-          </div>
-        </div>
-
-        <button class="btn btn-primary btn-large" id="btn-continue-ethics">GET TIPS →</button>
-      </div>
+      <button class="btn btn-primary btn-next-q hidden" id="btn-next-question">NEXT →</button>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════
-       LOADING OVERLAY (between screens 2 & 3)
+       SCREEN 2: PERSONA REVEAL
   ═══════════════════════════════════════════ -->
-  <div class="loading-screen hidden" id="loading-screen" role="status" aria-live="polite">
-    <div class="loading-content">
-      <div class="byte-loading" aria-hidden="true">
-        <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
-          <g class="byte-cloud-body">
-            <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
-            <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
-            <rect x="30" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
-            <rect x="55" y="12" width="36" height="36" rx="4" fill="#eef8ff"/>
-            <rect x="88" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
-            <rect x="40" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
-            <rect x="100" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
-          </g>
-          <!-- Wide eyes -->
-          <rect x="50" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>
-          <rect x="92" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>
-          <rect x="54" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>
-          <rect x="96" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>
-          <!-- Excited open mouth -->
-          <rect x="62" y="62" width="36" height="8" rx="4" fill="#1a1a2e"/>
-          <!-- Lightning bolt animated -->
-          <polygon class="bolt-anim" points="128,10 116,38 128,38 110,72 138,32 124,32 140,10" fill="#ffbe0b"/>
-        </svg>
-      </div>
-      <p class="pixel-font loading-text" data-i18n="ui.loadingText">Byte is working! ⚡</p>
-      <div class="loading-dots">
-        <span></span><span></span><span></span>
-      </div>
-      <p class="loading-sub" id="loading-prompt-preview"></p>
-    </div>
-  </div>
+  <section id="screen-persona" class="screen hidden">
+    <header class="screen-header">
+      <h2 class="pixel-font screen-title neon-cyan" data-i18n="ui.personaTitle">YOUR AI PERSONA</h2>
+    </header>
 
+    <div class="persona-reveal">
+      <div class="persona-byte-wrap">
+        <div class="persona-byte" id="persona-byte" aria-hidden="true"></div>
+      </div>
+      <div class="persona-name pixel-font" id="persona-name"></div>
+      <div class="persona-tagline" id="persona-tagline"></div>
+
+      <div class="persona-desc-panel glass-panel">
+        <p class="persona-description" id="persona-description"></p>
+        <div class="persona-score-display pixel-font" id="persona-score-display">Score: 0/20</div>
+      </div>
+    </div>
+
+    <button class="btn btn-secondary btn-large" id="btn-go-green" data-i18n="ui.goGreenBtn">
+      GO GREEN →
+    </button>
+  </section>
 
   <!-- ═══════════════════════════════════════════
-       SCREEN 4: GO GREENER
+       SCREEN 3: PERSONALIZED TIP
   ═══════════════════════════════════════════ -->
   <section id="screen-greener" class="screen hidden">
 
-    <!-- Byte + heading row -->
     <div class="greener-hero">
       <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="byte-greener-svg" aria-hidden="true">
         <g class="byte-cloud-body">
@@ -450,36 +314,30 @@
       </svg>
       <div class="greener-hero-text">
         <h2 class="pixel-font greener-title neon-green" data-i18n="ui.greenerTitle">GO GREENER! 🌱</h2>
-        <p class="greener-subtitle" data-i18n="ui.byteGreen">Smart choices add up. Here's how to shrink your footprint:</p>
+        <p class="greener-subtitle" data-i18n="ui.byteGreen">Smart choices add up. Here's your personalized tip:</p>
       </div>
     </div>
 
-    <!-- Personalized tip (based on highest-impact answer) -->
-    <div class="personal-tip-box hidden" id="personal-tip-box">
-      <div class="personal-tip-badge pixel-font">YOUR TIP</div>
-      <div class="personal-tip-scenario pixel-font" id="personal-tip-scenario"></div>
-      <p class="personal-tip-text" id="personal-tip-text"></p>
-    </div>
-
-    <!-- General tips -->
-    <div class="tips-grid" id="tips-grid" role="list">
-      <!-- Tips injected by JS -->
+    <!-- Single personalized tip -->
+    <div class="personalized-tip-card glass-panel" id="personalized-tip-card">
+      <div class="tip-badge pixel-font">⚡ PERSONALIZED FOR YOU</div>
+      <p class="tip-text" id="tip-text"></p>
     </div>
 
     <button class="btn btn-secondary btn-large" id="btn-print" data-i18n="ui.printBtn">
-      📄 PRINT MY CARD →
+      PRINT YOUR TICKET →
     </button>
   </section>
 
   <!-- ═══════════════════════════════════════════
-       SCREEN 5: PRINT / DOWNLOAD
+       SCREEN 4: TICKET DOWNLOAD
   ═══════════════════════════════════════════ -->
   <section id="screen-print" class="screen hidden">
     <header class="screen-header">
-      <h2 class="pixel-font screen-title neon-yellow" data-i18n="ui.printTitle">YOUR CARD IS READY! 🖨️</h2>
+      <h2 class="pixel-font screen-title neon-yellow" data-i18n="ui.printTitle">YOUR TICKET IS READY! 🖨️</h2>
     </header>
 
-    <!-- Byte waving -->
+    <!-- Byte waving with leaf -->
     <div class="byte-print-wrapper" aria-hidden="true">
       <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="byte-small">
         <g class="byte-cloud-body">
@@ -496,50 +354,64 @@
         <rect x="58" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
         <rect x="96" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
         <path d="M 62 64 Q 80 74 98 64" stroke="#1a1a2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-        <!-- Leaf -->
         <ellipse cx="138" cy="35" rx="10" ry="14" fill="#06d6a0" transform="rotate(-30 138 35)"/>
         <line x1="130" y1="44" x2="148" y2="26" stroke="#03a87c" stroke-width="2"/>
-        <!-- Wave arm -->
         <text x="20" y="55" font-size="24" class="wave-arm">👋</text>
       </svg>
     </div>
 
-    <!-- Receipt card (what gets downloaded) -->
-    <div class="receipt-wrapper">
-      <div class="receipt-card" id="receipt-card">
-        <div class="receipt-header">
-          <div class="receipt-logo pixel-font">(AI)RCADE</div>
-          <div class="receipt-session pixel-font" id="receipt-session">SESSION: #000000</div>
+    <!-- Ticket card (captured by html2canvas) -->
+    <div class="ticket-wrapper">
+      <div class="ticket-card" id="ticket-card">
+        <div class="ticket-header">
+          <div class="ticket-logo pixel-font">A(I)RCADE</div>
+          <div class="ticket-session pixel-font" id="ticket-session">SESSION: #000000</div>
         </div>
-        <div class="receipt-divider">· · · · · · · · · · · · · · · · · · · ·</div>
+        <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
 
-        <div class="receipt-section">
-          <div class="receipt-label" data-i18n="ui.receiptPlayer">PLAYER:</div>
-          <div class="receipt-player" id="receipt-player">—</div>
-          <div class="receipt-persona" id="receipt-persona">—</div>
-        </div>
-        <div class="receipt-divider">· · · · · · · · · · · · · · · · · · · ·</div>
-
-        <div class="receipt-section">
-          <div class="receipt-label" data-i18n="ui.receiptFootprint">YOUR FOOTPRINT:</div>
-          <div class="receipt-metric">⚡ Energy: <span id="r-ethics-energy">—</span></div>
-          <div class="receipt-metric">💧 Water: <span id="r-ethics-water">—</span></div>
-          <div class="receipt-metric">☁️ CO₂: <span id="r-ethics-co2">—</span></div>
-          <div class="receipt-metric">🎯 Score: <span id="r-score">—</span></div>
-        </div>
-        <div class="receipt-divider">· · · · · · · · · · · · · · · · · · · ·</div>
-
-        <div class="receipt-section">
-          <div class="receipt-label" data-i18n="ui.receiptTip">YOUR SMART TIP:</div>
-          <div class="receipt-tip" id="receipt-tip">—</div>
-        </div>
-        <div class="receipt-divider">· · · · · · · · · · · · · · · · · · · ·</div>
-
-        <div class="receipt-section receipt-remember">
-          <em data-i18n="ui.receiptQuote">"Every prompt has a footprint.<br>Leave a positive one."</em>
+        <div class="ticket-section">
+          <div class="ticket-label">PLAYER:</div>
+          <div class="ticket-player" id="ticket-player">—</div>
         </div>
 
-        <div class="receipt-qr">
+        <div class="ticket-section">
+          <div class="ticket-persona-row">
+            <div class="ticket-persona-byte" id="ticket-persona-byte" aria-hidden="true"></div>
+            <div>
+              <div class="ticket-persona-name pixel-font" id="ticket-persona-name">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
+
+        <div class="ticket-section">
+          <div class="ticket-label">YOUR SCORE:</div>
+          <div class="ticket-score pixel-font" id="ticket-score">—</div>
+          <div class="ticket-stamina" id="ticket-stamina">Final Stamina: —</div>
+        </div>
+        <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
+
+        <div class="ticket-section">
+          <div class="ticket-label">EST. DAILY AI FOOTPRINT:</div>
+          <div class="ticket-footprint" id="ticket-footprint">
+            <div class="ticket-footprint-row">💧 Water: <span id="ticket-water">—</span></div>
+            <div class="ticket-footprint-row">🌿 CO₂: <span id="ticket-co2">—</span></div>
+            <div class="ticket-footprint-row">⚡ Energy: <span id="ticket-energy">—</span></div>
+          </div>
+        </div>
+        <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
+
+        <div class="ticket-section">
+          <div class="ticket-label">YOUR GO GREEN TIP:</div>
+          <div class="ticket-tip" id="ticket-tip">—</div>
+        </div>
+        <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
+
+        <div class="ticket-section ticket-remember">
+          <em>"Every prompt has a footprint.<br>Leave a positive one."</em>
+        </div>
+
+        <div class="ticket-qr">
           <div class="qr-placeholder" aria-label="QR code placeholder">
             <div class="qr-mock">
               <div></div><div></div><div></div>
@@ -547,57 +419,20 @@
               <div></div><div></div><div></div>
             </div>
           </div>
-          <div class="receipt-url pixel-font">aircade.app</div>
+          <div class="ticket-url pixel-font">aircade.app</div>
         </div>
       </div>
     </div>
 
     <div class="print-actions">
       <button class="btn btn-primary btn-large" id="btn-download" data-i18n="ui.downloadBtn">
-        ⬇ DOWNLOAD AS IMAGE
+        ⬇ DOWNLOAD TICKET
       </button>
       <button class="btn btn-ghost btn-large" id="btn-play-again" data-i18n="ui.playAgainBtn">
         ↩ PLAY AGAIN
       </button>
     </div>
   </section>
-
-  <!-- ═══════════════════════════════════════════
-       SUSPENSE SCREEN (between Q5 and persona)
-  ═══════════════════════════════════════════ -->
-  <div class="suspense-screen hidden" id="suspense-screen" role="status" aria-live="polite">
-    <div class="suspense-content">
-      <div class="suspense-cloud" aria-hidden="true">
-        <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" width="140" height="105">
-          <g class="byte-cloud-body">
-            <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
-            <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
-            <rect x="30" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
-            <rect x="55" y="12" width="36" height="36" rx="4" fill="#eef8ff"/>
-            <rect x="88" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
-            <rect x="40" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
-            <rect x="100" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
-          </g>
-          <!-- Wide thinking eyes -->
-          <rect x="50" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>
-          <rect x="92" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>
-          <rect x="54" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>
-          <rect x="96" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>
-          <!-- Thinking mouth -->
-          <path d="M 64 66 Q 80 72 96 66" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <!-- Question marks -->
-          <text x="18" y="44" font-size="20" fill="#ffbe0b" opacity="0.8" class="suspense-q1">?</text>
-          <text x="130" y="36" font-size="16" fill="#00f5ff" opacity="0.8" class="suspense-q2">?</text>
-          <text x="125" y="58" font-size="22" fill="#ff006e" opacity="0.8" class="suspense-q3">!</text>
-        </svg>
-      </div>
-      <p class="pixel-font suspense-text">CALCULATING YOUR IMPACT...</p>
-      <div class="loading-dots">
-        <span></span><span></span><span></span>
-      </div>
-      <p class="suspense-sub">Analysing your AI footprint</p>
-    </div>
-  </div>
 
   <!-- Error toast -->
   <div class="error-toast hidden" id="error-toast" role="alert" aria-live="assertive">

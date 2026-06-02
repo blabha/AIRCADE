@@ -1509,37 +1509,211 @@ body.stamina-visible .ethics-main {
    SCREEN 1.1: ETHICS QUESTIONS
 ════════════════════════════════════════ */
 #screen-ethics {
-  flex-direction: row;
-  align-items: stretch;
+  flex-direction: column;
+  align-items: center;
   padding: 0;
   gap: 0;
+  padding-top: 0;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ── Mario HUD: 3 stamina bars across the top ── */
+.mario-hud {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 8px 20px;
+  background: linear-gradient(90deg, #08081e 0%, #0d1030 50%, #08081e 100%);
+  border-bottom: 3px solid rgba(0,245,255,0.35);
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(0,245,255,0.1);
+}
+
+/* Scanline on HUD */
+.mario-hud::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px);
+  pointer-events: none;
+}
+
+.mario-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  position: relative;
+  z-index: 1;
+}
+
+.mario-bar-icon {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
+}
+
+.mario-bar-label {
+  font-size: 6px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  min-width: 38px;
+}
+
+.mario-segments {
+  display: flex;
+  gap: 3px;
+}
+
+.mario-seg {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  border: 2px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.55);
+  transition: background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.mario-seg.filled.mario-seg-water {
+  background: linear-gradient(135deg, #0077b6, #00b4d8);
+  border-color: #48cae4;
+  box-shadow: 0 0 6px #00b4d880, inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.mario-seg.filled.mario-seg-co2 {
+  background: linear-gradient(135deg, #2d6a4f, #52b788);
+  border-color: #74c69d;
+  box-shadow: 0 0 6px #52b78870, inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.mario-seg.filled.mario-seg-energy {
+  background: linear-gradient(135deg, #d4800a, #ffbe0b);
+  border-color: #ffe166;
+  box-shadow: 0 0 6px #ffbe0b80, inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+@keyframes segPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.35) translateY(-3px); }
+  65%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+.bar-pop .mario-seg.filled {
+  animation: segPop 0.45s ease-out both;
+}
+
+/* ── Cloud path (Byte travels along top) ── */
+.cloud-path-wrap {
+  width: 100%;
+  height: 64px;
+  position: relative;
+  background: linear-gradient(180deg, #0d1f3a 0%, #07071a 100%);
+  border-bottom: 2px solid rgba(0,245,255,0.12);
+  flex-shrink: 0;
   overflow: hidden;
 }
 
-.ethics-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-  padding: 24px 32px;
-  gap: 16px;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--neon-cyan) var(--bg-card);
+.cloud-deco {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(200, 232, 245, 0.12);
+  pointer-events: none;
+}
+.cloud-deco-1 { width: 80px; height: 30px; top: 20px; left: 5%; animation: cloudDrift 18s linear infinite; }
+.cloud-deco-2 { width: 60px; height: 22px; top: 35px; left: 35%; animation: cloudDrift 24s linear infinite 6s; }
+.cloud-deco-3 { width: 50px; height: 18px; top: 15px; left: 65%; animation: cloudDrift 20s linear infinite 12s; }
+
+@keyframes cloudDrift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(120px); }
+}
+
+.path-marker {
+  position: absolute;
+  font-size: 7px;
+  color: rgba(0,245,255,0.5);
+  top: 50%;
+  transform: translateY(-50%);
+  letter-spacing: 0.08em;
+}
+.path-start  { left: 8px; }
+.path-finish { right: 8px; }
+
+.byte-traveler {
+  position: absolute;
+  left: 0%;
+  top: 50%;
+  transform: translateY(-60%);
+  transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 4px 12px rgba(0, 180, 230, 0.5));
+}
+
+/* ── Mario runner ground (scrolling platform lines behind question card) ── */
+#screen-ethics::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--neon-cyan) 0px,
+    var(--neon-cyan) 28px,
+    transparent 28px,
+    transparent 52px
+  );
+  opacity: 0.22;
+  animation: runner-scroll 2s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes runner-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Glass panel (frosted effect) ── */
+.glass-panel {
+  background: rgba(15, 15, 46, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── Question category badge ── */
+.question-category {
+  font-size: 7px;
+  color: var(--neon-cyan);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: -4px;
 }
 
 .ethics-progress {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   width: 100%;
   max-width: 680px;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  padding: 10px 24px 4px;
 }
 
 .ethics-progress-text {
-  font-size: 9px;
+  font-size: 8px;
   color: var(--neon-yellow);
   letter-spacing: 0.1em;
 }
@@ -1571,44 +1745,51 @@ body.stamina-visible .ethics-main {
   border-color: var(--neon-green);
 }
 
-/* Question card */
+/* Question card — stretches to fill remaining screen height */
 .question-card {
-  width: 100%;
+  width: calc(100% - 48px);
   max-width: 680px;
-  background: var(--bg-card);
-  border: 2px solid var(--bg-card-alt);
   border-radius: var(--radius-lg);
-  padding: 28px 32px;
+  padding: 18px 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 24px 16px;
+  /* glass-panel class provides bg + border */
 }
 
 .question-text {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--text-light);
-  line-height: 1.6;
+  line-height: 1.55;
   font-weight: 500;
 }
 
 .answer-options {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
 }
 
 .answer-btn {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 14px 18px;
-  background: var(--bg-card-alt);
-  border: 2px solid var(--bg-card-alt);
+  padding: 10px 14px;
+  background: rgba(19, 19, 64, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid rgba(255,255,255,0.1);
   border-radius: var(--radius);
   cursor: pointer;
   color: var(--text-light);
   font-family: var(--body-font);
-  font-size: 15px;
+  font-size: 14px;
   text-align: left;
   line-height: 1.5;
   transition: border-color 0.2s, background 0.2s, transform 0.1s;
@@ -1629,25 +1810,22 @@ body.stamina-visible .ethics-main {
   background: rgba(0, 245, 255, 0.07);
 }
 
-.answer-btn.selected-green {
-  border-color: var(--neon-green);
-  background: rgba(6, 214, 160, 0.12);
-}
-
-.answer-btn.selected-yellow {
-  border-color: var(--neon-yellow);
-  background: rgba(255, 190, 11, 0.12);
-}
-
+/* Selected answer: no color reveal — stays at full opacity while others dim */
+.answer-btn.selected-green,
+.answer-btn.selected-yellow,
 .answer-btn.selected-red {
-  border-color: var(--neon-pink);
-  background: rgba(255, 0, 110, 0.12);
+  opacity: 1 !important;
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(19, 19, 64, 0.65);
 }
 
 /* ── Next question button ── */
 .btn-next-q {
-  margin-top: 14px;
+  margin-top: 8px;
   width: 100%;
+  min-height: 48px;
+  font-size: 12px;
+  padding: 12px 28px;
 }
 
 .btn-next-q.hidden {
@@ -1656,8 +1834,8 @@ body.stamina-visible .ethics-main {
 
 /* ── Why card (appears below answers after selection) ── */
 .why-card {
-  margin-top: 14px;
-  padding: 12px 16px;
+  margin-top: 8px;
+  padding: 10px 14px;
   border-radius: 8px;
   border-left: 4px solid var(--text-dim);
   background: rgba(255,255,255,0.04);
@@ -1682,9 +1860,9 @@ body.stamina-visible .ethics-main {
 }
 
 .why-card-text {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-light);
-  line-height: 1.55;
+  line-height: 1.5;
   margin: 0;
 }
 
@@ -2362,101 +2540,7 @@ body.stamina-visible .ethics-main {
   transition: width 0.4s ease;
 }
 
-/* ════════════════════════════════════════
-   CHANGE 3 — RUNNER BACKGROUND + GLASSY QUESTION CARD
-════════════════════════════════════════ */
-
-/* Make ethics-main a positioning context for the runner layer */
-.ethics-main {
-  position: relative;
-}
-
-/* Side-scrolling path layer — sits behind all .ethics-main children */
-.runner-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Ground line — wide repeating dash, scrolls left */
-.runner-bg::before {
-  content: '';
-  position: absolute;
-  bottom: 48px;
-  left: 0;
-  width: 200%;
-  height: 3px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--neon-cyan) 0px,
-    var(--neon-cyan) 32px,
-    transparent 32px,
-    transparent 56px
-  );
-  opacity: 0.28;
-  animation: runner-scroll 2.2s linear infinite;
-}
-
-/* Elevated platform strip — slightly higher, slower, more sparse */
-.runner-bg::after {
-  content: '';
-  position: absolute;
-  bottom: 80px;
-  left: 0;
-  width: 200%;
-  height: 2px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 90px,
-    var(--neon-cyan) 90px,
-    var(--neon-cyan) 120px,
-    transparent 120px,
-    transparent 190px
-  );
-  opacity: 0.15;
-  animation: runner-scroll 4s linear infinite;
-}
-
-@keyframes runner-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* Ensure all real content sits above the runner layer */
-.ethics-progress,
-.question-card,
-.ethics-summary {
-  position: relative;
-  z-index: 1;
-}
-
-/* Glassy/frosted finish on the question card */
-.question-card {
-  backdrop-filter: blur(14px) saturate(1.4);
-  -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  background: rgba(15, 15, 46, 0.78);
-  border-color: rgba(0, 245, 255, 0.25);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-/* ════════════════════════════════════════
-   CHANGE 4 — SINGLE SELECTION COLOR (--neon-cyan)
-   Replace red/yellow/green states with one class.
-════════════════════════════════════════ */
-.answer-btn.selected-green,
-.answer-btn.selected-yellow,
-.answer-btn.selected-red {
-  border-color: var(--neon-cyan);
-  background: rgba(0, 245, 255, 0.10);
-  box-shadow: 0 0 8px rgba(0, 245, 255, 0.18);
-}
-
-/* Why-card border: single accent color regardless of answer type */
+/* Why-card border: single neutral accent color */
 .why-card.why-border-green,
 .why-card.why-border-yellow,
 .why-card.why-border-red {
@@ -2475,3 +2559,253 @@ body.stamina-visible .ethics-main {
   margin-top: -8px;
   margin-bottom: 8px;
 }
+
+/* ══════════════════════════════════════════
+   SCREEN 2: PERSONA REVEAL
+══════════════════════════════════════════ */
+#screen-persona {
+  gap: 20px;
+  padding-top: 24px;
+  align-items: center;
+}
+
+.persona-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 580px;
+  text-align: center;
+  animation: personaReveal 0.6s ease-out;
+}
+
+.persona-byte-wrap {
+  width: 200px;
+  height: 150px;
+  filter: drop-shadow(0 4px 20px rgba(0, 180, 230, 0.5));
+  animation: byteFloat 3s ease-in-out infinite;
+}
+
+.persona-byte-wrap .persona-byte {
+  width: 100%;
+  height: 100%;
+}
+
+.persona-byte-wrap .persona-byte svg {
+  width: 100%;
+  height: 100%;
+}
+
+.persona-desc-panel {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  padding: 22px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.persona-score-display {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+/* neon-cyan utility for screen-title */
+.neon-cyan {
+  color: var(--neon-cyan) !important;
+  text-shadow: 0 0 8px var(--neon-cyan) !important;
+}
+
+/* ══════════════════════════════════════════
+   SCREEN 3: PERSONALIZED TIP (GO GREENER)
+══════════════════════════════════════════ */
+.personalized-tip-card {
+  width: 100%;
+  max-width: 680px;
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-color: rgba(6, 214, 160, 0.35) !important;
+}
+
+.tip-badge {
+  font-size: 7px;
+  color: var(--neon-green);
+  letter-spacing: 0.14em;
+  opacity: 0.9;
+}
+
+.tip-text {
+  font-size: 17px;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════
+   SCREEN 4: TICKET DOWNLOAD
+══════════════════════════════════════════ */
+#screen-print {
+  gap: 20px;
+  padding-top: 24px;
+  align-items: center;
+}
+
+.ticket-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.ticket-card {
+  background: #fff;
+  color: #111;
+  width: 340px;
+  border-radius: 4px;
+  padding: 28px 24px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.ticket-card::before,
+.ticket-card::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 8px;
+  background-image: radial-gradient(circle at 8px 4px, #0a0a1a 6px, transparent 6px);
+  background-size: 16px 8px;
+}
+.ticket-card::before { top: -8px; }
+.ticket-card::after  { bottom: -8px; }
+
+.ticket-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.ticket-logo {
+  font-size: 16px;
+  font-family: var(--pixel-font);
+  color: #111;
+  letter-spacing: 0.05em;
+}
+
+.ticket-session {
+  font-size: 8px;
+  font-family: var(--pixel-font);
+  color: #666;
+  margin-top: 6px;
+}
+
+.ticket-divider {
+  text-align: center;
+  color: #aaa;
+  font-size: 12px;
+  margin: 12px 0;
+  letter-spacing: 0.05em;
+}
+
+.ticket-section {
+  margin-bottom: 4px;
+}
+
+.ticket-label {
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.ticket-player {
+  font-size: 15px;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.ticket-persona-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.ticket-persona-byte {
+  width: 48px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.ticket-persona-byte svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ticket-persona-name {
+  font-size: 9px;
+  color: #111;
+  letter-spacing: 0.06em;
+}
+
+.ticket-score {
+  font-size: 11px;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.ticket-stamina {
+  font-size: 13px;
+  color: #444;
+}
+
+.ticket-footprint {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.ticket-footprint-row {
+  font-size: 12px;
+  color: #222;
+  line-height: 1.5;
+}
+
+.ticket-tip {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #111;
+}
+
+.ticket-remember {
+  text-align: center;
+  font-style: italic;
+  color: #555;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ticket-qr {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ticket-url {
+  font-size: 8px;
+  color: #333;
+  letter-spacing: 0.1em;
+}
+

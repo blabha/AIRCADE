@@ -1,13 +1,13 @@
 /* ═══════════════════════════════════════════
-   A(I)RCADE — Print / Download Card
-   Uses html2canvas to capture receipt as PNG
+   A(I)RCADE — Ticket Download
+   Uses html2canvas to capture ticket card as PNG
 ═══════════════════════════════════════════ */
 
 async function downloadCard(sessionId) {
-  const card = document.getElementById('receipt-card');
+  const card = document.getElementById('ticket-card');
 
   if (!card) {
-    showError('Could not find the card to download.');
+    showError('Could not find the ticket to download.');
     return;
   }
 
@@ -22,78 +22,68 @@ async function downloadCard(sessionId) {
       scale: 2,
       useCORS: true,
       logging: false,
-      // Clip to the visible area of the card
-      width: card.offsetWidth,
+      width:  card.offsetWidth,
       height: card.offsetHeight
     });
 
     const link = document.createElement('a');
-    link.download = `aircade-${sessionId || 'card'}.png`;
+    link.download = `aircade-${sessionId || 'ticket'}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
 
     btn.textContent = tFn('ui.downloadDone') || '✅ Downloaded!';
     setTimeout(() => {
-      btn.textContent = tFn('ui.downloadBtn') || '⬇ DOWNLOAD AS IMAGE';
+      btn.textContent = tFn('ui.downloadBtn') || '⬇ DOWNLOAD TICKET';
       btn.disabled = false;
     }, 2000);
   } catch (err) {
     console.error('Download failed:', err);
-    showError('Download failed — try right-clicking the card and saving as image.');
-    btn.textContent = tFn('ui.downloadBtn') || '⬇ DOWNLOAD AS IMAGE';
+    showError('Download failed — try right-clicking the ticket and saving as image.');
+    btn.textContent = tFn('ui.downloadBtn') || '⬇ DOWNLOAD TICKET';
     btn.disabled = false;
   }
 }
 
-function populateReceiptCard(state) {
-  const { prompt, taskType, metrics, sessionId, userName, userAge, resources, ethicsAnswers, score } = state;
+function populateTicketCard(state) {
+  const { sessionId, userName, userAge, ethicsAnswers, score, staminaLevel, persona } = state;
 
   // Session ID
-  const sessionEl = document.getElementById('receipt-session');
+  const sessionEl = document.getElementById('ticket-session');
   if (sessionEl) sessionEl.textContent = `SESSION: #${sessionId}`;
 
-  // Player info
-  const playerEl = document.getElementById('receipt-player');
-  if (playerEl) {
-    const parts = [userName || 'Player'];
-    if (userAge) parts.push(userAge);
-    playerEl.textContent = parts.join(' | ');
+  // Player name
+  const playerEl = document.getElementById('ticket-player');
+  if (playerEl) playerEl.textContent = userName || 'Anonymous';
+
+  // Persona (name + mini Byte avatar)
+  if (persona) {
+    const nameEl = document.getElementById('ticket-persona-name');
+    if (nameEl) nameEl.textContent = persona.title;
+
+    const byteEl = document.getElementById('ticket-persona-byte');
+    if (byteEl) byteEl.innerHTML = persona.byteSvg || '';
   }
 
-  // Persona
-  const personaEl = document.getElementById('receipt-persona');
-  if (personaEl && state.persona) {
-    personaEl.textContent = state.persona.title + ' — ' + state.persona.subtitle;
-  }
+  // Score + stamina level
+  const scoreEl   = document.getElementById('ticket-score');
+  const staminaEl = document.getElementById('ticket-stamina');
+  if (scoreEl)   scoreEl.textContent   = (score || 0) + '/20';
+  if (staminaEl) staminaEl.textContent = 'Final Stamina: ' + (staminaLevel || 3) + '/5';
 
-  // Prompt
-  const promptEl = document.getElementById('receipt-prompt');
-  if (promptEl) promptEl.textContent = prompt;
+  // Daily footprint per stamina level
+  const footprint = DAILY_FOOTPRINT[staminaLevel] || DAILY_FOOTPRINT[3];
+  const waterEl   = document.getElementById('ticket-water');
+  const co2El     = document.getElementById('ticket-co2');
+  const energyEl  = document.getElementById('ticket-energy');
+  if (waterEl)   waterEl.textContent  = footprint.water  + '/day';
+  if (co2El)     co2El.textContent    = footprint.co2    + '/day';
+  if (energyEl)  energyEl.textContent = footprint.energy + '/day';
 
-  // Ethics resource totals
-  if (resources) {
-    const fmt = v => (Number.isInteger(v) ? v : +v.toFixed(1));
-    const ethEnergyEl = document.getElementById('r-ethics-energy');
-    const ethWaterEl  = document.getElementById('r-ethics-water');
-    const ethCo2El    = document.getElementById('r-ethics-co2');
-    if (ethEnergyEl) ethEnergyEl.textContent = fmt(resources.energy) + ' Wh';
-    if (ethWaterEl)  ethWaterEl.textContent  = fmt(resources.water)  + ' ml';
-    if (ethCo2El)    ethCo2El.textContent    = fmt(resources.co2)    + ' g';
-  }
-
-  // Score
-  const scoreEl = document.getElementById('r-score');
-  if (scoreEl) scoreEl.textContent = (score || 0) + '/25';
-
-  // Personalized tip (first of the 3)
-  const tipEl = document.getElementById('receipt-tip');
+  // Personalized tip (condensed to 2 lines on ticket)
+  const tipEl = document.getElementById('ticket-tip');
   if (tipEl) {
-    const tips = selectPersonalizedTips(taskType, resources || { energy: 0, water: 0, co2: 0 }, ethicsAnswers || []);
-    if (tips && tips.length > 0) {
-      const tip     = tips[0];
-      const tipTitle = (typeof t === 'function') ? (t('tips.' + tip.id + '.title') || tip.title) : tip.title;
-      const tipDesc  = (typeof t === 'function') ? (t('tips.' + tip.id + '.description') || tip.description) : tip.description;
-      tipEl.textContent = tipTitle + ': ' + tipDesc;
-    }
+    const tipText = getPersonalizedTip(ethicsAnswers || [], persona);
+    // Truncate for ticket readability
+    tipEl.textContent = tipText.length > 140 ? tipText.slice(0, 137) + '…' : tipText;
   }
 }

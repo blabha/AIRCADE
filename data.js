@@ -1101,6 +1101,75 @@ function getPersonaFromScore(score) {
   return SCORE_PERSONAS['sustainable-sage'];
 }
 
+// ── Personalized Tip (Personalized_Tips.md) ─────────────────────
+// Based on worst-impact (H) answer scenario; fallback by type B/L
+
+// Answer type → display color (shared across script.js and data.js)
+const ANSWER_TYPE_COLOR = { H: 'red', B: 'yellow', L: 'green' };
+
+// Generic WHY explanation shown after each ethics answer
+const WHY_TEXT = {
+  H: 'This option relies heavily on AI, which uses significantly more energy and water. High-impact choices add up quickly across millions of users.',
+  B: 'This is a balanced approach — using AI where it helps without over-relying on it. A good middle ground for most situations.',
+  L: 'Great choice! Doing tasks yourself or minimising AI use has a much lighter environmental footprint and builds real skills.'
+};
+
+const PERSONALIZED_TIP_TEXT = {
+  H: {
+    keywords: [
+      [['homework'],                   'AI is a great explainer but a poor substitute. Next time, struggle with the problem for 5 minutes first — your brain will actually remember the answer.'],
+      [['learn', 'read', 'stor', 'writ'], 'Stories written by you carry your voice. Use AI for a spark of inspiration, then close the tab and write it yourself.'],
+      [['draw', 'art', 'image', 'creat'], 'Every image you generate costs water and electricity. Try sketching your idea first — you might love what comes out.'],
+      [['research', 'science', 'project'], 'AI summaries can miss nuance. Use it to find starting points, then dig into the sources yourself.'],
+      [['cod', 'website', 'app'],       'AI-generated code often has hidden bugs. Write the logic yourself and use AI only to debug or explain concepts.']
+    ],
+    fallback: 'You picked the high-impact option this round. Next time, try the "do one step yourself first" rule — it reduces AI load and often produces better results.'
+  },
+  B: 'Good balance! You\'re on the right track. Next session, challenge yourself to take one more task fully offline — you might be surprised what you can do without AI.',
+  L: 'Great choice — you kept AI use minimal and intentional. Share this habit with someone who might not have considered the footprint of their prompts.'
+};
+
+function getPersonalizedTip(ethicsAnswers, persona) {
+  if (!ethicsAnswers || !ethicsAnswers.length) {
+    return persona ? persona.tip : PERSONALIZED_TIP_TEXT.B;
+  }
+  const hAnswers = ethicsAnswers.filter(a => a.type === 'H');
+  const worstAnswer = hAnswers.length > 0
+    ? hAnswers.reduce((min, a) => a.score < min.score ? a : min)
+    : ethicsAnswers[ethicsAnswers.length - 1];
+  if (!worstAnswer) return PERSONALIZED_TIP_TEXT.B;
+  const type     = worstAnswer.type || 'B';
+  const scenario = (worstAnswer.category || '').toLowerCase();
+  if (type === 'H') {
+    for (const [keywords, tip] of PERSONALIZED_TIP_TEXT.H.keywords) {
+      if (keywords.some(kw => scenario.includes(kw))) return tip;
+    }
+    return PERSONALIZED_TIP_TEXT.H.fallback;
+  }
+  return typeof PERSONALIZED_TIP_TEXT[type] === 'string'
+    ? PERSONALIZED_TIP_TEXT[type]
+    : PERSONALIZED_TIP_TEXT.B;
+}
+
+// ── Stamina level from cumulative score ──────────────────────────
+// Maps score range -15..+20 to tree levels 1..5
+function calculateStaminaLevel(score) {
+  if (score <= -8) return 1;
+  if (score <= -2) return 2;
+  if (score <=  4) return 3;
+  if (score <= 12) return 4;
+  return 5;
+}
+
+// Estimated daily AI-related footprint per stamina level (1=heaviest, 5=lightest)
+const DAILY_FOOTPRINT = {
+  1: { water: '3.5 L', co2: '520 g', energy: '0.80 kWh' },
+  2: { water: '2.5 L', co2: '380 g', energy: '0.58 kWh' },
+  3: { water: '1.5 L', co2: '230 g', energy: '0.35 kWh' },
+  4: { water: '0.8 L', co2: '110 g', energy: '0.18 kWh' },
+  5: { water: '0.3 L', co2: '35 g',  energy: '0.06 kWh' }
+};
+
 // ── Session ID generator ─────────────────────
 
 function generateSessionId() {
