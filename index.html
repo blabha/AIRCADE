@@ -178,7 +178,7 @@
   ═══════════════════════════════════════════ -->
   <section id="screen-ethics" class="screen hidden">
 
-    <!-- Mario HUD: 3 stamina bars -->
+    <!-- Mario HUD: 3 stamina bars — unchanged -->
     <div class="mario-hud" id="mario-hud" aria-label="Resource stamina bars">
       <div class="mario-bar-item">
         <span class="mario-bar-icon">💧</span>
@@ -215,49 +215,140 @@
       </div>
     </div>
 
-    <!-- Cloud path: Byte travels along this track -->
-    <div class="cloud-path-wrap" id="cloud-path-wrap" aria-hidden="true">
-      <div class="cloud-deco cloud-deco-1"></div>
-      <div class="cloud-deco cloud-deco-2"></div>
-      <div class="cloud-deco cloud-deco-3"></div>
-      <div class="path-marker path-start pixel-font">START</div>
-      <div class="path-marker path-finish pixel-font">FINISH</div>
-      <!-- Byte cloud traveler -->
-      <div class="byte-traveler" id="byte-traveler">
-        <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg" width="56" height="42">
-          <rect x="20" y="15" width="40" height="25" rx="4" fill="#c8e8f5"/>
-          <rect x="14" y="21" width="52" height="15" rx="4" fill="#c8e8f5"/>
-          <rect x="15" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
-          <rect x="28" y="6"  width="18" height="18" rx="2" fill="#eef8ff"/>
-          <rect x="44" y="11" width="14" height="14" rx="2" fill="#daf0fa"/>
-          <rect x="20" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
-          <rect x="50" y="34" width="10" height="8" rx="2" fill="#c8e8f5"/>
-          <rect x="27" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
-          <rect x="46" y="22" width="7" height="7" rx="2" fill="#1a1a2e"/>
-          <rect x="29" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
-          <rect x="48" y="24" width="2" height="2" rx="1" fill="white" opacity="0.8"/>
-          <path d="M 30 33 Q 40 39 50 33" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- ── Platformer Game World ──────────────── -->
+    <div class="game-world" id="game-world">
+
+      <!-- Parallax background: stars, moon, clouds -->
+      <div class="game-bg" aria-hidden="true">
+        <div class="game-bg-stars" id="game-stars"></div>
+        <div class="game-moon">
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+            <rect x="8"  y="4" width="28" height="38" rx="14" fill="rgba(120,100,200,0.82)"/>
+            <rect x="16" y="4" width="26" height="36" rx="13" fill="#07071a"/>
+          </svg>
+        </div>
+        <div class="game-bg-clouds" id="game-clouds"></div>
+      </div>
+
+      <!-- Top banner -->
+      <div class="game-banner pixel-font" aria-hidden="true">CRUSH BLOCKS TO ANSWER QUESTIONS!</div>
+
+      <!-- Lives / pause: top-right -->
+      <div class="game-lives" aria-hidden="true">
+        <svg class="game-heart" viewBox="0 0 8 7" width="22" height="20" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="1" y="0" width="2" height="1" fill="#ff006e"/><rect x="5" y="0" width="2" height="1" fill="#ff006e"/>
+          <rect x="0" y="1" width="4" height="1" fill="#ff006e"/><rect x="4" y="1" width="4" height="1" fill="#ff006e"/>
+          <rect x="0" y="2" width="8" height="2" fill="#ff006e"/>
+          <rect x="1" y="4" width="6" height="1" fill="#ff006e"/>
+          <rect x="2" y="5" width="4" height="1" fill="#ff006e"/>
+          <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
+        </svg>
+        <svg class="game-heart" viewBox="0 0 8 7" width="22" height="20" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="1" y="0" width="2" height="1" fill="#ff006e"/><rect x="5" y="0" width="2" height="1" fill="#ff006e"/>
+          <rect x="0" y="1" width="4" height="1" fill="#ff006e"/><rect x="4" y="1" width="4" height="1" fill="#ff006e"/>
+          <rect x="0" y="2" width="8" height="2" fill="#ff006e"/>
+          <rect x="1" y="4" width="6" height="1" fill="#ff006e"/>
+          <rect x="2" y="5" width="4" height="1" fill="#ff006e"/>
+          <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
+        </svg>
+        <svg class="game-heart" viewBox="0 0 8 7" width="22" height="20" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="1" y="0" width="2" height="1" fill="#ff006e"/><rect x="5" y="0" width="2" height="1" fill="#ff006e"/>
+          <rect x="0" y="1" width="4" height="1" fill="#ff006e"/><rect x="4" y="1" width="4" height="1" fill="#ff006e"/>
+          <rect x="0" y="2" width="8" height="2" fill="#ff006e"/>
+          <rect x="1" y="4" width="6" height="1" fill="#ff006e"/>
+          <rect x="2" y="5" width="4" height="1" fill="#ff006e"/>
+          <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
+        </svg>
+        <button class="game-pause-btn pixel-font" id="btn-pause" aria-label="Pause game">❚❚</button>
+      </div>
+
+      <!-- Floating jump hint near Byte -->
+      <div class="game-jump-hint" aria-hidden="true">
+        <span class="pixel-font jump-hint-line">ARROW UP</span>
+        <span class="pixel-font jump-hint-or">OR</span>
+        <kbd class="kbd-key pixel-font">SPACE</kbd>
+        <span class="pixel-font jump-hint-line">TO JUMP</span>
+        <svg class="jump-arc" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 5 35 C 5 8, 33 8, 33 4" stroke="#00f5ff" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="round"/>
+          <polyline points="28,1 33,4 30,9" stroke="#00f5ff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
         </svg>
       </div>
-    </div>
 
-    <!-- Progress indicator -->
-    <div class="ethics-progress">
-      <span class="ethics-progress-text pixel-font" id="ethics-progress-text">Question 1 of 5</span>
-      <div class="ethics-dots" id="ethics-dots" aria-hidden="true"></div>
-    </div>
-
-    <!-- Question card -->
-    <div class="question-card glass-panel" id="question-card">
-      <div class="question-category pixel-font" id="question-category"></div>
-      <div class="question-text" id="question-text"></div>
-      <div class="answer-options" id="answer-options"></div>
-      <div class="why-card hidden" id="why-card">
-        <span class="why-card-label pixel-font">WHY THIS MATTERS</span>
-        <p class="why-card-text" id="why-text"></p>
+      <!-- Floating crush hint near blocks -->
+      <div class="game-crush-hint" aria-hidden="true">
+        <span class="pixel-font crush-hint-text">CRUSH<br>TO ANSWER!</span>
+        <svg class="crush-arc" width="72" height="52" viewBox="0 0 72 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 6 48 C 6 16, 52 10, 66 8" stroke="#ff006e" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round"/>
+          <polyline points="61,4 66,8 62,13" stroke="#ff006e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
       </div>
-      <button class="btn btn-primary btn-next-q hidden" id="btn-next-question">NEXT →</button>
-    </div>
+
+      <!-- Neon brick ground -->
+      <div class="game-ground" id="game-ground"></div>
+
+      <!-- World-space objects: ? blocks (positioned by JS each frame) -->
+      <div class="game-world-objects" id="game-world-objects"></div>
+
+      <!-- Byte: cloud mascot, fixed screen X, JS-animated Y -->
+      <div class="byte-player byte-idle" id="byte-player" aria-hidden="true">
+        <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;display:block" width="88" height="66">
+          <g class="byte-cloud-body">
+            <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
+            <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
+            <rect x="30" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+            <rect x="55" y="12" width="36" height="36" rx="4" fill="#eef8ff"/>
+            <rect x="88" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+            <rect x="40" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+            <rect x="100" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+          </g>
+          <rect x="54" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
+          <rect x="92" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
+          <rect x="58" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
+          <rect x="96" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
+          <path class="byte-mouth" d="M 62 64 Q 80 74 98 64" stroke="#1a1a2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- Controls hint: bottom-right corner -->
+      <div class="controls-hint glass-panel" id="controls-hint" aria-label="Controls">
+        <div class="controls-hint-title pixel-font">CONTROLS</div>
+        <div class="controls-hint-row pixel-font"><span class="ctrl-key">←→</span> MOVE</div>
+        <div class="controls-hint-row pixel-font"><span class="ctrl-key">↑</span>&nbsp; JUMP</div>
+        <div class="controls-hint-row pixel-font"><span class="ctrl-key">↓</span>&nbsp; CRUSH BLOCK</div>
+      </div>
+
+      <!-- Progress: top-left of game world -->
+      <div class="ethics-progress">
+        <span class="ethics-progress-text pixel-font" id="ethics-progress-text">Question 1 of 5</span>
+        <div class="ethics-dots" id="ethics-dots" aria-hidden="true" style="display:none"></div>
+      </div>
+
+      <!-- ── Question Overlay (shown on block crush) ── -->
+      <div class="q-overlay hidden" id="q-overlay" role="dialog" aria-modal="true">
+        <div class="q-overlay-panels">
+
+          <!-- LEFT: question + answer buttons -->
+          <div class="q-panel-left glass-panel" id="question-card">
+            <div class="question-category pixel-font" id="question-category"></div>
+            <div class="question-text" id="question-text"></div>
+            <div class="answer-options" id="answer-options"></div>
+          </div>
+
+          <!-- RIGHT: feedback, revealed after answer -->
+          <div class="q-panel-right glass-panel" id="q-panel-right">
+            <div class="q-panel-placeholder pixel-font" id="q-panel-placeholder">← SELECT AN ANSWER</div>
+            <div class="why-card hidden" id="why-card">
+              <span class="why-card-label pixel-font">WHY THIS MATTERS</span>
+              <p class="why-card-text" id="why-text"></p>
+            </div>
+            <button class="btn btn-primary btn-next-q hidden" id="btn-next-question">CONTINUE →</button>
+          </div>
+
+        </div>
+      </div><!-- /.q-overlay -->
+
+    </div><!-- /.game-world -->
+
   </section>
 
   <!-- ═══════════════════════════════════════════

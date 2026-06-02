@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Screen 1.1 Game Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: monospace; color: white; }
+  h2 { margin-bottom: 8px; font-size: 14px; color: #aaa; }
+  #info { font-size: 12px; color: #666; margin-bottom: 6px; }
+
+  #world {
+    position: relative;
+    width: 700px;
+    height: 360px;
+    background: #0d1f3a;
+    border: 2px solid #333;
+    overflow: hidden;
+  }
+
+  #ground {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 40px;
+    background: #1a3a1a;
+    border-top: 3px solid #2a6a2a;
+  }
+
+  #byte {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: #111;
+    font-weight: bold;
+    border-radius: 4px;
+  }
+
+  .qblock {
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    background: #00f5ff;
+    border: 3px solid #007a80;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #111;
+    border-radius: 4px;
+  }
+  .qblock.crushed {
+    background: #444;
+    border-color: #222;
+    color: #666;
+    font-size: 12px;
+  }
+
+  /* overlay */
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  #overlay.hidden { display: none; }
+  #overlay-box {
+    background: #0d1f3a;
+    border: 2px solid #00f5ff;
+    border-radius: 8px;
+    padding: 32px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+  }
+  #overlay-box h3 { color: #00f5ff; margin-bottom: 16px; font-size: 13px; letter-spacing: 1px; }
+  #q-text { font-size: 16px; margin-bottom: 24px; line-height: 1.5; }
+  .ans-btn {
+    display: block; width: 100%;
+    margin-bottom: 10px;
+    padding: 10px 16px;
+    background: transparent;
+    border: 2px solid rgba(0,245,255,0.4);
+    color: white;
+    font-family: monospace;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: left;
+  }
+  .ans-btn:hover { background: rgba(0,245,255,0.1); }
+  .ans-btn.selected { background: rgba(0,245,255,0.18); border-color: #00f5ff; box-shadow: 0 0 8px rgba(0,245,255,0.5); }
+  #feedback { margin: 16px 0; font-size: 14px; min-height: 20px; color: #aaa; }
+  #btn-continue {
+    margin-top: 8px;
+    padding: 12px 32px;
+    background: #00f5ff;
+    color: #111;
+    border: none;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  #btn-continue.hidden { display: none; }
+
+  #progress { position: absolute; top: 8px; left: 8px; font-size: 12px; color: #aaa; }
+</style>
+</head>
+<body>
+<h2>SCREEN 1.1 — GAME MECHANIC TEST</h2>
+<div id="info">← → to move &nbsp;|&nbsp; ↑ or SPACE to jump &nbsp;|&nbsp; Land on ? block to trigger question</div>
+<div id="world">
+  <div id="progress">Q 0 / 5</div>
+  <div id="ground"></div>
+  <div id="byte">BYTE</div>
+</div>
+
+<div id="overlay" class="hidden">
+  <div id="overlay-box">
+    <h3>ETHICS QUESTION</h3>
+    <div id="q-text"></div>
+    <div id="answers"></div>
+    <div id="feedback"></div>
+    <button id="btn-continue" class="hidden" onclick="continueGame()">CONTINUE →</button>
+  </div>
+</div>
+
+<script>
+// ── Questions ──────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    q: "An AI system makes a hiring decision that disadvantages a minority group. Who is responsible?",
+    answers: ["The developer who built it", "The company that deployed it", "Both — responsibility is shared"],
+    correct: 2,
+    why: "AI responsibility is distributed. Both creators and deployers share accountability for real-world outcomes."
+  },
+  {
+    q: "An AI assistant remembers your location from last week to give better recommendations. Is this OK?",
+    answers: ["Yes, if it makes the app more useful", "Only if you explicitly consented to it", "No — AI should never store personal data"],
+    correct: 1,
+    why: "Consent is the foundation of ethical data use. Utility doesn't justify collecting data without permission."
+  },
+  {
+    q: "A self-driving car must choose between two unavoidable collisions. How should it decide?",
+    answers: ["Protect the passenger at all costs", "Minimize total harm to all people involved", "The car should not make this decision — stop immediately"],
+    correct: 1,
+    why: "Most ethical frameworks agree: minimizing total harm is the most defensible principle in unavoidable scenarios."
+  },
+  {
+    q: "An AI generates a realistic fake video of a politician. Should this be allowed?",
+    answers: ["Yes — it's free expression", "Only with clear labeling that it's synthetic", "No — deepfakes should be banned entirely"],
+    correct: 1,
+    why: "Transparency matters more than prohibition. Clear labeling preserves expression while preventing deception."
+  },
+  {
+    q: "A hospital AI predicts which patients need care — but was trained on biased data. What should happen?",
+    answers: ["Use it anyway, it's better than nothing", "Audit and retrain it before deployment", "Replace all AI in healthcare with human judgment"],
+    correct: 1,
+    why: "Biased AI in healthcare causes real harm. Auditing and retraining is the responsible path forward."
+  }
+];
+
+// ── Constants ──────────────────────────────────────────────────────────────
+const WORLD_W     = 700;
+const WORLD_H     = 360;
+const GROUND_H    = 40;
+const GRAVITY     = 0.65;
+const JUMP_FORCE  = -16;
+const MOVE_SPEED  = 4;
+const BYTE_W      = 40;
+const BYTE_H      = 40;
+const BLOCK_W     = 52;
+const BLOCK_H     = 52;
+const BLOCK_ELEV  = 70;   // px above ground
+const GROUND_Y    = WORLD_H - GROUND_H; // CSS top of ground = 320
+
+// Block ground-level top in CSS coords:
+// ground top = WORLD_H - GROUND_H = 320
+// block sits so its BOTTOM is at (ground top - BLOCK_ELEV) from ground top
+// block top = WORLD_H - GROUND_H - BLOCK_ELEV - BLOCK_H
+const BLOCK_CSS_TOP = WORLD_H - GROUND_H - BLOCK_ELEV - BLOCK_H; // 320 - 70 - 52 = 198
+
+// Block world X positions
+const BLOCK_WORLD_XS = [400, 900, 1400, 1900, 2400];
+
+// ── State ──────────────────────────────────────────────────────────────────
+let byteX     = 60;   // left edge, in world coords
+let byteY     = GROUND_Y - BYTE_H; // CSS top of Byte (starts on ground)
+let velX      = 0;
+let velY      = 0;
+let onGround  = false;
+let onBlock   = false;
+let worldX    = 0;    // camera / scroll offset
+
+let questionIdx = 0;  // which question we're on (0-based)
+let blockStates = BLOCK_WORLD_XS.map(() => 'active'); // 'active' | 'crushed'
+
+let keys = {};
+let overlayOpen = false;
+let crushedThisFrame = false;
+
+const worldEl    = document.getElementById('world');
+const byteEl     = document.getElementById('byte');
+const progressEl = document.getElementById('progress');
+
+// ── Create block DOM elements ──────────────────────────────────────────────
+const blockEls = BLOCK_WORLD_XS.map((wx, i) => {
+  const el = document.createElement('div');
+  el.className = 'qblock';
+  el.textContent = '?';
+  el.dataset.idx = i;
+  worldEl.appendChild(el);
+  return el;
+});
+
+// ── Input ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if ((e.code === 'Space' || e.code === 'ArrowUp') && !overlayOpen) e.preventDefault();
+});
+document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+// ── Game loop ──────────────────────────────────────────────────────────────
+function gameLoop() {
+  if (!overlayOpen) update();
+  render();
+  requestAnimationFrame(gameLoop);
+}
+
+function update() {
+  // Horizontal movement
+  velX = 0;
+  if (keys['ArrowLeft'])  velX = -MOVE_SPEED;
+  if (keys['ArrowRight']) velX =  MOVE_SPEED;
+
+  // Jump
+  if ((keys['ArrowUp'] || keys['Space']) && (onGround || onBlock)) {
+    velY = JUMP_FORCE;
+    onGround = false;
+    onBlock  = false;
+  }
+
+  // Gravity
+  velY += GRAVITY;
+
+  // Move Byte in world coords
+  byteX += velX;
+  byteY += velY;
+
+  // Clamp left
+  if (byteX < 0) byteX = 0;
+
+  // Land on ground
+  const groundTopY = GROUND_Y - BYTE_H; // CSS top when standing on ground = 280
+  if (byteY >= groundTopY) {
+    byteY = groundTopY;
+    velY = 0;
+    onGround = true;
+    onBlock  = false;
+  } else {
+    onGround = false;
+  }
+
+  // ── Block collision ────────────────────────────────────────────────────
+  onBlock = false;
+  crushedThisFrame = false;
+
+  for (let i = 0; i < BLOCK_WORLD_XS.length; i++) {
+    if (blockStates[i] !== 'active') continue;
+    // Only check current and next block
+    if (i !== questionIdx && i !== questionIdx + 1) continue;
+
+    const bWorldX = BLOCK_WORLD_XS[i];
+    const bTop    = BLOCK_CSS_TOP;       // CSS top of block
+    const bBot    = bTop + BLOCK_H;      // CSS bottom of block
+    const bLeft   = bWorldX;             // world left
+    const bRight  = bWorldX + BLOCK_W;  // world right
+
+    // Byte world coords
+    const byteLeft   = byteX;
+    const byteRight  = byteX + BYTE_W;
+    const byteTop    = byteY;
+    const byteBot    = byteY + BYTE_H;
+
+    // Horizontal overlap?
+    const hOverlap = byteRight > bLeft + 4 && byteLeft < bRight - 4;
+
+    if (hOverlap) {
+      // Landing on top of block: Byte was above block top, now at or below it
+      if (velY >= 0 && byteBot >= bTop && byteBot <= bBot + 8 && byteTop < bTop) {
+        byteY  = bTop - BYTE_H;
+        velY   = 0;
+        onBlock = true;
+
+        // Crush: this is the target block
+        if (i === questionIdx) {
+          blockStates[i] = 'crushed';
+          blockEls[i].classList.add('crushed');
+          blockEls[i].textContent = '✓';
+          openOverlay(i);
+          crushedThisFrame = true;
+        }
+        break;
+      }
+
+      // Side collision: push Byte out
+      if (byteBot > bTop + 6 && byteTop < bBot) {
+        if (velX > 0 && byteRight > bLeft && byteLeft < bLeft) {
+          byteX = bLeft - BYTE_W;
+        } else if (velX < 0 && byteLeft < bRight && byteRight > bRight) {
+          byteX = bRight;
+        }
+      }
+    }
+  }
+
+  // Camera: keep Byte roughly centered
+  const targetWorldX = byteX - WORLD_W * 0.35;
+  worldX += (targetWorldX - worldX) * 0.12;
+  if (worldX < 0) worldX = 0;
+}
+
+function render() {
+  // Byte screen position
+  const byteScreenX = byteX - worldX;
+  byteEl.style.left = byteScreenX + 'px';
+  byteEl.style.top  = byteY + 'px';
+
+  // Blocks
+  for (let i = 0; i < BLOCK_WORLD_XS.length; i++) {
+    const screenX = BLOCK_WORLD_XS[i] - worldX;
+    const visible = (i === questionIdx || i === questionIdx + 1)
+                    && screenX > -BLOCK_W - 100 && screenX < WORLD_W + 100;
+    if (!visible) {
+      blockEls[i].style.display = 'none';
+    } else {
+      blockEls[i].style.display = 'flex';
+      blockEls[i].style.left = screenX + 'px';
+      blockEls[i].style.top  = BLOCK_CSS_TOP + 'px';
+    }
+  }
+
+  progressEl.textContent = `Q ${questionIdx} / 5`;
+}
+
+// ── Overlay ────────────────────────────────────────────────────────────────
+function openOverlay(blockIdx) {
+  overlayOpen = true;
+  const q = QUESTIONS[blockIdx];
+
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('btn-continue').classList.add('hidden');
+
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  q.answers.forEach((text, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = `${String.fromCharCode(65 + i)}. ${text}`;
+    btn.onclick = () => selectAnswer(blockIdx, i, btn, q);
+    answersEl.appendChild(btn);
+  });
+
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function selectAnswer(blockIdx, chosenIdx, btn, q) {
+  // Disable all buttons
+  document.querySelectorAll('.ans-btn').forEach((b) => {
+    b.onclick = null;
+  });
+  btn.classList.add('selected');
+
+  const correct = chosenIdx === q.correct;
+  document.getElementById('feedback').textContent = correct
+    ? `✓ Correct! ${q.why}`
+    : `✗ Not quite. ${q.why}`;
+  document.getElementById('feedback').style.color = correct ? '#00ff88' : '#ff8888';
+  document.getElementById('btn-continue').classList.remove('hidden');
+}
+
+function continueGame() {
+  document.getElementById('overlay').classList.add('hidden');
+  overlayOpen = false;
+
+  questionIdx++;
+  if (questionIdx >= QUESTIONS.length) {
+    setTimeout(() => alert('🎮 GAME COMPLETE! All 5 ethics questions answered.'), 100);
+    return;
+  }
+
+  // Place Byte back on ground just before next block
+  const nextBlockWorldX = BLOCK_WORLD_XS[questionIdx];
+  byteX = nextBlockWorldX - 120;
+  byteY = GROUND_Y - BYTE_H;
+  velX = 0;
+  velY = 0;
+}
+
+// ── Start ──────────────────────────────────────────────────────────────────
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
