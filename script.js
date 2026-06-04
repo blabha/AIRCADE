@@ -25,6 +25,7 @@ const state = {
 
 // ── DOM References ───────────────────────────
 const screens = {
+  langselect: document.getElementById('screen-langselect'),
   idle:     document.getElementById('screen-idle'),
   userinfo: document.getElementById('screen-userinfo'),
   ethics:   document.getElementById('screen-ethics'),
@@ -83,7 +84,42 @@ function showScreen(name) {
     target.classList.add('active');
     target.scrollTop = 0;
     state.screen = name;
+    _focusScreen(name);
   }, 320);
+}
+
+// Reset function assigned by initCustomSelects IIFE — used when userinfo screen loads
+let _resetCustomSelects = null;
+
+// Auto-focus the primary action element when a screen becomes active
+function _focusScreen(name) {
+  if (name === 'userinfo') {
+    setTimeout(() => {
+      if (typeof _resetCustomSelects === 'function') _resetCustomSelects();
+      const el = document.getElementById('user-name');
+      if (el) el.focus();
+    }, 60);
+    return;
+  }
+  if (name === 'ethics') {
+    setTimeout(() => {
+      if (document.activeElement && document.activeElement !== document.body) {
+        document.activeElement.blur();
+      }
+    }, 60);
+    return;
+  }
+  const focusMap = {
+    langselect: 'btn-lang-en',
+    idle:    'btn-start',
+    persona: 'btn-go-green',
+    greener: 'btn-print',
+    print:   'btn-download',
+  };
+  const id = focusMap[name];
+  if (id) {
+    setTimeout(() => { const el = document.getElementById(id); if (el) el.focus(); }, 60);
+  }
 }
 
 // ── State Reset ──────────────────────────────
@@ -112,6 +148,7 @@ document.getElementById('error-close').addEventListener('click', () => {
 document.getElementById('btn-start').addEventListener('click', () => {
   overlayInstructions.classList.remove('hidden');
   Byte.say('Here\'s how to play! 🎮');
+  setTimeout(() => document.getElementById('btn-lets-go').focus(), 60);
 });
 
 document.getElementById('btn-lets-go').addEventListener('click', () => {
@@ -123,7 +160,250 @@ document.getElementById('btn-lets-go').addEventListener('click', () => {
 
 Byte.setState('idle');
 
+// ── SCREEN -1: LANGUAGE SELECTION ───────────
+(function initLangSelect() {
+  const LANG_BTNS = ['btn-lang-en', 'btn-lang-es', 'btn-lang-ca'];
+
+  LANG_BTNS.forEach((id, i) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      setLanguage(btn.dataset.lang);
+      showScreen('idle');
+    });
+
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const next = document.getElementById(LANG_BTNS[Math.min(i + 1, LANG_BTNS.length - 1)]);
+        if (next) next.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = document.getElementById(LANG_BTNS[Math.max(i - 1, 0)]);
+        if (prev) prev.focus();
+      }
+    });
+  });
+
+  // Auto-focus first button on initial load — screen-langselect is pre-active
+  setTimeout(() => { const el = document.getElementById('btn-lang-en'); if (el) el.focus(); }, 120);
+})();
+
 // ── SCREEN 0.5: USER INFO ───────────────────
+
+// Custom keyboard-navigable selectors replacing native <select> elements
+(function initCustomSelects() {
+  const SELECTS = [
+    {
+      id: 'cs-user-age',
+      hiddenId: 'user-age',
+      nextId: 'cs-user-expertise',
+      placeholder: 'Select age range...',
+      options: [
+        { value: '0-12',  label: '0-12'  },
+        { value: '13-19', label: '13-19' },
+        { value: '20-39', label: '20-39' },
+        { value: '40-59', label: '40-59' },
+        { value: '60+',   label: '60+'   },
+      ],
+    },
+    {
+      id: 'cs-user-expertise',
+      hiddenId: 'user-expertise',
+      nextId: 'cs-user-gender',
+      placeholder: 'Select expertise level...',
+      options: [
+        { value: 'Beginner', label: 'Beginner' },
+        { value: 'Average',  label: 'Average'  },
+        { value: 'Expert',   label: 'Expert'   },
+      ],
+    },
+    {
+      id: 'cs-user-gender',
+      hiddenId: 'user-gender',
+      nextId: 'btn-userinfo-continue',
+      placeholder: 'Prefer not to say',
+      options: [
+        { value: 'Female',     label: 'Female'            },
+        { value: 'Male',       label: 'Male'              },
+        { value: 'Non-binary', label: 'Non-binary'        },
+        { value: 'Other',      label: 'Other'             },
+        { value: '',           label: 'Prefer not to say' },
+      ],
+    },
+  ];
+
+  // Per-selector mutable state stored here so resetAll can reach it
+  const states = {};
+
+  let currentlyOpen = null;
+
+  function closeAll() {
+    SELECTS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('cs-open');
+      const dd = el.querySelector('.custom-sel-dropdown');
+      if (dd) dd.classList.add('hidden');
+    });
+    currentlyOpen = null;
+  }
+
+  SELECTS.forEach(({ id, hiddenId, nextId, placeholder, options }) => {
+    const el     = document.getElementById(id);
+    const hidden = document.getElementById(hiddenId);
+    if (!el || !hidden) return;
+
+    const valSpan = el.querySelector('.custom-sel-value');
+
+    // Build the dropdown list (injected once into the DOM)
+    const dropdown = document.createElement('div');
+    dropdown.className = 'custom-sel-dropdown hidden';
+    options.forEach((opt, i) => {
+      const item = document.createElement('div');
+      item.className = 'custom-sel-option';
+      item.textContent = opt.label;
+      item.dataset.idx = i;
+      dropdown.appendChild(item);
+    });
+    el.appendChild(dropdown);
+
+    const state = { selectedIdx: -1, highlightedIdx: -1 };
+    states[id] = { el, hidden, valSpan, placeholder, options, dropdown, state };
+
+    // Auto-open whenever this selector receives focus (handles keyboard chain and TAB)
+    el.addEventListener('focus', () => {
+      if (!el.classList.contains('cs-open')) openDropdown();
+    });
+
+    function getItems() {
+      return [...dropdown.querySelectorAll('.custom-sel-option')];
+    }
+
+    function setHighlight(idx) {
+      const items = getItems();
+      items.forEach(it => it.classList.remove('cs-highlighted'));
+      if (idx >= 0 && idx < items.length) {
+        items[idx].classList.add('cs-highlighted');
+        items[idx].scrollIntoView({ block: 'nearest' });
+      }
+      state.highlightedIdx = idx;
+    }
+
+    function openDropdown() {
+      closeAll();
+      currentlyOpen = id;
+      el.classList.add('cs-open');
+      dropdown.classList.remove('hidden');
+      // Start highlight on currently selected option, else first
+      setHighlight(state.selectedIdx >= 0 ? state.selectedIdx : 0);
+    }
+
+    function closeDropdown() {
+      el.classList.remove('cs-open');
+      dropdown.classList.add('hidden');
+      if (currentlyOpen === id) currentlyOpen = null;
+      state.highlightedIdx = -1;
+    }
+
+    function confirmSelection(idx) {
+      const items = getItems();
+      if (idx < 0 || idx >= items.length) return;
+      state.selectedIdx = idx;
+      const opt = options[idx];
+      hidden.value = opt.value;
+      valSpan.textContent = opt.label;
+      valSpan.classList.remove('custom-sel-placeholder');
+      items.forEach(it => it.classList.remove('cs-selected'));
+      items[idx].classList.add('cs-selected');
+      closeDropdown();
+      // Advance focus to the next field in the linear form flow
+      const next = document.getElementById(nextId);
+      if (next) next.focus();
+    }
+
+    el.addEventListener('keydown', (e) => {
+      const isOpen = el.classList.contains('cs-open');
+
+      if (!isOpen) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          openDropdown();
+        }
+        // TAB and SHIFT+TAB: natural browser navigation, no intercept
+      } else {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const items = getItems();
+          setHighlight(Math.min(state.highlightedIdx + 1, items.length - 1));
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setHighlight(Math.max(state.highlightedIdx - 1, 0));
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (state.highlightedIdx >= 0) confirmSelection(state.highlightedIdx);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          closeDropdown();
+        } else if (e.key === 'Tab') {
+          // Close dropdown and let browser handle TAB focus movement naturally
+          closeDropdown();
+        }
+      }
+    });
+
+    // Option click (mouse/touch fallback)
+    getItems().forEach((item, i) => {
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // prevent blur on the selector
+        confirmSelection(i);
+      });
+    });
+
+    // Close when focus leaves the selector entirely
+    el.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement !== el) closeDropdown();
+      }, 80);
+    });
+  });
+
+  // Close open dropdown on any outside click
+  document.addEventListener('mousedown', (e) => {
+    if (!e.target.closest('.custom-sel')) closeAll();
+  });
+
+  // Expose reset function so _focusScreen can call it when userinfo loads
+  _resetCustomSelects = function () {
+    closeAll();
+    Object.values(states).forEach(({ el, hidden, valSpan, placeholder, dropdown, state }) => {
+      state.selectedIdx    = -1;
+      state.highlightedIdx = -1;
+      hidden.value = '';
+      valSpan.textContent = placeholder;
+      valSpan.classList.add('custom-sel-placeholder');
+      el.classList.remove('cs-open');
+      dropdown.classList.add('hidden');
+      dropdown.querySelectorAll('.custom-sel-option').forEach(opt => {
+        opt.classList.remove('cs-highlighted', 'cs-selected');
+      });
+    });
+  };
+})();
+
+// ENTER on Name input advances to Age selector (which auto-opens on focus)
+(function initNameEnter() {
+  const nameInput = document.getElementById('user-name');
+  if (!nameInput) return;
+  nameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const age = document.getElementById('cs-user-age');
+      if (age) age.focus();
+    }
+  });
+})();
 
 const PROMPTS = [
   { prompt: 'A cat astronaut on Mars',                                taskType: 'image'      },
@@ -324,63 +604,24 @@ const game = {
 
     this._keyHandler = (e) => {
       if (!this._running) return;
+      // Only active on the ethics screen — never consume events on other screens
+      if (state.screen !== 'ethics') return;
+      // When overlay is open let the overlay handle its own keyboard navigation
+      if (this._overlayOpen) return;
       const nav = ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '];
       if (nav.includes(e.key)) e.preventDefault();
       this._keys[e.key] = true;
-
-      if ((e.key === 'ArrowUp' || e.key === ' ') && !this._overlayOpen) {
-        if (this._onGround || this._onBlock) this._startJump();
+      if ((e.key === 'ArrowUp' || e.key === ' ') && (this._onGround || this._onBlock)) {
+        this._startJump();
       }
     };
     this._keyUpHandler = (e) => { this._keys[e.key] = false; };
 
     document.addEventListener('keydown', this._keyHandler);
     document.addEventListener('keyup',   this._keyUpHandler);
-    this._bindTouch();
   },
 
-  _bindTouch() {
-    const world = this._worldEl;
-    if (!world) return;
-
-    const onStart = (e) => {
-      if (this._overlayOpen) return;
-      e.preventDefault();
-      Array.from(e.changedTouches).forEach(t => {
-        const rect = world.getBoundingClientRect();
-        const x = t.clientX - rect.left;
-        const rel = x / rect.width;
-        if (rel < 0.3)      { this._keys.ArrowLeft  = true; }
-        else if (rel > 0.7) { this._keys.ArrowRight = true; }
-        else {
-          if (this._onGround || this._onBlock) this._startJump();
-        }
-      });
-    };
-    const onEnd = (e) => {
-      e.preventDefault();
-      Array.from(e.changedTouches).forEach(t => {
-        const rect = world.getBoundingClientRect();
-        const x = t.clientX - rect.left;
-        const rel = x / rect.width;
-        if (rel < 0.3)      { this._keys.ArrowLeft  = false; }
-        else if (rel > 0.7) { this._keys.ArrowRight = false; }
-      });
-    };
-
-    world.addEventListener('touchstart', onStart, { passive: false });
-    world.addEventListener('touchend',   onEnd,   { passive: false });
-    world.addEventListener('touchcancel',onEnd,   { passive: false });
-
-    // Tap a block while standing on it = crush
-    world.addEventListener('click', (e) => {
-      if (this._overlayOpen) return;
-      const blockEl = e.target.closest('.q-block-platform');
-      if (blockEl && this._onBlock && this._onBlock.el === blockEl && !this._onBlock.activated) {
-        this._crushBlock(this._onBlock);
-      }
-    });
-  },
+  // Keyboard-only cabinet: touch and mouse handlers removed
 
   _startJump() {
     this._byteVelY = this.JUMP_FORCE;
@@ -402,6 +643,11 @@ const game = {
         overlay.classList.remove('hidden');
         void overlay.offsetWidth;
         overlay.classList.add('overlay-burst-in');
+        // Focus first answer button after burst-in animation completes
+        setTimeout(() => {
+          const firstAnswer = document.querySelector('#answer-options .answer-btn:not(:disabled)');
+          if (firstAnswer) firstAnswer.focus();
+        }, 460);
       }
     }, 380);
   },
@@ -551,9 +797,13 @@ const game = {
       block.el.classList.remove('block-activated');
       block.el.classList.add('block-used');
     }
-    this._onBlock    = null;
-    this._animating  = false;
+    this._onBlock     = null;
+    this._animating   = false;
     this._overlayOpen = false;
+    // Blur focused element so arrow keys control Byte immediately
+    if (document.activeElement && document.activeElement !== document.body) {
+      document.activeElement.blur();
+    }
     setTimeout(() => { if (cb) cb(); }, 120);
   },
 
@@ -656,6 +906,20 @@ function renderQuestion() {
       playSound('click');
       handleAnswer(answer, btn);
     });
+    // Arrow key navigation between answer buttons
+    btn.addEventListener('keydown', function (e) {
+      const all = [...document.querySelectorAll('#answer-options .answer-btn:not(:disabled)')];
+      const idx = all.indexOf(this);
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const next = all[idx + 1];
+        if (next) next.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = all[idx - 1];
+        if (prev) prev.focus();
+      }
+    });
     answersEl.appendChild(btn);
   });
 
@@ -723,7 +987,10 @@ function handleAnswer(answer, clickedBtn) {
   document.getElementById('why-text').textContent = WHY_TEXT[answer.type] || WHY_TEXT.B;
   whyCard.className = `why-card why-border-${answer.color}`;
 
-  document.getElementById('btn-next-question').classList.remove('hidden');
+  const nextBtn = document.getElementById('btn-next-question');
+  nextBtn.classList.remove('hidden');
+  // Auto-focus CONTINUE so player can press ENTER immediately
+  setTimeout(() => nextBtn.focus(), 50);
 }
 
 // ── Next button ──────────────────────────────
@@ -788,15 +1055,83 @@ function populateGreenerScreen() {
   if (tipEl) tipEl.textContent = state.personalizedTip;
 }
 
+function _saveSessionToSupabase(state) {
+  const ans = (i) => (state.ethicsAnswers && state.ethicsAnswers[i]) || {};
+  const payload = {
+    session_id:       state.sessionId,
+    player_name:      state.userName || 'Anonymous',
+    age_group:        state.userAge    || null,
+    expertise:        state.userExpertise || null,
+    gender:           state.userGender   || null,
+    language:         (typeof currentLang !== 'undefined') ? currentLang : 'en',
+    score:            state.score        ?? null,
+    persona:          state.persona ? state.persona.title : null,
+    stamina_level:    state.staminaLevel ?? null,
+    answer_1_category: ans(0).category ?? null,
+    answer_1_type:     ans(0).type     ?? null,
+    answer_1_score:    ans(0).score    ?? null,
+    answer_2_category: ans(1).category ?? null,
+    answer_2_type:     ans(1).type     ?? null,
+    answer_2_score:    ans(1).score    ?? null,
+    answer_3_category: ans(2).category ?? null,
+    answer_3_type:     ans(2).type     ?? null,
+    answer_3_score:    ans(2).score    ?? null,
+    answer_4_category: ans(3).category ?? null,
+    answer_4_type:     ans(3).type     ?? null,
+    answer_4_score:    ans(3).score    ?? null,
+    answer_5_category: ans(4).category ?? null,
+    answer_5_type:     ans(4).type     ?? null,
+    answer_5_score:    ans(4).score    ?? null,
+  };
+  fetch('https://tpacbxkobtekehqrgodd.supabase.co/rest/v1/aircade_sessions', {
+    method:  'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'apikey':        'sb_publishable_qSeNNoQsnXbfNFWc-a8Bxg_0Y2LgLYx',
+      'Authorization': 'Bearer sb_publishable_qSeNNoQsnXbfNFWc-a8Bxg_0Y2LgLYx',
+      'Prefer':        'return=minimal',
+    },
+    body: JSON.stringify(payload),
+  })
+    .then(res => {
+      if (!res.ok) return res.text().then(t => { throw new Error(`${res.status}: ${t}`); });
+      console.log('SESSION SAVED', state.sessionId);
+    })
+    .catch(err => console.error('Supabase save failed:', err));
+}
+
 document.getElementById('btn-print').addEventListener('click', () => {
   state.sessionId = generateSessionId();
   populateTicketCard(state);
+  _saveSessionToSupabase(state);
   showScreen('print');
   Byte.setState('print');
   playSound('print');
 });
 
 // ── SCREEN 4: TICKET DOWNLOAD ────────────────
+
+(function initPrintScreenNav() {
+  const BTNS = ['btn-download', 'btn-play-again'];
+  BTNS.forEach((id, i) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const next = document.getElementById(BTNS[Math.min(i + 1, BTNS.length - 1)]);
+        if (next) next.focus();
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const prev = document.getElementById(BTNS[Math.max(i - 1, 0)]);
+        if (prev) prev.focus();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+  });
+})();
 
 document.getElementById('btn-download').addEventListener('click', () => {
   downloadCard(state.sessionId);
@@ -825,7 +1160,26 @@ document.getElementById('btn-play-again').addEventListener('click', () => {
 
 // ── Keyboard Navigation ──────────────────────
 document.addEventListener('keydown', e => {
+  // Escape closes instructions overlay
   if (e.key === 'Escape' && !overlayInstructions.classList.contains('hidden')) {
     overlayInstructions.classList.add('hidden');
+    document.getElementById('btn-start').focus();
+    return;
+  }
+
+  // Focus trap inside the question overlay
+  const qOverlay = document.getElementById('q-overlay');
+  if (qOverlay && !qOverlay.classList.contains('hidden') && e.key === 'Tab') {
+    const focusable = [...qOverlay.querySelectorAll(
+      'button:not(:disabled), [tabindex]:not([tabindex="-1"])'
+    )].filter(el => !el.classList.contains('hidden') && el.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last  = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+    }
   }
 });

@@ -145,12 +145,24 @@ h1, h2, h3 {
   cursor: not-allowed;
 }
 
-/* Focus styles for keyboard nav */
+/* Focus styles for keyboard nav — neon cyan on ALL interactive elements */
 .btn:focus-visible,
 .prompt-btn:focus-visible,
-input:focus-visible {
-  outline: 3px solid var(--neon-yellow);
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+.custom-sel:focus-visible {
+  outline: 3px solid var(--neon-cyan);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--neon-cyan), 0 0 14px rgba(0,245,255,0.55);
+}
+
+/* Answer buttons in game overlay */
+.answer-btn:focus-visible {
+  outline: 3px solid var(--neon-cyan);
   outline-offset: 2px;
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 14px rgba(0,245,255,0.6), inset 0 0 6px rgba(0,245,255,0.08) !important;
 }
 
 .btn-primary {
@@ -201,6 +213,57 @@ input:focus-visible {
 @keyframes btnBlink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.3; }
+}
+
+/* ════════════════════════════════════════
+   SCREEN -1: LANGUAGE SELECTION
+════════════════════════════════════════ */
+#screen-langselect {
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 30%, #1a1a4e 0%, var(--bg-dark) 70%);
+}
+
+.lang-select-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.lang-select-titles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.lang-select-title {
+  font-size: 11px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan)66;
+  letter-spacing: 0.05em;
+}
+
+.lang-select-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+.lang-btn {
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+}
+
+.lang-btn:focus::before,
+.lang-btn:focus-visible::before {
+  content: '▶ ';
 }
 
 /* ════════════════════════════════════════
@@ -1469,7 +1532,8 @@ body.stamina-visible .ethics-main {
 }
 
 .form-input:focus,
-.form-select:focus {
+.form-select:focus,
+.custom-sel:focus {
   outline: none;
   border-color: var(--neon-cyan);
   box-shadow: var(--border-glow);
@@ -1478,6 +1542,97 @@ body.stamina-visible .ethics-main {
 .form-select option {
   background: var(--bg-card);
   color: var(--text-light);
+}
+
+/* Custom keyboard-navigable selector (replaces native <select>) */
+.custom-sel {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card-alt);
+  border-radius: var(--radius);
+  color: var(--text-light);
+  font-family: var(--body-font);
+  font-size: 17px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: default;
+  user-select: none;
+  position: relative;
+}
+
+.custom-sel.cs-open {
+  border-color: var(--neon-cyan);
+  box-shadow: var(--border-glow);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.custom-sel-placeholder {
+  color: var(--text-dim);
+}
+
+.custom-sel-arrow {
+  color: var(--text-dim);
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-left: 8px;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.custom-sel:focus .custom-sel-arrow,
+.custom-sel.cs-open .custom-sel-arrow {
+  color: var(--neon-cyan);
+}
+
+.custom-sel.cs-open .custom-sel-arrow {
+  transform: rotate(180deg);
+}
+
+.custom-sel-dropdown {
+  position: absolute;
+  top: 100%;
+  left: -2px;
+  right: -2px;
+  background: var(--bg-card);
+  border: 2px solid var(--neon-cyan);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 245, 255, 0.2);
+  z-index: 200;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-cyan) var(--bg-card);
+}
+
+.custom-sel-dropdown.hidden {
+  display: none;
+}
+
+.custom-sel-option {
+  padding: 13px 18px;
+  font-family: var(--body-font);
+  font-size: 16px;
+  color: var(--text-light);
+  cursor: default;
+  transition: background 0.08s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.custom-sel-option:last-child {
+  border-bottom: none;
+}
+
+.custom-sel-option.cs-highlighted {
+  background: var(--neon-cyan);
+  color: var(--bg-dark);
+}
+
+.custom-sel-option.cs-selected:not(.cs-highlighted) {
+  color: var(--neon-cyan);
 }
 
 .privacy-note {

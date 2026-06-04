@@ -11,13 +11,56 @@
 <body>
 
   <!-- ═══════════════════════════════════════════
+       SCREEN -1: LANGUAGE SELECTION
+  ═══════════════════════════════════════════ -->
+  <section id="screen-langselect" class="screen active">
+    <div class="scanlines"></div>
+    <div class="lang-select-content">
+
+      <div class="byte-wrapper" aria-hidden="true">
+        <div class="byte-mascot">
+          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-label="Byte the cloud mascot">
+            <g class="byte-cloud-body">
+              <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
+              <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
+              <rect x="30" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+              <rect x="55" y="12" width="36" height="36" rx="4" fill="#eef8ff"/>
+              <rect x="88" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+              <rect x="40" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+              <rect x="100" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+            </g>
+            <rect class="byte-eye byte-eye-left" x="54" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
+            <rect class="byte-eye byte-eye-right" x="92" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
+            <rect x="58" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
+            <rect x="96" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
+            <path class="byte-mouth" d="M 62 64 Q 80 74 98 64" stroke="#1a1a2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="lang-select-titles">
+        <div class="pixel-font lang-select-title">CHOOSE YOUR LANGUAGE</div>
+        <div class="pixel-font lang-select-title">ELIGE TU IDIOMA</div>
+        <div class="pixel-font lang-select-title">TRIA EL TEU IDIOMA</div>
+      </div>
+
+      <div class="lang-select-buttons">
+        <button class="btn btn-primary btn-large lang-btn" id="btn-lang-en" data-lang="en">ENGLISH</button>
+        <button class="btn btn-primary btn-large lang-btn" id="btn-lang-es" data-lang="es">CASTELLANO</button>
+        <button class="btn btn-primary btn-large lang-btn" id="btn-lang-ca" data-lang="ca">CATALÀ</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
        SCREEN 0: IDLE / ATTRACT MODE
   ═══════════════════════════════════════════ -->
-  <section id="screen-idle" class="screen active">
+  <section id="screen-idle" class="screen hidden">
     <div class="scanlines"></div>
 
-    <!-- Language switcher -->
-    <div class="lang-switcher">
+    <!-- Language switcher (hidden — language is chosen on the lang-select screen) -->
+    <div class="lang-switcher" style="display:none">
       <select class="lang-select" id="lang-select" onchange="setLanguage(this.value)" aria-label="Language">
         <option value="en" selected>English</option>
         <option value="es">Castellano</option>
@@ -129,40 +172,30 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="user-age" data-i18n="ui.ageLabel">Your age <span class="required-star">*</span></label>
-        <select id="user-age" class="form-select" required>
-          <option value="" data-i18n="ui.ageDefault">Select age range...</option>
-          <option value="0-12">0 – 12</option>
-          <option value="13-19">13 – 19</option>
-          <option value="20-39">20 – 39</option>
-          <option value="40-59">40 – 59</option>
-          <option value="60+">60+</option>
-        </select>
+        <label class="form-label" for="cs-user-age" data-i18n="ui.ageLabel">Your age <span class="required-star">*</span></label>
+        <div class="custom-sel" id="cs-user-age" tabindex="0" role="combobox" aria-label="Age range">
+          <span class="custom-sel-value custom-sel-placeholder">Select age range...</span>
+          <span class="custom-sel-arrow">▾</span>
+        </div>
+        <input type="hidden" id="user-age" value="">
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="user-expertise" data-i18n="ui.expertiseLabel">AI Expertise Level <span class="required-star">*</span></label>
-        <select id="user-expertise" class="form-select" required>
-          <option value="" data-i18n="ui.expertiseDefault">Select expertise level...</option>
-          <option value="Beginner">Beginner</option>
-          <option value="Average">Average</option>
-          <option value="Expert">Expert</option>
-        </select>
+        <label class="form-label" for="cs-user-expertise" data-i18n="ui.expertiseLabel">AI Expertise Level <span class="required-star">*</span></label>
+        <div class="custom-sel" id="cs-user-expertise" tabindex="0" role="combobox" aria-label="AI expertise level">
+          <span class="custom-sel-value custom-sel-placeholder">Select expertise level...</span>
+          <span class="custom-sel-arrow">▾</span>
+        </div>
+        <input type="hidden" id="user-expertise" value="">
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="user-gender">Gender (optional)</label>
-        <select id="user-gender" class="form-select">
-          <option value="">Prefer not to say</option>
-          <option value="Female">Female</option>
-          <option value="Male">Male</option>
-          <option value="Non-binary">Non-binary</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      <div class="privacy-note" data-i18n="ui.privacyNote">
-        🔒 Your information is used only for this session and is not stored or shared.
+        <label class="form-label" for="cs-user-gender">Gender (optional)</label>
+        <div class="custom-sel" id="cs-user-gender" tabindex="0" role="combobox" aria-label="Gender">
+          <span class="custom-sel-value custom-sel-placeholder">Prefer not to say</span>
+          <span class="custom-sel-arrow">▾</span>
+        </div>
+        <input type="hidden" id="user-gender" value="">
       </div>
     </div>
 
@@ -216,7 +249,7 @@
     </div>
 
     <!-- ── Platformer Game World ──────────────── -->
-    <div class="game-world" id="game-world">
+    <div class="game-world" id="game-world" tabindex="-1">
 
       <!-- Parallax background: stars, moon, clouds -->
       <div class="game-bg" aria-hidden="true">
@@ -516,10 +549,10 @@
     </div>
 
     <div class="print-actions">
-      <button class="btn btn-primary btn-large" id="btn-download" data-i18n="ui.downloadBtn">
-        ⬇ DOWNLOAD TICKET
+      <button class="btn btn-primary btn-large" id="btn-download" tabindex="0" data-i18n="ui.downloadBtn">
+        🖨 PRINT TICKET
       </button>
-      <button class="btn btn-ghost btn-large" id="btn-play-again" data-i18n="ui.playAgainBtn">
+      <button class="btn btn-ghost btn-large" id="btn-play-again" tabindex="0" data-i18n="ui.playAgainBtn">
         ↩ PLAY AGAIN
       </button>
     </div>
