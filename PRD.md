@@ -1,5 +1,5 @@
 # A(I)RCADE — Product Requirements Document
-### Status: **IMPLEMENTED** — Last updated June 2026
+### Status: **IMPLEMENTED** — Last updated 2026-06-05
 
 ---
 
@@ -37,13 +37,14 @@ A playful, educational arcade-style experience that teaches people about the env
 | **Deployment** | Static file, no server required |
 | **i18n** | Built-in translation system (English, Castilian, Catalan) |
 | **Sound** | Web Audio API via `sounds.js` |
+| **Data collection** | Supabase REST API (direct fetch, no library) — fire-and-forget, silent on error |
 
 ### File Structure
 ```
 AIRCADE/
 ├── index.html          # All screen HTML
 ├── styles.css          # All styles
-├── script.js           # Screen logic, state, events
+├── script.js           # Screen logic, state, events, game loop
 ├── data.js             # Personas, tips, DAILY_FOOTPRINT, calculateStaminaLevel, getPersonalizedTip
 ├── questionBank.js     # Age × expertise question bank (15 sets × 20 questions)
 ├── translations.js     # i18n strings (en / es / ca)
@@ -86,13 +87,15 @@ const state = {
 ## Screen Flow
 
 ```
-[Screen 0: Idle]
+[Screen −1: Language Select]
+    ↓ Choose language (EN / ES / CA)
+[Screen 0: Idle / Attract Mode]
     ↓ Press Start
 [Instructions Overlay]
     ↓ Let's Go
 [Screen 0.5: User Info]
     ↓ Continue
-[Screen 1.1: Ethics Questions × 5]
+[Screen 1.1: Ethics Questions × 5]  ← platformer game (Chrome Dino style)
     ↓ After Q5
 [Screen 2: Persona Reveal]
     ↓ Go Green
@@ -104,10 +107,20 @@ const state = {
 
 ---
 
+## Screen −1: LANGUAGE SELECT
+
+**Shown first, before Idle.** Full-screen card with three language buttons:
+- English
+- Castellano
+- Català
+
+Calls `setLanguage(lang)` (defined in `translations.js`), then navigates to Idle. Language persists for the entire session; can be changed only by reloading.
+
+---
+
 ## Screen 0: IDLE / ATTRACT MODE
 
 **Elements:**
-- Language switcher (top right): English / Castilian / Catalan dropdown
 - Game title: `A(I)RCADE` (center, large pixel font, neon cyan glow)
 - Subtitle: `INSERT COIN TO PLAY` (blinking yellow)
 - Tagline: `Every prompt has a footprint.`
@@ -139,9 +152,21 @@ const state = {
 | Field | Type | Required |
 |---|---|---|
 | Name | Text input (max 30 chars) | No |
-| Age | Dropdown: 0–12, 13–19, 20–39, 40–59, 60+ | Yes |
-| AI Expertise Level | Dropdown: Beginner, Average, Expert | Yes |
-| Gender | Dropdown: Female, Male, Non-binary, Other, Prefer not to say | No |
+| Age | Custom selector: 0–12, 13–19, 20–39, 40–59, 60+ | Yes |
+| AI Expertise Level | Custom selector: Beginner, Average, Expert | Yes |
+| Gender | Custom selector: Female, Male, Non-binary, Other, Prefer not to say | No |
+
+**Custom selectors:** All three dropdowns are implemented as custom DOM components (`.custom-sel` divs with `tabindex="0"` and injected `.custom-sel-dropdown`). No native `<select>` elements. Each selector:
+- Opens its dropdown automatically when it receives focus
+- Closes on ESC (focus stays on the selector)
+- Closes on click-outside
+
+**Keyboard flow (linear, no TAB jumping):**
+1. ENTER on Name → focuses Age selector → dropdown opens automatically
+2. Confirm Age → focuses Expertise selector → dropdown opens automatically
+3. Confirm Expertise → focuses Gender selector → dropdown opens automatically
+4. Confirm Gender → focuses CONTINUE button
+5. TAB also works (same auto-open behavior via focus event)
 
 **Validation:** Age and Expertise must be selected; inline error shown if not.
 
@@ -149,13 +174,22 @@ const state = {
 - Stores `userName`, `userAge`, `userExpertise`, `userGender` in state
 - Randomly assigns one of 5 prompts from the prompt pool
 - Calls `selectQuestionsFromBank(userAge, userExpertise)` → 5 questions
+- Submits session data to Supabase (fire-and-forget)
 - Navigates to Screen 1.1
 
 ---
 
-## Screen 1.1: ETHICS QUESTIONS
+## Screen 1.1: ETHICS QUESTIONS (Platformer Game)
 
-The screen fills the full viewport. Layout is a fixed flex column — no page scroll.
+Screen 1.1 is a Chrome Dino-style DOM platformer. The player controls **Byte** (a character sprite) across a scrolling world. Five `?` blocks are placed at increasing horizontal distances. Landing on a `?` block triggers a question overlay. After answering all 5 questions the game ends and the app moves to Screen 2.
+
+### Game Engine (`game` object in `script.js`)
+
+- `requestAnimationFrame` loop with `game.start()` / `game.stop()`
+- Physics: gravity, jump force, ground collision, block top-landing detection
+- Byte moves left/right with arrow keys; jumps with ↑ or SPACE
+- A `_keyHandler` on `document` is added by `game.start()` and removed by `game.stop()`
+- Screen guard inside `_keyHandler`: `if (state.screen !== 'ethics') return;` — prevents the handler from consuming key events on any other screen
 
 ### Layout (top to bottom)
 
@@ -274,7 +308,14 @@ All three bars (Water, CO₂, Energy) update together to the same level after ea
 - Header: "YOUR TICKET IS READY! 🖨️"
 - Byte (small, waving + leaf accessory)
 - White ticket card with perforated-edge aesthetic (captured by html2canvas)
-- DOWNLOAD TICKET button + PLAY AGAIN button
+- `🖨 PRINT TICKET` button (auto-focused on load)
+- `↩ PLAY AGAIN` button
+
+### Keyboard Navigation (Screen 4)
+- Screen loads → `PRINT TICKET` auto-focused (neon cyan glow)
+- ↑ / ↓ arrow keys (or TAB / SHIFT+TAB) move focus between the two buttons
+- ENTER or SPACE activates the focused button
+- Focused button shows neon cyan outline glow via `:focus` CSS
 
 ### Ticket Card Content
 
@@ -327,7 +368,7 @@ All three bars (Water, CO₂, Energy) update together to the same level after ea
 
 ## Multilingual Support
 
-Language switcher on idle screen.
+Language selected on Screen −1 before Idle.
 
 | Code | Language |
 |---|---|
@@ -356,6 +397,51 @@ All UI strings use `data-i18n` attributes and `t('key.path')` helper. Falls back
 
 ---
 
+## Keyboard Controls
+
+| Screen | Key | Action |
+|---|---|---|
+| Any | TAB | Move focus forward |
+| Screen 0 | ENTER / SPACE | Press Start |
+| Screen 0.5 | ENTER on Name field | Focus Age selector, open dropdown |
+| Screen 0.5 | ENTER on open dropdown | Confirm selection, advance to next field |
+| Screen 0.5 | ESC on open dropdown | Close dropdown, keep focus on selector |
+| Screen 0.5 | TAB | Advance through Name → Age → Expertise → Gender → CONTINUE |
+| Screen 1.1 | ← → | Move Byte left / right |
+| Screen 1.1 | ↑ or SPACE | Jump |
+| Screen 4 | ↑ / ↓ | Move focus between PRINT TICKET and PLAY AGAIN |
+| Screen 4 | ENTER / SPACE | Activate focused button |
+
+---
+
+## Data Collection
+
+Session data is submitted to Supabase after the user clicks CONTINUE on Screen 0.5.
+
+**Endpoint:** `https://tpacbxkobtekehqrgodd.supabase.co/rest/v1/aircade_sessions`
+**Method:** POST (direct `fetch`, no Supabase client library)
+**Auth:** `apikey` header with publishable key
+
+**Fields collected:**
+
+| Field | Value |
+|---|---|
+| `session_id` | `state.sessionId` |
+| `user_name` | `state.userName` (may be empty) |
+| `user_age` | `state.userAge` |
+| `user_expertise` | `state.userExpertise` |
+| `user_gender` | `state.userGender` (may be empty) |
+| `score` | `state.score` |
+| `stamina_level` | `state.staminaLevel` |
+| `persona` | `state.persona.title` |
+| `ethics_answers` | JSON array of answer objects |
+| `language` | active language code |
+| `created_at` | server timestamp |
+
+**Error handling:** All errors are silent to the player. The POST is fire-and-forget and does not block the game flow.
+
+---
+
 ## Reference Files (Do Not Modify)
 
 | File | Purpose |
@@ -363,6 +449,7 @@ All UI strings use `data-i18n` attributes and `t('key.path')` helper. Falls back
 | `Question_Bank.md` | Source of truth for ethics questions by age × expertise |
 | `Scoring_Logic.md` | Score formula, persona table |
 | `Personalized_Tips.md` | Tip text by scenario + answer type |
+| `Persona_Tips.md` | Per-persona tip text and mascot descriptions |
 
 ---
 
@@ -374,6 +461,7 @@ All UI strings use `data-i18n` attributes and `t('key.path')` helper. Falls back
 | Idle timeout (30 s reset) | Deferred | Low priority for installation |
 | Thermal printer integration | Out of scope (hardware) | — |
 | PWA / offline caching | Not implemented | Runs fine as local file |
+| Supabase schema enforcement | Not implemented | Table accepts arbitrary JSON fields |
 
 ---
 
