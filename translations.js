@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   A(I)RCADE — Translations
+   (Ai)rcade — Translations
    Supported: en | es | ca
 ═══════════════════════════════════════════ */
 
@@ -62,7 +62,7 @@ en: {
     tagline:        'Every prompt has a footprint.',
     pressStart:     '▶ PRESS START',
     freePlay:       '☁ FREE PLAY ☁',
-    credits:        '© (AI)RCADE 2025',
+    credits:        '© (Ai)rcade 2025',
     howToPlay:      'HOW TO PLAY',
     step1title:     'Tell us about you',
     step1desc:      'Quick optional profile to personalize your experience',
@@ -112,6 +112,8 @@ en: {
     downloadDone:   '✅ Downloaded!',
     downloading:    '⏳ Generating...',
     playAgainBtn:   '↩ PLAY AGAIN',
+    thankYouMsg:    'THANK YOU! SEE YOU NEXT TIME! 👾',
+    resettingIn:    'Resetting in {n}...',
     receiptPlayer:  'PLAYER:',
     receiptCreated: 'YOU CREATED:',
     receiptFootprint:'YOUR FOOTPRINT:',
@@ -196,7 +198,7 @@ es: {
     tagline:        'Cada prompt deja huella.',
     pressStart:     '▶ PULSA START',
     freePlay:       '☁ JUEGO LIBRE ☁',
-    credits:        '© (AI)RCADE 2025',
+    credits:        '© (Ai)rcade 2025',
     howToPlay:      'CÓMO JUGAR',
     step1title:     'Cuéntanos sobre ti',
     step1desc:      'Perfil rápido y opcional para personalizar tu experiencia',
@@ -246,6 +248,8 @@ es: {
     downloadDone:   '✅ ¡Descargado!',
     downloading:    '⏳ Generando...',
     playAgainBtn:   '↩ JUGAR DE NUEVO',
+    thankYouMsg:    '¡GRACIAS! ¡HASTA LA PRÓXIMA! 👾',
+    resettingIn:    'Reiniciando en {n}...',
     receiptPlayer:  'JUGADOR/A:',
     receiptCreated: 'HAS CREADO:',
     receiptFootprint:'TU HUELLA AMBIENTAL:',
@@ -330,7 +334,7 @@ ca: {
     tagline:        'Cada prompt deixa petjada.',
     pressStart:     '▶ PREM START',
     freePlay:       '☁ JOC LLIURE ☁',
-    credits:        '© (AI)RCADE 2025',
+    credits:        '© (Ai)rcade 2025',
     howToPlay:      'COM ES JUGA',
     step1title:     "Explica'ns qui ets",
     step1desc:      'Perfil ràpid i opcional per personalitzar la teva experiència',
@@ -380,6 +384,8 @@ ca: {
     downloadDone:   '✅ Descarregat!',
     downloading:    '⏳ Generant...',
     playAgainBtn:   '↩ JUGAR DE NOU',
+    thankYouMsg:    'GRÀCIES! FINS AVIAT! 👾',
+    resettingIn:    'Reiniciant en {n}...',
     receiptPlayer:  'JUGADOR/A:',
     receiptCreated: 'HAS CREAT:',
     receiptFootprint:'LA TEVA PETJADA AMBIENTAL:',

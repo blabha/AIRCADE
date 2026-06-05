@@ -1,4 +1,4 @@
-# A(I)RCADE — Product Requirements Document
+# (Ai)rcade — Product Requirements Document
 ### Status: **IMPLEMENTED** — Last updated 2026-06-05
 
 ---
@@ -7,7 +7,7 @@
 
 | Field | Value |
 |---|---|
-| **Product Name** | A(I)RCADE |
+| **Product Name** | (Ai)rcade |
 | **Tagline** | "Every prompt has a footprint. Leave a positive one." |
 | **Format** | Interactive web application (laptop/tablet, full-viewport) |
 | **Duration** | 2–3 minutes per session |
@@ -121,12 +121,12 @@ Calls `setLanguage(lang)` (defined in `translations.js`), then navigates to Idle
 ## Screen 0: IDLE / ATTRACT MODE
 
 **Elements:**
-- Game title: `A(I)RCADE` (center, large pixel font, neon cyan glow)
+- Game title: `(Ai)rcade` (center, large pixel font; "(Ai)" in hot pink, "rcade" in neon cyan)
 - Subtitle: `INSERT COIN TO PLAY` (blinking yellow)
 - Tagline: `Every prompt has a footprint.`
 - Byte mascot (floating cloud SVG) with rotating speech bubbles every 4 s
 - `▶ PRESS START` button (blinking)
-- Footer: `© A(I)RCADE 2025 | ☁ FREE PLAY ☁`
+- Footer: `© (Ai)rcade 2025 | ☁ FREE PLAY ☁`
 
 **On PRESS START:** Instructions overlay appears.
 

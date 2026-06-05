@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   A(I)RCADE — Main App Logic
+   (Ai)rcade — Main App Logic
    Screen transitions, state management, events
 ═══════════════════════════════════════════ */
 
@@ -1111,52 +1111,50 @@ document.getElementById('btn-print').addEventListener('click', () => {
 
 // ── SCREEN 4: TICKET DOWNLOAD ────────────────
 
-(function initPrintScreenNav() {
-  const BTNS = ['btn-download', 'btn-play-again'];
-  BTNS.forEach((id, i) => {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        const next = document.getElementById(BTNS[Math.min(i + 1, BTNS.length - 1)]);
-        if (next) next.focus();
-      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-        e.preventDefault();
-        const prev = document.getElementById(BTNS[Math.max(i - 1, 0)]);
-        if (prev) prev.focus();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        btn.click();
-      }
-    });
-  });
-})();
-
 document.getElementById('btn-download').addEventListener('click', () => {
   downloadCard(state.sessionId);
+  showThankYouAndReset();
 });
 
-document.getElementById('btn-play-again').addEventListener('click', () => {
-  resetGameState();
-  state.prompt      = '';
-  state.taskType    = 'text-short';
-  state.metrics     = null;
-  state.sessionId   = generateSessionId();
-  state.userName    = '';
-  state.userAge     = '';
-  state.userExpertise = '';
-  state.userGender  = '';
+function showThankYouAndReset() {
+  const overlay = document.getElementById('thankyou-overlay');
+  const msgEl   = document.getElementById('thankyou-msg');
+  const cntEl   = document.getElementById('thankyou-countdown');
+  if (!overlay || !msgEl || !cntEl) return;
 
-  document.getElementById('user-name').value      = '';
-  document.getElementById('user-age').value       = '';
-  document.getElementById('user-expertise').value = '';
-  document.getElementById('user-gender').value    = '';
+  msgEl.textContent = t('ui.thankYouMsg');
+  overlay.classList.remove('hidden');
 
-  updateBytePosition(0);
-  showScreen('idle');
-  Byte.setState('idle');
-});
+  let count = 3;
+  cntEl.textContent = t('ui.resettingIn').replace('{n}', count);
+
+  const interval = setInterval(() => {
+    count--;
+    if (count <= 0) {
+      clearInterval(interval);
+      overlay.classList.add('hidden');
+      // Full state reset
+      resetGameState();
+      state.prompt        = '';
+      state.taskType      = 'text-short';
+      state.metrics       = null;
+      state.sessionId     = generateSessionId();
+      state.userName      = '';
+      state.userAge       = '';
+      state.userExpertise = '';
+      state.userGender    = '';
+      document.getElementById('user-name').value      = '';
+      document.getElementById('user-age').value       = '';
+      document.getElementById('user-expertise').value = '';
+      document.getElementById('user-gender').value    = '';
+      updateBytePosition(0);
+      showScreen('langselect');
+      Byte.setState('idle');
+    } else {
+      cntEl.textContent = t('ui.resettingIn').replace('{n}', count);
+    }
+  }, 1000);
+}
 
 // ── Keyboard Navigation ──────────────────────
 document.addEventListener('keydown', e => {

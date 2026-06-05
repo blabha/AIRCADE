@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A(I)RCADE — Every prompt has a footprint</title>
+  <title>(Ai)rcade — Every prompt has a footprint</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
@@ -71,7 +71,7 @@
     <div class="idle-content">
       <div class="title-block">
         <div class="title-sub pixel-font" data-i18n="ui.insertCoin">INSERT COIN TO PLAY</div>
-        <h1 class="game-title pixel-font"><span class="title-paren">A(I)</span>RCADE</h1>
+        <h1 class="game-title pixel-font"><span class="title-paren">(Ai)</span>rcade</h1>
         <div class="title-tagline" data-i18n="ui.tagline">Every prompt has a footprint.</div>
       </div>
 
@@ -103,7 +103,7 @@
           ▶ PRESS START
         </button>
         <div class="credits pixel-font">
-          <span data-i18n="ui.credits">© A(I)RCADE 2025</span>
+          <span data-i18n="ui.credits">© (Ai)rcade 2025</span>
           <span class="blink-slow" data-i18n="ui.freePlay">☁ FREE PLAY ☁</span>
         </div>
       </div>
@@ -488,7 +488,7 @@
     <div class="ticket-wrapper">
       <div class="ticket-card" id="ticket-card">
         <div class="ticket-header">
-          <div class="ticket-logo pixel-font">A(I)RCADE</div>
+          <div class="ticket-logo pixel-font"><span style="color:#ff006e">(Ai)</span>rcade</div>
           <div class="ticket-session pixel-font" id="ticket-session">SESSION: #000000</div>
         </div>
         <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
@@ -552,11 +552,38 @@
       <button class="btn btn-primary btn-large" id="btn-download" tabindex="0" data-i18n="ui.downloadBtn">
         🖨 PRINT TICKET
       </button>
-      <button class="btn btn-ghost btn-large" id="btn-play-again" tabindex="0" data-i18n="ui.playAgainBtn">
-        ↩ PLAY AGAIN
-      </button>
     </div>
   </section>
+
+  <!-- Thank-you overlay (shown after print, auto-resets to lang select) -->
+  <div class="thankyou-overlay hidden" id="thankyou-overlay" role="status" aria-live="polite">
+    <div class="scanlines"></div>
+    <div class="thankyou-content">
+      <div class="byte-wrapper" aria-hidden="true">
+        <div class="byte-mascot">
+          <svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <g class="byte-cloud-body">
+              <rect x="40" y="30" width="80" height="50" rx="6" fill="#c8e8f5"/>
+              <rect x="28" y="42" width="104" height="30" rx="6" fill="#c8e8f5"/>
+              <rect x="30" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+              <rect x="55" y="12" width="36" height="36" rx="4" fill="#eef8ff"/>
+              <rect x="88" y="22" width="28" height="28" rx="4" fill="#daf0fa"/>
+              <rect x="40" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+              <rect x="100" y="68" width="20" height="16" rx="3" fill="#c8e8f5"/>
+            </g>
+            <rect x="54" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
+            <rect x="92" y="44" width="14" height="14" rx="3" fill="#1a1a2e"/>
+            <rect x="58" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
+            <rect x="96" y="47" width="4" height="4" rx="1" fill="white" opacity="0.8"/>
+            <path d="M 62 64 Q 80 74 98 64" stroke="#1a1a2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <text x="20" y="55" font-size="24" class="wave-arm">👋</text>
+          </svg>
+        </div>
+      </div>
+      <div class="thankyou-msg pixel-font" id="thankyou-msg">THANK YOU! SEE YOU NEXT TIME! 👾</div>
+      <div class="thankyou-countdown pixel-font" id="thankyou-countdown">Resetting in 3...</div>
+    </div>
+  </div>
 
   <!-- Error toast -->
   <div class="error-toast hidden" id="error-toast" role="alert" aria-live="assertive">

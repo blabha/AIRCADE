@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   A(I)RCADE — Arcade-style CSS
+   (Ai)rcade — Arcade-style CSS
    Tablet-optimized: 1024x768px minimum
 ═══════════════════════════════════════════ */
 
@@ -3475,5 +3475,52 @@ body.stamina-visible .ethics-main {
   min-width: 18px;
   text-align: center;
   box-shadow: 0 0 4px rgba(0,245,255,0.2);
+}
+
+/* ── Thank-you overlay ──────────────────── */
+.thankyou-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.thankyou-overlay.hidden {
+  display: none;
+}
+
+.thankyou-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  text-align: center;
+  padding: 40px;
+}
+
+.thankyou-content .byte-mascot {
+  width: 160px;
+  height: 120px;
+  animation: byteFloat 2.4s ease-in-out infinite;
+}
+
+.thankyou-msg {
+  font-size: clamp(14px, 2.5vw, 22px);
+  color: var(--neon-cyan);
+  text-shadow:
+    0 0 10px var(--neon-cyan),
+    0 0 30px var(--neon-cyan)80;
+  line-height: 2;
+  max-width: 700px;
+}
+
+.thankyou-countdown {
+  font-size: clamp(11px, 1.8vw, 16px);
+  color: var(--neon-yellow);
+  text-shadow: 0 0 8px var(--neon-yellow);
 }
 
