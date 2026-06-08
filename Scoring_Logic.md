@@ -7,7 +7,9 @@ This document defines the scoring logic for the (AI)RCADE game. The system evalu
 
 ## Core Formula
 
-score = clamp(-3, +4, envScore + moralAdj)
+score = clamp(0, +7, envScore + moralAdj)
+
+> All scores are shifted by +3 relative to the original design (minimum anchored at 0).
 
 ---
 
@@ -15,12 +17,12 @@ score = clamp(-3, +4, envScore + moralAdj)
 
 | Weight | Description | envScore |
 |--------|------------|----------|
-| 1 | Highest impact | -3 |
-| 2 | High impact | -1 |
-| 3 | Moderate | +1 |
-| 4 | Good | +2 |
-| 5 | Very good | +3 |
-| 6 | Zero/Minimal impact | +4 |
+| 1 | Highest impact | 0 |
+| 2 | High impact | 2 |
+| 3 | Moderate | 4 |
+| 4 | Good | 5 |
+| 5 | Very good | 6 |
+| 6 | Zero/Minimal impact | 7 |
 
 ---
 
@@ -32,17 +34,19 @@ score = clamp(-3, +4, envScore + moralAdj)
 | 1 | Practical | 0 |
 | 2 | Conscious / intentional | +1 |
 
+> Note: moralAdj still shifts ±1 relative to the envScore. The clamp(0, 7) prevents the final per-question score from going below 0 or above 7.
+
 ---
 
 ## Per Question Score Range
-- Minimum: -3
-- Maximum: +4
+- Minimum: 0
+- Maximum: 7
 
 ---
 
 ## Total Score Range (5 Questions)
-- Minimum: -15
-- Maximum: +20
+- Minimum: 0
+- Maximum: 35
 
 ---
 
@@ -50,13 +54,13 @@ score = clamp(-3, +4, envScore + moralAdj)
 
 | Score Range | Persona | Description |
 |-------------|---------|-------------|
-| -15 to -8 | Grid Goblin | Maximum consumption, zero awareness — draining the planet one click at a time |
-| -7 to -2 | Turbo Tapper | Fast and reckless; convenience wins every time, consequences be damned |
-| -1 to 4 | Casual Clicker | Convenience-first with occasional good instincts, but not thinking it through |
-| 5 to 9 | Eco Experimenter | Starting to connect the dots between choices and impact |
-| 10 to 14 | Mindful Maker | Thoughtful and intentional — balancing usefulness with environmental care |
-| 15 to 17 | Green Hacker | Deliberately sustainable; earns the hacker badge for optimizing the right things |
-| 18 to 20 | Sustainable Sage | Near-perfect alignment of impact and intent — the rarest unlock |
+| 0 to 7 | Grid Goblin | Maximum consumption, zero awareness — draining the planet one click at a time |
+| 8 to 13 | Turbo Tapper | Fast and reckless; convenience wins every time, consequences be damned |
+| 14 to 19 | Casual Clicker | Convenience-first with occasional good instincts, but not thinking it through |
+| 20 to 24 | Eco Experimenter | Starting to connect the dots between choices and impact |
+| 25 to 29 | Mindful Maker | Thoughtful and intentional — balancing usefulness with environmental care |
+| 30 to 32 | Green Hacker | Deliberately sustainable; earns the hacker badge for optimizing the right things |
+| 33 to 35 | Sustainable Sage | Near-perfect alignment of impact and intent — the rarest unlock |
 
 ---
 
@@ -110,6 +114,7 @@ Each category scored from 0–10.
 
 ## Notes
 
-- Clamping ensures stability of scoring
-- MoralScore introduces ethical nuance
+- Clamping ensures stability of scoring — per-question scores are bounded to [0, 7]
+- The entire scoring system is shifted by +3 per question (+15 total) relative to the original design; all relative differences and persona tiers are preserved
+- moralAdj (−1 / 0 / +1) still applies before clamping, so intent continues to influence final score
 - Environmental metrics are cumulative, not part of score calculation directly
