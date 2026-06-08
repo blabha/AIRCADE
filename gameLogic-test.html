@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GameLogic Test Harness</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: monospace; background: #111; color: #eee; padding: 24px; }
+  h1 { font-size: 16px; color: #aaa; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
+
+  .hud {
+    display: flex; gap: 24px; align-items: center;
+    background: #1a1a1a; border: 1px solid #333; padding: 12px 20px;
+    margin-bottom: 20px; border-radius: 4px;
+  }
+  .hud-label { color: #666; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; }
+  .lives { font-size: 28px; letter-spacing: 4px; }
+  .scroll-status { font-size: 13px; padding: 4px 10px; border-radius: 3px; font-weight: bold; }
+  .scroll-status.running { background: #1a3a1a; color: #4caf50; }
+  .scroll-status.paused  { background: #3a1a1a; color: #f44336; }
+
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  .panel {
+    background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 4px; padding: 16px;
+  }
+  .panel h2 { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+  button {
+    display: block; width: 100%; margin-bottom: 8px;
+    padding: 10px 14px; border: 1px solid #333; border-radius: 3px;
+    background: #222; color: #ddd; font-family: monospace; font-size: 13px;
+    cursor: pointer; text-align: left; transition: background 0.1s;
+  }
+  button:hover { background: #2a2a2a; border-color: #555; }
+  button .key { color: #888; font-size: 11px; float: right; margin-top: 1px; }
+
+  .answer-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .answer-row button { margin-bottom: 0; }
+
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+  }
+  .overlay.active { display: flex; }
+  .overlay h2 { font-size: 18px; color: #fff; }
+  .overlay p  { color: #aaa; font-size: 13px; }
+  .overlay .answers { display: flex; gap: 12px; }
+  .overlay .answers button { width: auto; padding: 10px 24px; }
+
+  .flash-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(255,50,50,0.25); pointer-events: none;
+  }
+  .flash-overlay.active { display: block; }
+
+  .log {
+    background: #0d0d0d; border: 1px solid #222; border-radius: 4px;
+    padding: 12px; height: 180px; overflow-y: auto; font-size: 12px; color: #888;
+  }
+  .log .entry { padding: 2px 0; border-bottom: 1px solid #1a1a1a; }
+  .log .entry.info   { color: #4fc3f7; }
+  .log .entry.warn   { color: #ffb74d; }
+  .log .entry.error  { color: #ef5350; }
+  .log .entry.good   { color: #81c784; }
+
+  .gameover-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92); align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+  }
+  .gameover-overlay.active { display: flex; }
+  .gameover-overlay h2 { font-size: 32px; color: #f44336; letter-spacing: 4px; }
+  .gameover-overlay button { width: auto; padding: 10px 32px; }
+</style>
+</head>
+<body>
+
+<h1>(AI)RCADE — GameLogic Test Harness</h1>
+
+<div class="hud">
+  <div>
+    <div class="hud-label">Lives</div>
+    <div class="lives" id="lives">❤️❤️❤️</div>
+  </div>
+  <div>
+    <div class="hud-label">Scroll</div>
+    <div class="scroll-status running" id="scroll-status">RUNNING</div>
+  </div>
+  <div>
+    <div class="hud-label">Active block</div>
+    <div id="active-block" style="font-size:13px;color:#666">—</div>
+  </div>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <h2>Trigger events</h2>
+    <button onclick="hitQuestionBlock()">Hit ? block from below <span class="key">Q</span></button>
+    <button onclick="hitObstacle()">Touch ! obstacle <span class="key">E</span></button>
+    <button onclick="missBlock()">? block scrolls off left edge <span class="key">M</span></button>
+  </div>
+  <div class="panel">
+    <h2>Controls</h2>
+    <button onclick="GameLogic.reset(); refreshHUD(); log('Reset → 3 lives, scroll running', 'good')">Reset game state <span class="key">R</span></button>
+    <div style="margin-top:8px;color:#555;font-size:11px;">
+      While question is open, select an answer:
+    </div>
+    <div class="answer-row" style="margin-top:8px;">
+      <button onclick="selectAnswer('A')">Answer A</button>
+      <button onclick="selectAnswer('B')">Answer B</button>
+      <button onclick="selectAnswer('C')">Answer C</button>
+    </div>
+  </div>
+</div>
+
+<div class="log" id="log"></div>
+
+<!-- Question overlay -->
+<div class="overlay" id="q-overlay">
+  <h2>❓ Question Block Hit</h2>
+  <p id="q-block-info">Block info shown here</p>
+  <p style="color:#666;font-size:11px;">Scroll is paused. Select an answer to continue.</p>
+  <div class="answers">
+    <button onclick="selectAnswer('A')">A</button>
+    <button onclick="selectAnswer('B')">B</button>
+    <button onclick="selectAnswer('C')">C</button>
+  </div>
+</div>
+
+<!-- Damage flash -->
+<div class="flash-overlay" id="flash"></div>
+
+<!-- Game Over -->
+<div class="gameover-overlay" id="gameover-overlay">
+  <h2>GAME OVER</h2>
+  <p style="color:#aaa;font-size:13px;">No lives remaining.</p>
+  <button onclick="resetGame()">Try Again</button>
+</div>
+
+<script src="gameLogic.js"></script>
+<script>
+  // --- Wire callbacks ---
+  GameLogic.init({
+    pauseScroll:   () => setScrollStatus(false),
+    resumeScroll:  () => setScrollStatus(true),
+    openQuestion:  (b) => openQuestion(b),
+    closeQuestion: () => closeQuestion(),
+    scoreAnswer:   (id) => log(`Score: answer "${id}" passed to scoring system`, 'good'),
+    flash:         () => doFlash(),
+    updateLives:   (n) => renderLives(n),
+    gameOver:      () => showGameOver(),
+  });
+
+  // --- Mock block factory ---
+  let _blockCounter = 0;
+  function makeBlock() {
+    return { id: ++_blockCounter, questionIdx: Math.floor(Math.random() * 5) };
+  }
+
+  // --- Trigger helpers ---
+  function hitQuestionBlock() {
+    if (GameLogic.isScrollPaused()) { log('Scroll paused — cannot hit another block now', 'warn'); return; }
+    const b = makeBlock();
+    log(`? block #${b.id} hit from below (Q${b.questionIdx + 1})`, 'info');
+    GameLogic.onQuestionBlockHit(b);
+  }
+
+  function hitObstacle() {
+    log('! obstacle touched', 'warn');
+    GameLogic.onObstacleHit();
+  }
+
+  function missBlock() {
+    const b = makeBlock();
+    log(`? block #${b.id} exited left edge — life penalty`, 'warn');
+    GameLogic.onBlockMissed(b);
+  }
+
+  function selectAnswer(id) {
+    if (!GameLogic.isScrollPaused()) { log(`Answer "${id}" ignored — no active question`, 'warn'); return; }
+    log(`Answer "${id}" selected`, 'good');
+    GameLogic.onAnswerSelected(id);
+  }
+
+  function resetGame() {
+    document.getElementById('gameover-overlay').classList.remove('active');
+    GameLogic.reset();
+    refreshHUD();
+    log('Game reset', 'good');
+  }
+
+  // --- UI helpers ---
+  function setScrollStatus(running) {
+    const el = document.getElementById('scroll-status');
+    el.textContent = running ? 'RUNNING' : 'PAUSED';
+    el.className = 'scroll-status ' + (running ? 'running' : 'paused');
+  }
+
+  function renderLives(n) {
+    document.getElementById('lives').textContent = '❤️'.repeat(n) + '🖤'.repeat(3 - n);
+  }
+
+  function refreshHUD() {
+    renderLives(GameLogic.getLives());
+    setScrollStatus(!GameLogic.isScrollPaused());
+    document.getElementById('active-block').textContent = '—';
+  }
+
+  function openQuestion(b) {
+    document.getElementById('q-block-info').textContent =
+      `Block #${b.id} — Question ${b.questionIdx + 1}`;
+    document.getElementById('active-block').textContent = `Block #${b.id}`;
+    document.getElementById('q-overlay').classList.add('active');
+  }
+
+  function closeQuestion() {
+    document.getElementById('q-overlay').classList.remove('active');
+    document.getElementById('active-block').textContent = '—';
+  }
+
+  function doFlash() {
+    const el = document.getElementById('flash');
+    el.classList.add('active');
+    setTimeout(() => el.classList.remove('active'), 300);
+  }
+
+  function showGameOver() {
+    document.getElementById('gameover-overlay').classList.add('active');
+    log('GAME OVER', 'error');
+  }
+
+  function log(msg, type = '') {
+    const el = document.getElementById('log');
+    const entry = document.createElement('div');
+    entry.className = 'entry ' + type;
+    const t = new Date().toLocaleTimeString('en-GB', { hour12: false });
+    entry.textContent = `[${t}] ${msg}`;
+    el.prepend(entry);
+  }
+
+  // --- Keyboard shortcuts ---
+  document.addEventListener('keydown', e => {
+    if (e.key === 'q' || e.key === 'Q') hitQuestionBlock();
+    if (e.key === 'e' || e.key === 'E') hitObstacle();
+    if (e.key === 'm' || e.key === 'M') missBlock();
+    if (e.key === 'r' || e.key === 'R') resetGame();
+    if (e.key === 'a' || e.key === 'A') selectAnswer('A');
+    if (e.key === 'b' || e.key === 'B') selectAnswer('B');
+    if (e.key === 'c' || e.key === 'C') selectAnswer('C');
+  });
+
+  refreshHUD();
+  log('GameLogic loaded. Use buttons or keyboard shortcuts.', 'info');
+</script>
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>(AI)RCADE — Game Logic Test</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    display: flex; align-items: center; justify-content: center;
+    height: 100vh; overflow: hidden;
+    font-family: 'Courier New', monospace;
+  }
+  #wrap { position: relative; }
+  canvas { display: block; }
+
+  /* ── Question overlay ── */
+  #q-overlay {
+    display: none; position: absolute; inset: 0;
+    background: rgba(13,27,42,0.93);
+    flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+  }
+  #q-overlay.on { display: flex; }
+  #q-tag  { font-size: 10px; letter-spacing: 4px; color: #334; text-transform: uppercase; }
+  #q-text { font-size: 20px; color: #00FFFF; letter-spacing: 2px; text-align: center; max-width: 520px; }
+  .ans-row { display: flex; gap: 14px; }
+  .ans-btn {
+    padding: 12px 30px;
+    background: transparent; border: 2px solid #00FFFF;
+    color: #00FFFF; font-family: 'Courier New', monospace;
+    font-size: 13px; letter-spacing: 2px; cursor: pointer;
+    text-transform: uppercase; transition: background .1s, color .1s;
+  }
+  .ans-btn:hover { background: #00FFFF; color: #0D1B2A; }
+  .ans-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
+  /* demo-only hint banner inside q-overlay */
+  #demo-hint {
+    display: none;
+    font-size: 13px; letter-spacing: 3px; color: #39FF14;
+    text-transform: uppercase; margin-bottom: -8px;
+  }
+  #demo-hint.on { display: block; }
+
+  /* continue button shown after demo answer */
+  #continue-btn {
+    display: none;
+    padding: 12px 44px;
+    background: transparent; border: 2px solid #39FF14;
+    color: #39FF14; font-family: 'Courier New', monospace;
+    font-size: 13px; letter-spacing: 3px; cursor: pointer;
+    text-transform: uppercase; margin-top: 8px;
+  }
+  #continue-btn.on { display: block; }
+  #continue-btn:hover { background: #39FF14; color: #0D1B2A; }
+
+  /* ── Game Over overlay ── */
+  #gameover {
+    display: none; position: absolute; inset: 0;
+    background: rgba(13,27,42,0.95);
+    flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  }
+  #gameover.on { display: flex; }
+  #go-title  { font-size: 52px; color: #FF2D6B; letter-spacing: 10px; }
+  #go-sub    { font-size: 12px; color: #555; letter-spacing: 3px; }
+  #go-score  { font-size: 22px; color: #39FF14; letter-spacing: 3px; margin-top: 8px; }
+  #go-persona{ font-size: 18px; color: #00FFFF; letter-spacing: 2px; }
+  #go-pdesc  { font-size: 12px; color: #667; letter-spacing: 1px; max-width: 420px; text-align: center; }
+  #restart-btn {
+    margin-top: 8px; padding: 12px 44px;
+    background: transparent; border: 2px solid #39FF14;
+    color: #39FF14; font-family: 'Courier New', monospace;
+    font-size: 13px; letter-spacing: 3px; cursor: pointer;
+    text-transform: uppercase;
+  }
+  #restart-btn:hover { background: #39FF14; color: #0D1B2A; }
+
+  /* ── Results overlay ── */
+  #results {
+    display: none; position: absolute; inset: 0;
+    background: rgba(13,27,42,0.97);
+    flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  }
+  #results.on { display: flex; }
+  #res-title   { font-size: 32px; color: #00FFFF; letter-spacing: 8px; }
+  #res-score   { font-size: 22px; color: #39FF14; letter-spacing: 3px; margin-top: 4px; }
+  #res-persona { font-size: 18px; color: #FFD600; letter-spacing: 2px; }
+  #res-pdesc   { font-size: 12px; color: #667; letter-spacing: 1px; max-width: 420px; text-align: center; }
+  #playagain-btn {
+    margin-top: 8px; padding: 12px 44px;
+    background: transparent; border: 2px solid #39FF14;
+    color: #39FF14; font-family: 'Courier New', monospace;
+    font-size: 13px; letter-spacing: 3px; cursor: pointer;
+    text-transform: uppercase;
+  }
+  #playagain-btn:hover { background: #39FF14; color: #0D1B2A; }
+
+  #controls {
+    position: absolute; bottom: 8px; left: 0; right: 0;
+    text-align: center; font-size: 10px; color: #223; letter-spacing: 2px;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c" width="800" height="450"></canvas>
+
+  <div id="q-overlay">
+    <div id="demo-hint">This is how questions work!</div>
+    <div id="q-tag">— question —</div>
+    <div id="q-text"></div>
+    <div class="ans-row" id="ans-row"></div>
+    <button id="continue-btn" onclick="demoQuestionContinue()">CONTINUE</button>
+  </div>
+
+  <div id="results">
+    <div id="res-title">RESULTS</div>
+    <div id="res-score"></div>
+    <div id="res-persona"></div>
+    <div id="res-pdesc"></div>
+    <button id="playagain-btn" onclick="restart()">PLAY AGAIN</button>
+  </div>
+
+  <div id="gameover">
+    <div id="go-title">GAME OVER</div>
+    <div id="go-sub">NO LIVES REMAINING</div>
+    <div id="go-score"></div>
+    <div id="go-persona"></div>
+    <div id="go-pdesc"></div>
+    <button id="restart-btn" onclick="restart()">RESTART</button>
+  </div>
+
+  <div id="controls">↑ — jump in place &nbsp;&nbsp;|&nbsp;&nbsp; → + ↑ — arc jump forward</div>
+</div>
+
+<script src="gameLogic.js"></script>
+<script>
+// ─── Dimensions ───────────────────────────────────────────────────────────────
+const W = 800, H = 450;
+const GROUND_Y   = H - 55;
+const SCROLL_SPD = 2.5;
+
+// ─── Player ───────────────────────────────────────────────────────────────────
+const PX = 140, PW = 36, PH = 44;
+const GRAVITY = 0.6, JUMP_VY = -12, JUMP_VX = 4.5;
+let px, py, velX, velY, onGround;
+let downHeld = false;
+
+// ─── Block geometry ───────────────────────────────────────────────────────────
+const BW = 52, BH = 52;
+const BLOCK_BOT = GROUND_Y - 110;  // bottom of block in CSS Y
+const BLOCK_TOP = BLOCK_BOT - BH;  // top of block in CSS Y
+
+// ─── Datacenter dimensions (match drawing below exactly) ─────────────────────
+const DC_W = 80, DC_H = 55;  // center tower = tallest building
+
+// ─── Canvas ───────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// ─── Questions ────────────────────────────────────────────────────────────────
+// Q0 chosen as demo question: envWeight range = 4 (lowest of the three)
+const DEMO_QUESTION_IDX = 0;
+const QUESTIONS = [
+  {
+    text: 'How do you run your AI prompt?',
+    ans: [
+      { label: 'A — Max quality model, no context limit',       envWeight: 1, moralScore: 0 },
+      { label: 'B — Smallest model that does the job',          envWeight: 5, moralScore: 2 },
+      { label: "C — Default settings, didn't think about it",   envWeight: 3, moralScore: 1 },
+    ],
+  },
+  {
+    text: 'Where is your data centre?',
+    ans: [
+      { label: 'A — Coal-powered region',     envWeight: 1, moralScore: 0 },
+      { label: 'B — Renewable energy region', envWeight: 6, moralScore: 2 },
+      { label: "C — Don't know",              envWeight: 2, moralScore: 0 },
+    ],
+  },
+  {
+    text: 'How often do you retrain your model?',
+    ans: [
+      { label: 'A — Every week, full dataset',         envWeight: 1, moralScore: 1 },
+      { label: 'B — Only when accuracy drops',         envWeight: 5, moralScore: 2 },
+      { label: 'C — Continuously, automated pipeline', envWeight: 2, moralScore: 0 },
+    ],
+  },
+];
+let qIdx = 0;
+let qAnswered = 0;
+
+// ─── Game objects ─────────────────────────────────────────────────────────────
+let objects = [];
+const PATTERN = ['dc', 'block'];  // strict alternation: never two same in a row
+let patIdx = 0;
+
+function spawnOne() {
+  const type = PATTERN[patIdx % PATTERN.length];
+  patIdx++;
+  let x;
+  if (objects.length === 0) {
+    x = W + 20;  // first object: just off right edge — visible immediately
+  } else {
+    const lastX = objects[objects.length - 1].x;
+    x = lastX + 350 + Math.random() * 200;  // 350–550px gap
+  }
+  if (type === 'block') {
+    objects.push({ type: 'block', x, used: false });
+  } else {
+    objects.push({ type: 'dc', x, used: false, dcW: DC_W, dcH: DC_H });
+  }
+}
+
+// ─── Flash ────────────────────────────────────────────────────────────────────
+let flashAlpha = 0;
+let flashColor = 'red';  // 'red' | 'cyan'
+
+// ─── Block-standing state ─────────────────────────────────────────────────────
+let standingBlock = null;
+
+// ─── Scroll flag ──────────────────────────────────────────────────────────────
+let scrolling = true;
+
+// ─── Right-arrow speed boost (PLAY mode only) ─────────────────────────────────
+let rightHeld = false;
+let rightPressedAt = 0;  // timestamp of last → keydown, for 150ms co-press window
+
+// ─── Game state: 'DEMO' | 'PLAY' ─────────────────────────────────────────────
+let gameState = 'DEMO';
+
+// ─── Demo state ───────────────────────────────────────────────────────────────
+// Phases:
+//   act1_scroll  → DC scrolls in from right
+//   act1_bubble  → DC at centre, bubble shown, auto-timer, then act1_resume
+//   act1_resume  → DC continues scrolling left; player can jump it (flash on hit, no life)
+//   act2_scroll  → block scrolls in from right (starts after DC exits left edge)
+//   act2_bubble  → block at centre, bubble shown, auto-timer, then act2_resume
+//   act2_resume  → block continues scrolling; player must physically hit it
+//   act2_question→ question overlay open; wait for CONTINUE
+//   ready        → blinking text; wait for SPACE
+
+const DEMO_SCROLL_SPD    = SCROLL_SPD;
+const DEMO_BUBBLE_FRAMES = 72;   // 1.2 s at 60 fps
+const DEMO_READY_FRAMES  = 48;   // 0.8 s auto-start after CONTINUE
+
+let demoPhase  = 'act1_scroll';
+let demoObj    = null;   // { type: 'dc'|'block', x }
+let demoTimer  = 0;
+let demoFrame  = 0;
+
+// ─── Wire GameLogic ───────────────────────────────────────────────────────────
+GameLogic.init({
+  pauseScroll:   () => { scrolling = false; },
+  resumeScroll:  () => { scrolling = true; },
+  openQuestion:  (b) => openQOverlay(b),
+  closeQuestion: () => document.getElementById('q-overlay').classList.remove('on'),
+  scoreAnswer:   () => {},
+  flash:         () => { flashAlpha = 0.55; flashColor = 'red'; },
+  updateLives:   () => {},
+  gameOver:      (total, persona) => {
+    document.getElementById('go-score').textContent   = 'SCORE: ' + total + ' / 35';
+    document.getElementById('go-persona').textContent = persona.name.toUpperCase();
+    document.getElementById('go-pdesc').textContent   = persona.desc;
+    document.getElementById('gameover').classList.add('on');
+  },
+});
+
+// ─── Results screen (5 questions answered) ────────────────────────────────────
+function showResults() {
+  scrolling = false;
+  const st      = GameLogic.getState();
+  const persona = GameLogic.getPersona(st.score);
+  document.getElementById('res-score').textContent   = 'SCORE: ' + st.score + ' / 35';
+  document.getElementById('res-persona').textContent = persona.name.toUpperCase();
+  document.getElementById('res-pdesc').textContent   = persona.desc;
+  document.getElementById('results').classList.add('on');
+}
+
+// ─── Question overlay (real game) ─────────────────────────────────────────────
+function openQOverlay(block) {
+  const q = QUESTIONS[qIdx % QUESTIONS.length];
+  document.getElementById('demo-hint').classList.remove('on');
+  document.getElementById('continue-btn').classList.remove('on');
+  document.getElementById('q-text').textContent = q.text;
+  const row = document.getElementById('ans-row');
+  row.innerHTML = '';
+  q.ans.forEach((a, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = a.label;
+    btn.onclick = () => {
+      qIdx++;
+      qAnswered = Math.min(qAnswered + 1, 5);
+      GameLogic.onAnswerSelected(['A','B','C'][i], a.envWeight, a.moralScore);
+      if (qAnswered >= 5) showResults();
+    };
+    row.appendChild(btn);
+  });
+  document.getElementById('q-overlay').classList.add('on');
+}
+
+// ─── Demo question overlay (no scoring, no GameLogic) ─────────────────────────
+function openDemoQuestion() {
+  const q = QUESTIONS[DEMO_QUESTION_IDX];
+  document.getElementById('demo-hint').classList.add('on');
+  document.getElementById('continue-btn').classList.remove('on');
+  document.getElementById('q-text').textContent = q.text;
+  const row = document.getElementById('ans-row');
+  row.innerHTML = '';
+  q.ans.forEach((a) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = a.label;
+    btn.onclick = () => {
+      row.querySelectorAll('.ans-btn').forEach(b => b.disabled = true);
+      document.getElementById('continue-btn').classList.add('on');
+    };
+    row.appendChild(btn);
+  });
+  document.getElementById('q-overlay').classList.add('on');
+}
+
+function demoQuestionContinue() {
+  document.getElementById('q-overlay').classList.remove('on');
+  document.getElementById('demo-hint').classList.remove('on');
+  document.getElementById('continue-btn').classList.remove('on');
+  demoObj   = null;
+  demoPhase = 'ready';
+  demoTimer = 0;  // auto-start countdown begins now
+}
+
+// ─── Input ────────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.code === 'ArrowRight') { rightHeld = true; rightPressedAt = performance.now(); }
+  if (e.code === 'ArrowDown')  { e.preventDefault(); downHeld = true; }
+
+  if ((e.code === 'ArrowUp' || e.code === 'Space') && gameState === 'DEMO' && demoPhase === 'ready') {
+    e.preventDefault();
+    startGame();
+    return;
+  }
+  if ((e.code === 'Space' || e.code === 'ArrowUp') && onGround) {
+    e.preventDefault();
+    const timeSinceRight = performance.now() - rightPressedAt;
+    const isArcJump = rightHeld || timeSinceRight < 150;
+    if (isArcJump) {
+      velX = JUMP_VX;  // arc jump forward
+    } else {
+      velX = 0;         // straight jump
+    }
+    velY = JUMP_VY;
+    onGround = false;
+    console.log('jump:', isArcJump ? 'ARC' : 'STRAIGHT', '| velX:', velX);
+  }
+});
+
+document.addEventListener('keyup', e => {
+  if (e.code === 'ArrowRight') rightHeld = false;
+  if (e.code === 'ArrowDown')  downHeld  = false;
+});
+
+// ─── Draw: ground ─────────────────────────────────────────────────────────────
+function drawGround() {
+  ctx.fillStyle = '#0f1e2d';
+  ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
+  for (let x = 0; x < W; x += 8) {
+    ctx.fillStyle = x % 16 === 0 ? '#0d1b2a' : '#122030';
+    ctx.fillRect(x, GROUND_Y + 6, 8, H - GROUND_Y - 6);
+  }
+  ctx.strokeStyle = '#00FFFF';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, GROUND_Y); ctx.lineTo(W, GROUND_Y); ctx.stroke();
+}
+
+// ─── Draw: player ─────────────────────────────────────────────────────────────
+function drawPlayer() {
+  const x = px, y = py - PH;
+  ctx.fillStyle = 'rgba(0,255,255,0.08)';
+  ctx.fillRect(x - 4, GROUND_Y - 2, PW + 8, 4);
+  ctx.fillStyle = '#E8E8E8';
+  ctx.fillRect(x, y, PW, PH);
+  ctx.fillStyle = '#00FFFF';
+  ctx.fillRect(x + 5, y + 7, PW - 10, 13);
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.fillRect(x + 5, y + 7, PW - 10, 13);
+  ctx.fillStyle = '#00FFFF';
+  ctx.fillRect(x + 5, y + 7, PW - 10, 4);
+  ctx.fillStyle = '#AAAAAA';
+  ctx.fillRect(x + 6, y + 24, PW - 12, 12);
+  ctx.fillStyle = '#00FFFF';
+  ctx.fillRect(x + 10, y + 27, 6, 6);
+  ctx.fillStyle = '#CCCCCC';
+  ctx.fillRect(x + 3,       py, 11, 7);
+  ctx.fillRect(x + PW - 14, py, 11, 7);
+}
+
+// ─── Draw: ? block ────────────────────────────────────────────────────────────
+function drawBlock(x) {
+  const by = BLOCK_TOP;
+  ctx.shadowColor = '#00FFFF';
+  ctx.shadowBlur  = 12;
+  ctx.fillStyle = '#0a1520';
+  ctx.fillRect(x, by, BW, BH);
+  ctx.strokeStyle = '#00FFFF';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 1, by + 1, BW - 2, BH - 2);
+  ctx.strokeStyle = 'rgba(0,255,255,0.3)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 5, by + 5, BW - 10, BH - 10);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#00FFFF';
+  ctx.font = 'bold 26px Courier New';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('?', x + BW / 2, by + BH / 2 + 1);
+}
+
+// ─── Draw: datacenter obstacle ────────────────────────────────────────────────
+// Total footprint: 80px  |  Center tower: 44×55  |  Side wings: 17×38
+function drawDatacenter(x) {
+  const buildings = [
+    { bx: x,      bw: 17, bh: 38 },  // left wing
+    { bx: x + 18, bw: 44, bh: 55 },  // center tower
+    { bx: x + 63, bw: 17, bh: 38 },  // right wing
+  ];
+
+  buildings.forEach(b => {
+    const by = GROUND_Y - b.bh;
+    ctx.fillStyle = '#1a2744';
+    ctx.fillRect(b.bx, by, b.bw, b.bh);
+    ctx.strokeStyle = '#6b7fa3';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(b.bx + 0.5, by + 0.5, b.bw - 1, b.bh - 1);
+    ctx.fillStyle = '#6b7fa3';
+    ctx.fillRect(b.bx, by, b.bw, 3);
+    ctx.fillStyle = '#3a4f72';
+    ctx.fillRect(b.bx, by + 4, b.bw, 2);
+    ctx.shadowColor = '#00FFFF';
+    ctx.shadowBlur  = 6;
+    ctx.fillStyle   = '#00FFFF';
+    const cols = 2, rowH = 10;
+    const colW = Math.floor((b.bw - 8) / cols);
+    const winW = colW - 3, winH = 5;
+    for (let row = 0; by + 10 + row * rowH + winH < GROUND_Y - 4; row++) {
+      for (let col = 0; col < cols; col++) {
+        ctx.fillRect(b.bx + 4 + col * colW, by + 10 + row * rowH, winW, winH);
+      }
+    }
+    ctx.shadowBlur = 0;
+  });
+
+  ctx.fillStyle = 'rgba(0,255,255,0.06)';
+  ctx.fillRect(x + 2, GROUND_Y - 2, DC_W - 4, 4);
+}
+
+// ─── Draw: HUD ────────────────────────────────────────────────────────────────
+function drawHUD() {
+  const st = GameLogic.getState();
+  ctx.shadowBlur = 0;
+  ctx.textBaseline = 'top';
+  ctx.font = '13px Courier New';
+  ctx.fillStyle = '#FF2D6B';
+  ctx.textAlign = 'left';
+  ctx.fillText('LIVES: ' + '♥'.repeat(st.lives) + '♡'.repeat(3 - st.lives), 16, 14);
+  ctx.fillStyle = '#39FF14';
+  ctx.fillText('SCORE: ' + st.score, 16, 32);
+  ctx.fillStyle = '#00FFFF';
+  ctx.textAlign = 'center';
+  ctx.fillText('Q ' + (Math.min(qAnswered + 1, 5)) + ' / 5', W / 2, 14);
+  ctx.textAlign = 'left';
+}
+
+// ─── Draw: demo tooltip bubble ────────────────────────────────────────────────
+// hints: optional array of { text, color } shown below the main line
+function drawBubble(cx, objTopY, text, hints) {
+  hints = hints || [];
+  const HINT_LINE_H = 17;
+  const bubbleW = 480;
+  const bubbleH = 38 + (hints.length > 0 ? 8 + hints.length * HINT_LINE_H : 0);
+  const bx = Math.max(10, Math.min(W - bubbleW - 10, cx - bubbleW / 2));
+  const by = objTopY - bubbleH - 26;
+
+  ctx.fillStyle = 'rgba(5,12,22,0.93)';
+  ctx.fillRect(bx, by, bubbleW, bubbleH);
+  ctx.strokeStyle = '#00FFFF';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(bx + 0.5, by + 0.5, bubbleW - 1, bubbleH - 1);
+
+  // Main text
+  ctx.fillStyle = '#00FFFF';
+  ctx.font = 'bold 13px Courier New';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, bx + bubbleW / 2, by + 19);
+
+  // Hint lines
+  if (hints.length > 0) {
+    ctx.font = '10px Courier New';
+    hints.forEach((h, i) => {
+      ctx.fillStyle = h.color || '#FFD600';
+      ctx.fillText(h.text, bx + bubbleW / 2, by + 38 + 4 + i * HINT_LINE_H + HINT_LINE_H / 2);
+    });
+  }
+
+  // Bouncing arrow pointing at object
+  const arrowX = Math.max(bx + 12, Math.min(bx + bubbleW - 12, cx));
+  const bounce  = Math.sin(demoFrame * 0.12) * 5;
+  const arrowY  = by + bubbleH + 6 + bounce;
+  ctx.fillStyle = '#00FFFF';
+  ctx.beginPath();
+  ctx.moveTo(arrowX - 7, arrowY);
+  ctx.lineTo(arrowX + 7, arrowY);
+  ctx.lineTo(arrowX,     arrowY + 11);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.textAlign = 'left';
+}
+
+// ─── Draw: demo "ready" controls panel ───────────────────────────────────────
+function drawReadyScreen() {
+  const panelW = 420, panelH = 170;
+  const px_ = W / 2 - panelW / 2;
+  const py_ = H / 2 - panelH / 2;
+
+  ctx.fillStyle = 'rgba(5,12,22,0.95)';
+  ctx.fillRect(px_, py_, panelW, panelH);
+  ctx.strokeStyle = '#00FFFF';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(px_ + 0.5, py_ + 0.5, panelW - 1, panelH - 1);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const cx = W / 2;
+
+  const lines = [
+    { text: '↑        jump straight up',   color: '#ffffff' },
+    { text: '↑ + →    arc jump forward',   color: '#ffffff' },
+  ];
+  ctx.font = '13px Courier New';
+  lines.forEach((l, i) => {
+    ctx.fillStyle = l.color;
+    ctx.fillText(l.text, cx, py_ + 38 + i * 26);
+  });
+
+  // Blinking PRESS ↑ TO START
+  if (Math.floor(demoFrame / 28) % 2 === 0) {
+    ctx.fillStyle = '#FFD600';
+    ctx.font = 'bold 14px Courier New';
+    ctx.fillText('PRESS ↑ TO START', cx, py_ + panelH - 18);
+  }
+
+  ctx.textAlign = 'left';
+}
+
+// ─── Demo: update state machine ───────────────────────────────────────────────
+function updateDemo() {
+  demoFrame++;
+
+  if (demoPhase === 'act1_scroll') {
+    demoObj.x -= DEMO_SCROLL_SPD;
+    if (demoObj.x + DC_W / 2 <= W / 2) {
+      demoObj.x = W / 2 - DC_W / 2;
+      demoPhase = 'act1_bubble';
+      demoTimer = 0;
+    }
+
+  } else if (demoPhase === 'act1_bubble') {
+    demoTimer++;
+    if (demoTimer >= DEMO_BUBBLE_FRAMES) demoPhase = 'act1_resume';
+
+  } else if (demoPhase === 'act1_resume') {
+    demoObj.x -= DEMO_SCROLL_SPD;
+    if (demoObj.x + DC_W < 0) {
+      demoObj   = { type: 'block', x: W + 100 };
+      demoPhase = 'act2_scroll';
+    }
+
+  } else if (demoPhase === 'act2_scroll') {
+    demoObj.x -= DEMO_SCROLL_SPD;
+    if (demoObj.x + BW / 2 <= W / 2) {
+      demoObj.x = W / 2 - BW / 2;
+      demoPhase = 'act2_bubble';
+      demoTimer = 0;
+    }
+
+  } else if (demoPhase === 'act2_bubble') {
+    demoTimer++;
+    if (demoTimer >= DEMO_BUBBLE_FRAMES) demoPhase = 'act2_resume';
+
+  } else if (demoPhase === 'act2_resume') {
+    demoObj.x -= DEMO_SCROLL_SPD;
+    // Transition to act2_question is triggered by player hitting the block in checkDemoCollisions
+
+  } else if (demoPhase === 'act2_question') {
+    // Waiting for player to answer and click CONTINUE — demoQuestionContinue() sets ready + clears demoObj
+
+  }
+  // 'ready' phase: waiting for ↑ keypress (handled in keydown listener)
+}
+
+// ─── Demo: draw bubble / ready screen overlay ─────────────────────────────────
+function drawDemoOverlay() {
+  if (demoPhase === 'act1_bubble' && demoObj) {
+    drawBubble(
+      demoObj.x + DC_W / 2,
+      GROUND_Y - DC_H,
+      'Jump over these!',
+      [
+        { text: '↑ + → to arc jump over it', color: '#FFD600' },
+      ]
+    );
+  } else if (demoPhase === 'act2_bubble' && demoObj) {
+    drawBubble(
+      demoObj.x + BW / 2,
+      BLOCK_TOP,
+      'Hit these to open a question!',
+      [
+        { text: '↑ to jump into it from below',         color: '#FFD600' },
+        { text: '↑ + → to arc jump and land on top',    color: '#FFD600' },
+      ]
+    );
+  } else if (demoPhase === 'ready') {
+    drawReadyScreen();
+  }
+}
+
+// ─── Demo: collision checks ───────────────────────────────────────────────────
+function checkDemoCollisions() {
+  if (!demoObj) return;
+
+  // ── DC: flash only, never deduct a life ───────────────────────────────────
+  if (demoObj.type === 'dc' &&
+      (demoPhase === 'act1_scroll' || demoPhase === 'act1_bubble' || demoPhase === 'act1_resume')) {
+
+    const pLeft = px, pRight = px + PW, pTop = py - PH, pBottom = py;
+    const dcLeft = demoObj.x, dcRight = demoObj.x + DC_W, dcTop = GROUND_Y - DC_H;
+
+    if (pBottom > dcTop && pRight > dcLeft && pLeft < dcRight && pTop < GROUND_Y) {
+      flashAlpha = 0.45; flashColor = 'red';
+    }
+  }
+
+  // ── Block: only active during act2_resume — hit triggers question overlay ──
+  if (demoObj.type === 'block' && demoPhase === 'act2_resume') {
+    const pLeft = px, pRight = px + PW, pTop = py - PH;
+    if (pRight < demoObj.x + 4 || pLeft > demoObj.x + BW - 4) return;
+
+    // Hit from below
+    if (velY < 0 && pTop <= BLOCK_BOT && pTop >= BLOCK_TOP) {
+      velY = 1.5; velX = 0;
+      flashAlpha = 0.35; flashColor = 'cyan';
+      demoPhase = 'act2_question';
+      openDemoQuestion();
+    }
+    // Land on top
+    if (velY > 0 && py >= BLOCK_TOP && py <= BLOCK_TOP + 14 && pTop < BLOCK_TOP) {
+      py = BLOCK_TOP; velY = 0; velX = 0; onGround = false;
+      standingBlock = demoObj;
+      flashAlpha = 0.35; flashColor = 'cyan';
+      demoPhase = 'act2_question';
+      openDemoQuestion();
+    }
+  }
+}
+
+// ─── Collision: ? block (game mode only) ─────────────────────────────────────
+function checkBlocks() {
+  for (const obj of objects) {
+    if (obj.type !== 'block' || obj.used) continue;
+    const pLeft = px, pRight = px + PW, pTop = py - PH;
+    if (pRight < obj.x + 4 || pLeft > obj.x + BW - 4) continue;
+
+    if (velY < 0 && pTop <= BLOCK_BOT && pTop >= BLOCK_TOP) {
+      obj.used = true; velY = 1.5; velX = 0;
+      GameLogic.onQuestionBlockHit({ id: obj.x, qIdx });
+      break;
+    }
+    if (velY > 0 && py >= BLOCK_TOP && py <= BLOCK_TOP + 14 && pTop < BLOCK_TOP) {
+      obj.used = true; py = BLOCK_TOP; velY = 0; velX = 0; onGround = false;
+      standingBlock = obj;
+      GameLogic.onQuestionBlockHit({ id: obj.x, qIdx });
+      break;
+    }
+  }
+}
+
+// ─── Collision: datacenter (game mode only) ───────────────────────────────────
+function checkDatacenters() {
+  for (const obj of objects) {
+    if (obj.type !== 'dc' || obj.used) continue;
+
+    // Player hitbox — shrunk slightly on all sides for fair dino-game feel
+    const pLeft   = px + 6;
+    const pRight  = px + PW - 6;
+    const pTop    = py - PH + 4;
+    const pBottom = py;            // feet
+
+    // Datacenter hitbox — single solid rectangle, full height of center tower
+    const dcLeft   = obj.x;
+    const dcRight  = obj.x + DC_W;
+    const dcTop    = GROUND_Y - DC_H;
+    const dcBottom = GROUND_Y;
+
+    // Player is above the datacenter → they cleared it → do nothing
+    if (pBottom <= dcTop) continue;
+
+    // Simple AABB overlap — fires only if player body physically overlaps the box
+    if (pRight > dcLeft && pLeft < dcRight && pBottom > dcTop && pTop < dcBottom) {
+      obj.used = true;
+      GameLogic.onTreeHit();
+    }
+  }
+}
+
+// ─── Start game (from demo → play) ───────────────────────────────────────────
+function startGame() {
+  gameState     = 'PLAY';
+  scrolling     = true;
+  demoObj       = null;
+  standingBlock = null;
+  for (let i = 0; i < 4; i++) spawnOne();
+}
+
+// ─── Reset / restart (skips demo) ────────────────────────────────────────────
+function initState() {
+  px = PX; py = GROUND_Y; velX = 0; velY = 0; onGround = true; standingBlock = null;
+  objects = []; patIdx = 0; qIdx = 0; qAnswered = 0; flashAlpha = 0; scrolling = true;
+  rightHeld = false; downHeld = false;
+}
+
+function restart() {
+  GameLogic.reset();
+  initState();
+  gameState = 'PLAY';
+  for (let i = 0; i < 4; i++) spawnOne();
+  document.getElementById('gameover').classList.remove('on');
+  document.getElementById('results').classList.remove('on');
+  document.getElementById('q-overlay').classList.remove('on');
+}
+
+// ─── Main loop ────────────────────────────────────────────────────────────────
+function loop() {
+  requestAnimationFrame(loop);
+
+  // Background
+  ctx.fillStyle = '#0D1B2A';
+  ctx.fillRect(0, 0, W, H);
+  for (let y = 0; y < GROUND_Y; y += 3) {
+    ctx.fillStyle = `rgba(0,20,40,${0.03 + (y / GROUND_Y) * 0.04})`;
+    ctx.fillRect(0, y, W, 1);
+  }
+
+  // Physics (always — player can jump during demo)
+  if (standingBlock) {
+    const overlapX = (px + PW) > standingBlock.x + 4 && px < standingBlock.x + BW - 4;
+    if (overlapX) { py = BLOCK_TOP; velX = 0; velY = 0; }
+    else          { standingBlock = null; }
+  }
+  if (!onGround && !standingBlock) {
+    const effectiveGravity = (downHeld && !onGround) ? GRAVITY * 3 : GRAVITY;
+    velY += effectiveGravity;
+    px   += velX;
+    // Hard clamp: mascot never goes past 45% of canvas width while airborne
+    if (px > W * 0.45) px = W * 0.45;
+    py   += velY;
+    if (py >= GROUND_Y) {
+      py = GROUND_Y; velY = 0; velX = 0;
+      onGround = true;
+    }
+  }
+  // Drift back to home X after arc jump — 2px per frame, no teleport
+  if (onGround && px > PX) {
+    px -= 2;
+    if (px < PX) px = PX;
+  }
+
+  drawGround();
+
+  if (gameState === 'DEMO') {
+    if (demoObj) {
+      if (demoObj.type === 'dc')    drawDatacenter(demoObj.x);
+      if (demoObj.type === 'block') drawBlock(demoObj.x);
+    }
+    drawPlayer();
+    checkDemoCollisions();
+    updateDemo();
+    drawDemoOverlay();
+
+  } else {
+    // ── PLAY mode ──
+    const spd = rightHeld ? SCROLL_SPD * 2 : SCROLL_SPD;
+
+    if (scrolling) {
+      for (const o of objects) o.x -= spd;
+      if (!objects.length || objects[objects.length - 1].x < W * 0.6) spawnOne();
+    }
+
+    for (const o of objects) {
+      if (o.type === 'block' && !o.used && o.x + BW < 0) {
+        o.used = true;
+        GameLogic.onBlockMissed();
+      }
+    }
+
+    objects = objects.filter(o => o.x + (o.dcW || BW) > -80);
+
+    for (const o of objects) {
+      if (o.x > W + 20) continue;
+      if (o.type === 'block' && !o.used) drawBlock(o.x);
+      if (o.type === 'dc')               drawDatacenter(o.x);
+    }
+
+    drawPlayer();
+
+    if (scrolling) { checkBlocks(); checkDatacenters(); }
+
+    drawHUD();
+  }
+
+  // Flash (always)
+  if (flashAlpha > 0) {
+    ctx.fillStyle = flashColor === 'cyan'
+      ? `rgba(0,255,255,${flashAlpha})`
+      : `rgba(255,45,107,${flashAlpha})`;
+    ctx.fillRect(0, 0, W, H);
+    flashAlpha = Math.max(0, flashAlpha - 0.045);
+  }
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+initState();
+gameState  = 'DEMO';
+demoPhase  = 'act1_scroll';
+demoObj    = { type: 'dc', x: W + 100 };
+demoTimer  = 0;
+demoFrame  = 0;
+loop();
+</script>
+</body>
+</html>

@@ -496,13 +496,15 @@ const game = {
   // Tuning constants
   GRAVITY:    0.65,
   JUMP_FORCE: -16,    // negative = upward in CSS coords
-  MOVE_SPEED: 3.8,
+  BASE_SCROLL_SPEED: 3.0,
+  SPEED_MULTIPLIERS: [1.0, 1.05, 1.1, 1.2, 1.3],
+  ZONE_WIDTH: 2800,   // world-space width allocated per question
   BYTE_W:     88,
   BYTE_H:     66,
   GROUND_H:   40,
   BLOCK_W:    52,
   BLOCK_H:    52,
-  BLOCK_ELEV: 58,     // block bottom this many px above ground surface
+  BLOCK_ELEV: 58,     // low-height block: bottom this many px above ground
 
   init() {
     this._byteEl     = document.getElementById('byte-player');
@@ -528,13 +530,13 @@ const game = {
     this._onGround    = true;
     this._onBlock     = null;
     this._questionIdx = state.currentQuestionIndex || 0;
-    this._worldX      = this._questionIdx > 0
-      ? Math.max(0, this._questionIdx * 700 - 200)
-      : 0;
+    this._worldX      = this._questionIdx * this.ZONE_WIDTH;
     this._inJump     = false;
     this._animating  = false;
     this._overlayOpen = false;
     this._pendingCrushCb = null;
+    this._obstacles  = [];
+    this._obstacleHitCooldown = 0;
     this._keys = {};
 
     this._spawnStars();
@@ -601,33 +603,123 @@ const game = {
   _spawnBlocks() {
     if (!this._worldObjEl) return;
     this._worldObjEl.innerHTML = '';
-    this._blocks = [];
-    // 5 question clusters, each with 7 blocks (5 valid + 2 decoys)
-    // Cluster i starts at worldX = 400 + i*700; blocks spaced 65px apart
+    this._blocks    = [];
+    this._obstacles = [];
+
+    // Per-question config: obstacle count and spacing between items
+    const CONFIGS = [
+      { nObs: 3, spacing: 160 },  // Q1
+      { nObs: 3, spacing: 140 },  // Q2
+      { nObs: 4, spacing: 120 },  // Q3
+      { nObs: 4, spacing: 100 },  // Q4
+      { nObs: 5, spacing: 85  },  // Q5
+    ];
+
+    // Block bottom must be above player head (BYTE_H=66) for hit-from-below to work
+    const BLOCK_ELEVS = {
+      low:  80,   // block bottom 80px above ground (14px clearance above player head)
+      mid:  120,
+      high: 160,
+    };
+    const ELEV_KEYS = ['low', 'mid', 'high'];
+
+    // Obstacle heights derived from max jump height
+    // JUMP_FORCE=-16, GRAVITY=0.65 → peak rise = 16²/(2×0.65) ≈ 197px
+    const MAX_JUMP_HEIGHT = Math.round((this.JUMP_FORCE * this.JUMP_FORCE) / (2 * this.GRAVITY));
+    const GROUND_OBS_H    = Math.round(MAX_JUMP_HEIGHT * 0.60);  // ~118px, clearable with full jump
+    const FLOAT_OBS_Y     = Math.round(MAX_JUMP_HEIGHT * 0.75);  // ~148px above ground, safe to walk under
+    // Only two obstacle types: ground (must jump over) and floating (must NOT jump)
+    const OBS_TYPES = ['low', 'floating'];
+
+    // answerIds for 5 non-decoy blocks per question (cycles A→B→C→A→B)
+    const ANSWER_IDS = ['A', 'B', 'C', 'A', 'B'];
+
     for (let qi = 0; qi < 5; qi++) {
-      const baseX = 400 + qi * 700;
+      const cfg = CONFIGS[qi];
+
+      // Items start just off the right edge when this question's zone begins
+      let curX = qi * this.ZONE_WIDTH + this._worldW + 220;
+
+      // Build item list: 7 ? blocks + N ! obstacles, then shuffle
+      const items = [];
+
       // Pick 2 random decoy positions out of 7
-      const indices = [0, 1, 2, 3, 4, 5, 6];
-      for (let i = indices.length - 1; i > 0; i--) {
+      const bidx = [0,1,2,3,4,5,6];
+      for (let i = bidx.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
+        [bidx[i], bidx[j]] = [bidx[j], bidx[i]];
       }
-      const decoySet = new Set([indices[0], indices[1]]);
+      const decoySet = new Set([bidx[0], bidx[1]]);
+
+      let nonDecoyCount = 0;
       for (let i = 0; i < 7; i++) {
-        const el = document.createElement('div');
-        el.className = 'q-block-platform hidden';
-        el.textContent = '?';
-        this._worldObjEl.appendChild(el);
-        this._blocks.push({
-          worldX:      baseX + i * 65,
-          screenX:     baseX + i * 65,
-          el,
-          activated:   false,
-          used:        false,
-          questionIdx: qi,
-          isDecoy:     decoySet.has(i)
-        });
+        const isDecoy     = decoySet.has(i);
+        const elev        = ELEV_KEYS[Math.floor(Math.random() * 3)];
+        const blockCSSTop = this._groundY - BLOCK_ELEVS[elev] - this.BLOCK_H;
+        const answerId    = isDecoy ? null : ANSWER_IDS[nonDecoyCount++];
+        items.push({ kind: 'block', isDecoy, answerId, blockCSSTop });
       }
+
+      for (let i = 0; i < cfg.nObs; i++) {
+        const ot = OBS_TYPES[Math.floor(Math.random() * 2)];
+        let obsTop, obsH;
+        if (ot === 'low') {
+          // Ground obstacle: sits on floor, player must jump over
+          obsH   = GROUND_OBS_H;
+          obsTop = this._groundY - GROUND_OBS_H;
+        } else {
+          // Floating obstacle: mid-air at FLOAT_OBS_Y above ground, player must NOT jump
+          obsH   = this.BLOCK_H;
+          obsTop = this._groundY - FLOAT_OBS_Y - this.BLOCK_H;
+        }
+        items.push({ kind: 'obs', obsType: ot, obsTop, obsH });
+      }
+
+      // Shuffle item order for random layout each run
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+
+      items.forEach(item => {
+        const jitter = Math.floor(Math.random() * 30) - 15;  // ±15px
+        const x = curX + jitter;
+        curX += cfg.spacing + Math.floor(Math.random() * 30);
+
+        if (item.kind === 'block') {
+          const el = document.createElement('div');
+          el.className = 'q-block-platform hidden';
+          el.textContent = '?';
+          this._worldObjEl.appendChild(el);
+          this._blocks.push({
+            worldX:      x,
+            screenX:     x,
+            el,
+            activated:   false,
+            used:        false,
+            questionIdx: qi,
+            isDecoy:     item.isDecoy,
+            answerId:    item.answerId,
+            blockCSSTop: item.blockCSSTop,
+          });
+        } else {
+          const el = document.createElement('div');
+          el.className = 'exclaim-block hidden';
+          el.textContent = '!';
+          el.style.height = item.obsH + 'px';
+          this._worldObjEl.appendChild(el);
+          this._obstacles.push({
+            worldX:      x,
+            screenX:     x,
+            el,
+            used:        false,
+            questionIdx: qi,
+            obsType:     item.obsType,
+            obsTop:      item.obsTop,
+            obsH:        item.obsH,
+          });
+        }
+      });
     }
   },
 
@@ -693,7 +785,6 @@ const game = {
   },
 
   _updateBlocks() {
-    const blockCSSTop = this._groundY - this.BLOCK_ELEV - this.BLOCK_H;
     this._blocks.forEach(b => {
       b.screenX = b.worldX - this._worldX;
       const inCluster = b.questionIdx === this._questionIdx;
@@ -703,24 +794,57 @@ const game = {
       } else {
         b.el.classList.remove('hidden');
         b.el.style.left = b.screenX + 'px';
-        b.el.style.top  = blockCSSTop + 'px';
+        b.el.style.top  = b.blockCSSTop + 'px';
+      }
+    });
+  },
+
+  _updateObstacles() {
+    if (!this._obstacles) return;
+    this._obstacles.forEach(b => {
+      b.screenX = b.worldX - this._worldX;
+      const inZone   = b.questionIdx === this._questionIdx;
+      const onScreen = b.screenX > -this.BLOCK_W - 60 && b.screenX < this._worldW + 200;
+      if (!inZone || !onScreen || b.used) {
+        b.el.classList.add('hidden');
+      } else {
+        b.el.classList.remove('hidden');
+        b.el.style.left = b.screenX + 'px';
+        b.el.style.top  = b.obsTop + 'px';
       }
     });
   },
 
   _checkBlockCollision() {
-    const byteLeft  = Math.round(this._worldW * 0.20);
-    const byteRight = byteLeft + this.BYTE_W;
-    const blockCSSTop = this._groundY - this.BLOCK_ELEV - this.BLOCK_H;
+    const byteLeft    = Math.round(this._worldW * 0.20);
+    const byteRight   = byteLeft + this.BYTE_W;
+    const byteTop     = this._byteBottom - this.BYTE_H;
+    const prevByteTop = this._prevByteBottom - this.BYTE_H;
 
     let foundBlock = null;
     for (const b of this._blocks) {
       if (b.used || b.activated) continue;
-      const overlapX = byteRight > b.screenX + 8 && byteLeft < b.screenX + this.BLOCK_W - 8;
+      const blockCSSTop = b.blockCSSTop;
+      const blockBottom = blockCSSTop + this.BLOCK_H;
+      const overlapX    = byteRight > b.screenX + 8 && byteLeft < b.screenX + this.BLOCK_W - 8;
+
       if (overlapX) {
-        // Landing detection — exact condition from game-test.html:
-        // velY >= 0 (falling or peak), byteBottom crossed block top from above
-        const byteTop = this._byteBottom - this.BYTE_H;
+        // Hit-from-below: player rising (velY < 0 in CSS), head enters block from below.
+        // Condition 1: velY < 0 (moving upward in CSS coords where negative = up)
+        // Condition 2: player head is within the block's vertical range
+        if (this._byteVelY < 0 &&
+            byteTop <= blockBottom &&
+            byteTop >= blockCSSTop) {
+          this._byteVelY = 1.0;  // stop upward movement, gravity takes over
+          if (b.isDecoy) {
+            this._crushDecoy(b);
+          } else if (b.questionIdx === this._questionIdx) {
+            this._crushBlock(b);
+          }
+          break;
+        }
+
+        // Landing on top: player falling, land on block surface (physics only — no trigger)
         if (this._byteVelY >= 0 &&
             this._byteBottom >= blockCSSTop &&
             this._byteBottom <= blockCSSTop + this.BLOCK_H + 8 &&
@@ -731,15 +855,9 @@ const game = {
           this._onBlock    = b;
           this._inJump     = false;
           foundBlock = b;
-          if (!b.activated) {
-            if (b.isDecoy) {
-              this._crushDecoy(b);
-            } else if (b.questionIdx === this._questionIdx) {
-              this._crushBlock(b);
-            }
-          }
           break;
         }
+
         // Already standing on this block: keep locked
         if (this._onBlock === b) {
           this._byteBottom = blockCSSTop;
@@ -754,6 +872,38 @@ const game = {
     }
   },
 
+  _checkObstacleCollision() {
+    if (!this._obstacles || this._obstacleHitCooldown > 0) {
+      if (this._obstacleHitCooldown > 0) this._obstacleHitCooldown--;
+      return;
+    }
+    const byteLeft   = Math.round(this._worldW * 0.20) + 12;
+    const byteRight  = byteLeft + this.BYTE_W - 24;
+    const byteTop    = this._byteBottom - this.BYTE_H + 12;
+    const byteBottom = this._byteBottom - 4;
+
+    for (const b of this._obstacles) {
+      if (b.used || b.questionIdx !== this._questionIdx) continue;
+      const ol = b.screenX + 6;
+      const or_ = b.screenX + this.BLOCK_W - 6;
+      const ot = b.obsTop + 4;
+      const ob = b.obsTop + b.obsH - 4;
+      if (byteRight > ol && byteLeft < or_ && byteBottom > ot && byteTop < ob) {
+        b.used = true;
+        b.el.classList.add('hidden');
+        this._obstacleHitCooldown = 60;
+        this._showFlash('OUCH!');
+        playSound('damage');
+        this._setByteState('damage');
+        this._animating = true;
+        setTimeout(() => { this._animating = false; }, 650);
+        this._loseLife();
+        if (!this._running) return;
+        break;
+      }
+    }
+  },
+
   _loop() {
     if (!this._running) return;
     this._raf = requestAnimationFrame(() => this._loop());
@@ -765,11 +915,9 @@ const game = {
 
     this._prevByteBottom = this._byteBottom;
 
-    // Horizontal movement → world scroll
-    const movingRight = !!this._keys.ArrowRight;
-    const movingLeft  = !!this._keys.ArrowLeft;
-    if (movingRight) this._worldX += this.MOVE_SPEED;
-    else if (movingLeft) this._worldX = Math.max(0, this._worldX - this.MOVE_SPEED);
+    // Auto-scroll: world moves left at per-question speed
+    const mult = this.SPEED_MULTIPLIERS[this._questionIdx] || 1.0;
+    this._worldX += this.BASE_SCROLL_SPEED * mult;
 
     // Gravity + velocity (only when airborne)
     if (!this._onGround && this._onBlock === null) {
@@ -788,10 +936,11 @@ const game = {
       this._byteVelY   = 0;
     }
 
-    // Update block screen positions and collision
+    // Update block and obstacle screen positions
     this._updateBlocks();
+    this._updateObstacles();
 
-    // Scroll-off penalty: lose a life for each uncrushed block that exits left edge
+    // Scroll-off penalty: lose a life for each uncrushed ? block that exits left edge
     for (const b of this._blocks) {
       if (b.questionIdx !== this._questionIdx) continue;
       if (b.used || b.activated) continue;
@@ -804,6 +953,7 @@ const game = {
     }
 
     this._checkBlockCollision();
+    this._checkObstacleCollision();
 
     // Parallax: stars at 15%, clouds at 30%
     if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-(this._worldX * 0.15).toFixed(1)}px)`;
@@ -811,9 +961,7 @@ const game = {
 
     // Byte animation state (don't override jump/react anims)
     if (!this._animating && !this._inJump) {
-      const moving = movingRight || movingLeft;
-      if (moving) this._setByteState('walk');
-      else if (this._onGround || this._onBlock) this._setByteState('idle');
+      if (this._onGround || this._onBlock) this._setByteState('idle');
     }
 
     // Position Byte on screen
@@ -838,7 +986,7 @@ const game = {
   },
 
   walkForward(cb) {
-    // Close overlay, mark all blocks in current cluster used, resume game, then call cb
+    // Close overlay, mark all blocks/obstacles in current zone used, resume game, then call cb
     const qi = this._questionIdx;
     this._blocks.forEach(b => {
       if (b.questionIdx === qi) {
@@ -848,6 +996,14 @@ const game = {
         b.el.classList.add('hidden');
       }
     });
+    if (this._obstacles) {
+      this._obstacles.forEach(b => {
+        if (b.questionIdx === qi) {
+          b.used = true;
+          b.el.classList.add('hidden');
+        }
+      });
+    }
     this._onBlock     = null;
     this._animating   = false;
     this._overlayOpen = false;
@@ -879,6 +1035,16 @@ const game = {
     setTimeout(() => coin.remove(), 1000);
   },
 
+  _showFlash(text) {
+    const world = this._worldEl;
+    if (!world) return;
+    const el = document.createElement('div');
+    el.className = 'game-flash';
+    el.textContent = text;
+    world.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  },
+
   _crushDecoy(block) {
     block.activated = true;
     block.used      = true;
@@ -888,6 +1054,7 @@ const game = {
       block.el.classList.add('hidden');
     }, 400);
     playSound('damage');
+    this._showFlash('WRONG!');
     this._setByteState('damage');
     this._animating = true;
     setTimeout(() => { this._animating = false; }, 650);
