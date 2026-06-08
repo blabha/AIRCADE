@@ -20,18 +20,22 @@ const state = {
   ethicsAnswers: [],
   currentQuestions: [],
   currentQuestionIndex: 0,
-  persona: null
+  persona: null,
+  livesRemaining:    3,
+  isFirstGameOver:   false,
+  savedSessionData:  null,
+  resumeFromQuestion: 0
 };
 
 // ── DOM References ───────────────────────────
 const screens = {
   langselect: document.getElementById('screen-langselect'),
-  idle:     document.getElementById('screen-idle'),
-  userinfo: document.getElementById('screen-userinfo'),
-  ethics:   document.getElementById('screen-ethics'),
-  persona:  document.getElementById('screen-persona'),
-  greener:  document.getElementById('screen-greener'),
-  print:    document.getElementById('screen-print')
+  idle:       document.getElementById('screen-idle'),
+  userinfo:   document.getElementById('screen-userinfo'),
+  howtoplay:  document.getElementById('screen-howtoplay'),
+  ethics:     document.getElementById('screen-ethics'),
+  persona:    document.getElementById('screen-persona'),
+  print:      document.getElementById('screen-print')
 };
 
 const overlayInstructions = document.getElementById('overlay-instructions');
@@ -111,10 +115,10 @@ function _focusScreen(name) {
   }
   const focusMap = {
     langselect: 'btn-lang-en',
-    idle:    'btn-start',
-    persona: 'btn-go-green',
-    greener: 'btn-print',
-    print:   'btn-download',
+    idle:       'btn-start',
+    howtoplay:  'btn-howtoplay-start',
+    persona:    'btn-go-green',
+    print:      'btn-download',
   };
   const id = focusMap[name];
   if (id) {
@@ -131,6 +135,10 @@ function resetGameState() {
   state.currentQuestions     = [];
   state.currentQuestionIndex = 0;
   state.persona              = null;
+  state.livesRemaining       = 3;
+  state.isFirstGameOver      = false;
+  state.savedSessionData     = null;
+  state.resumeFromQuestion   = 0;
 }
 
 // ── Error Handling ───────────────────────────
@@ -434,6 +442,10 @@ document.getElementById('btn-userinfo-continue').addEventListener('click', () =>
   state.prompt   = pick.prompt;
   state.taskType = pick.taskType;
 
+  showScreen('howtoplay');
+});
+
+document.getElementById('btn-howtoplay-start').addEventListener('click', () => {
   startEthicsQuestions();
   showScreen('ethics');
 });
@@ -511,12 +523,14 @@ const game = {
     this._groundY    = this._worldH - this.GROUND_H;
 
     // Reset physics
-    this._byteBottom = this._groundY;
-    this._byteVelY   = 0;
-    this._onGround   = true;
-    this._onBlock    = null;
-    this._worldX     = 0;
-    this._questionIdx = 0;
+    this._byteBottom  = this._groundY;
+    this._byteVelY    = 0;
+    this._onGround    = true;
+    this._onBlock     = null;
+    this._questionIdx = state.currentQuestionIndex || 0;
+    this._worldX      = this._questionIdx > 0
+      ? Math.max(0, this._questionIdx * 700 - 200)
+      : 0;
     this._inJump     = false;
     this._animating  = false;
     this._overlayOpen = false;
@@ -588,14 +602,33 @@ const game = {
     if (!this._worldObjEl) return;
     this._worldObjEl.innerHTML = '';
     this._blocks = [];
-    // 5 blocks spaced ~420px apart in world space; first one ~380px from start
-    [400, 900, 1400, 1900, 2400].forEach((worldX, i) => {
-      const el = document.createElement('div');
-      el.className = 'q-block-platform hidden';
-      el.textContent = '?';
-      this._worldObjEl.appendChild(el);
-      this._blocks.push({ worldX, el, activated: false, used: false, screenX: worldX });
-    });
+    // 5 question clusters, each with 7 blocks (5 valid + 2 decoys)
+    // Cluster i starts at worldX = 400 + i*700; blocks spaced 65px apart
+    for (let qi = 0; qi < 5; qi++) {
+      const baseX = 400 + qi * 700;
+      // Pick 2 random decoy positions out of 7
+      const indices = [0, 1, 2, 3, 4, 5, 6];
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      const decoySet = new Set([indices[0], indices[1]]);
+      for (let i = 0; i < 7; i++) {
+        const el = document.createElement('div');
+        el.className = 'q-block-platform hidden';
+        el.textContent = '?';
+        this._worldObjEl.appendChild(el);
+        this._blocks.push({
+          worldX:      baseX + i * 65,
+          screenX:     baseX + i * 65,
+          el,
+          activated:   false,
+          used:        false,
+          questionIdx: qi,
+          isDecoy:     decoySet.has(i)
+        });
+      }
+    }
   },
 
   _bindInput() {
@@ -661,12 +694,11 @@ const game = {
 
   _updateBlocks() {
     const blockCSSTop = this._groundY - this.BLOCK_ELEV - this.BLOCK_H;
-    this._blocks.forEach((b, i) => {
+    this._blocks.forEach(b => {
       b.screenX = b.worldX - this._worldX;
-      // Show only current and next block (progressive reveal)
-      const inProgressWindow = (i === this._questionIdx || i === this._questionIdx + 1);
-      const onScreen = b.screenX > -this.BLOCK_W - 120 && b.screenX < this._worldW + 240;
-      if (!inProgressWindow || !onScreen) {
+      const inCluster = b.questionIdx === this._questionIdx;
+      const onScreen  = b.screenX > -this.BLOCK_W - 60 && b.screenX < this._worldW + 200;
+      if (!inCluster || !onScreen || b.used) {
         b.el.classList.add('hidden');
       } else {
         b.el.classList.remove('hidden');
@@ -699,9 +731,12 @@ const game = {
           this._onBlock    = b;
           this._inJump     = false;
           foundBlock = b;
-          if (!b.activated && b === this._blocks[this._questionIdx]) {
-            console.log('BLOCK HIT');
-            this._crushBlock(b);
+          if (!b.activated) {
+            if (b.isDecoy) {
+              this._crushDecoy(b);
+            } else if (b.questionIdx === this._questionIdx) {
+              this._crushBlock(b);
+            }
           }
           break;
         }
@@ -755,6 +790,19 @@ const game = {
 
     // Update block screen positions and collision
     this._updateBlocks();
+
+    // Scroll-off penalty: lose a life for each uncrushed block that exits left edge
+    for (const b of this._blocks) {
+      if (b.questionIdx !== this._questionIdx) continue;
+      if (b.used || b.activated) continue;
+      if (b.screenX + this.BLOCK_W < 0) {
+        b.used = true;
+        b.el.classList.add('hidden');
+        this._loseLife();
+        if (!this._running) return;
+      }
+    }
+
     this._checkBlockCollision();
 
     // Parallax: stars at 15%, clouds at 30%
@@ -790,13 +838,16 @@ const game = {
   },
 
   walkForward(cb) {
-    // Close overlay, mark block used, resume game, then call cb
-    const block = this._blocks[this._questionIdx];
-    if (block) {
-      block.used = true;
-      block.el.classList.remove('block-activated');
-      block.el.classList.add('block-used');
-    }
+    // Close overlay, mark all blocks in current cluster used, resume game, then call cb
+    const qi = this._questionIdx;
+    this._blocks.forEach(b => {
+      if (b.questionIdx === qi) {
+        b.used = true;
+        b.el.classList.remove('block-activated');
+        b.el.classList.add('block-used');
+        b.el.classList.add('hidden');
+      }
+    });
     this._onBlock     = null;
     this._animating   = false;
     this._overlayOpen = false;
@@ -828,6 +879,31 @@ const game = {
     setTimeout(() => coin.remove(), 1000);
   },
 
+  _crushDecoy(block) {
+    block.activated = true;
+    block.used      = true;
+    block.el.classList.add('block-activated');
+    setTimeout(() => {
+      block.el.classList.remove('block-activated');
+      block.el.classList.add('hidden');
+    }, 400);
+    playSound('damage');
+    this._setByteState('damage');
+    this._animating = true;
+    setTimeout(() => { this._animating = false; }, 650);
+    this._loseLife();
+  },
+
+  _loseLife() {
+    state.livesRemaining = Math.max(0, state.livesRemaining - 1);
+    updateLivesDisplay();
+    if (state.livesRemaining <= 0) {
+      this._running = false;
+      if (this._raf) cancelAnimationFrame(this._raf);
+      setTimeout(() => showGameOver(), 350);
+    }
+  },
+
   stop() {
     this._running = false;
     if (this._raf) cancelAnimationFrame(this._raf);
@@ -842,10 +918,15 @@ function startEthicsQuestions() {
   state.staminaLevel         = 3;
   state.currentQuestions     = selectQuestionsFromBank(state.userAge, state.userExpertise);
   state.currentQuestionIndex = 0;
+  state.livesRemaining       = 3;
+  state.isFirstGameOver      = false;
+  state.savedSessionData     = null;
+  state.resumeFromQuestion   = 0;
 
   updateStaminaBars(3);
-  game.stop(); // cancel any previous loop before re-init
-  game.init(); // defers via setTimeout if screen not yet visible
+  updateLivesDisplay();
+  game.stop();
+  game.init();
   renderQuestion();
 }
 
@@ -1042,9 +1123,91 @@ function showPersonaScreen() {
 }
 
 document.getElementById('btn-go-green').addEventListener('click', () => {
-  populateGreenerScreen();
-  showScreen('greener');
-  Byte.setState('greener');
+  state.sessionId = generateSessionId();
+  populateTicketCard(state);
+  _saveSessionToSupabase(state);
+  showScreen('print');
+  Byte.setState('print');
+  playSound('print');
+});
+
+// ── Lives display ────────────────────────────
+function updateLivesDisplay() {
+  const hearts = document.querySelectorAll('#screen-ethics .game-heart');
+  hearts.forEach((h, i) => {
+    h.classList.toggle('heart-lost', i >= state.livesRemaining);
+  });
+}
+
+// ── Game Over overlay ────────────────────────
+function showGameOver() {
+  state.resumeFromQuestion = state.currentQuestionIndex;
+  state.savedSessionData = {
+    ethicsAnswers: [...state.ethicsAnswers],
+    score:         state.score,
+    staminaLevel:  state.staminaLevel
+  };
+
+  const overlay = document.getElementById('gameover-overlay');
+  if (!overlay) return;
+
+  const qEl = document.getElementById('gameover-question');
+  if (qEl) qEl.textContent = state.currentQuestionIndex + 1;
+
+  const playAgainBtn   = document.getElementById('btn-gameover-playagain');
+  const retryCaption   = document.getElementById('gameover-retry-caption');
+  if (state.isFirstGameOver) {
+    if (playAgainBtn)  playAgainBtn.classList.add('hidden');
+    if (retryCaption)  retryCaption.classList.remove('hidden');
+  } else {
+    if (playAgainBtn)  playAgainBtn.classList.remove('hidden');
+    if (retryCaption)  retryCaption.classList.add('hidden');
+  }
+
+  overlay.classList.remove('hidden');
+  if (playAgainBtn && !state.isFirstGameOver) playAgainBtn.focus();
+}
+
+document.getElementById('btn-gameover-playagain').addEventListener('click', () => {
+  document.getElementById('gameover-overlay').classList.add('hidden');
+
+  state.isFirstGameOver      = true;
+  state.livesRemaining       = 3;
+  state.currentQuestionIndex = state.resumeFromQuestion;
+
+  if (state.savedSessionData) {
+    state.ethicsAnswers = [...state.savedSessionData.ethicsAnswers];
+    state.score         = state.savedSessionData.score;
+    state.staminaLevel  = state.savedSessionData.staminaLevel;
+  }
+
+  updateStaminaBars(state.staminaLevel);
+  updateLivesDisplay();
+
+  game.stop();
+  game.init();
+  renderQuestion();
+});
+
+document.getElementById('btn-gameover-backtostart').addEventListener('click', () => {
+  document.getElementById('gameover-overlay').classList.add('hidden');
+  game.stop();
+  resetGameState();
+  state.prompt        = '';
+  state.taskType      = 'text-short';
+  state.metrics       = null;
+  state.sessionId     = generateSessionId();
+  state.userName      = '';
+  state.userAge       = '';
+  state.userExpertise = '';
+  state.userGender    = '';
+  document.getElementById('user-name').value      = '';
+  document.getElementById('user-age').value       = '';
+  document.getElementById('user-expertise').value = '';
+  document.getElementById('user-gender').value    = '';
+  updateBytePosition(0);
+  showScreen('idle');
+  Byte.setState('idle');
 });
 
 // ── SCREEN 3: PERSONALIZED TIP ───────────────

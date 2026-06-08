@@ -207,6 +207,52 @@
   </section>
 
   <!-- ═══════════════════════════════════════════
+       SCREEN 1.05: HOW TO PLAY
+  ═══════════════════════════════════════════ -->
+  <section id="screen-howtoplay" class="screen hidden">
+    <div class="howtoplay-content">
+      <h2 class="pixel-font howtoplay-title" data-i18n="ui.howToPlay">HOW TO PLAY</h2>
+      <div class="howtoplay-rows">
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">← →</span> to move</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">↑ SPACE</span> to jump</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">↓</span> (airborne) to crush a block</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">?</span> blocks hide answers — crush the one you choose</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">!</span> extra decoy blocks appear — don't let any block scroll off or you lose a life</div>
+      </div>
+      <div class="howtoplay-lives">
+        <div class="howtoplay-hearts" aria-hidden="true">
+          <svg class="game-heart" viewBox="0 0 8 7" width="28" height="25" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+            <rect x="1" y="0" width="2" height="1" fill="#ff006e"/><rect x="5" y="0" width="2" height="1" fill="#ff006e"/>
+            <rect x="0" y="1" width="4" height="1" fill="#ff006e"/><rect x="4" y="1" width="4" height="1" fill="#ff006e"/>
+            <rect x="0" y="2" width="8" height="2" fill="#ff006e"/>
+            <rect x="1" y="4" width="6" height="1" fill="#ff006e"/>
+            <rect x="2" y="5" width="4" height="1" fill="#ff006e"/>
+            <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
+          </svg>
+          <svg class="game-heart" viewBox="0 0 8 7" width="28" height="25" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+            <rect x="1" y="0" width="2" height="1" fill="#ff006e"/><rect x="5" y="0" width="2" height="1" fill="#ff006e"/>
+            <rect x="0" y="1" width="4" height="1" fill="#ff006e"/><rect x="4" y="1" width="4" height="1" fill="#ff006e"/>
+            <rect x="0" y="2" width="8" height="2" fill="#ff006e"/>
+            <rect x="1" y="4" width="6" height="1" fill="#ff006e"/>
+            <rect x="2" y="5" width="4" height="1" fill="#ff006e"/>
+            <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
+          </svg>
+          <svg class="game-heart" viewBox="0 0 8 7" width="28" height="25" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+            <rect x="1" y="0" width="2" height="1" fill="#ff006e"/><rect x="5" y="0" width="2" height="1" fill="#ff006e"/>
+            <rect x="0" y="1" width="4" height="1" fill="#ff006e"/><rect x="4" y="1" width="4" height="1" fill="#ff006e"/>
+            <rect x="0" y="2" width="8" height="2" fill="#ff006e"/>
+            <rect x="1" y="4" width="6" height="1" fill="#ff006e"/>
+            <rect x="2" y="5" width="4" height="1" fill="#ff006e"/>
+            <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
+          </svg>
+        </div>
+        <div class="pixel-font howtoplay-lives-caption" data-i18n="ui.livesCaption">You have 3 lives. Don't let blocks scroll off screen!</div>
+      </div>
+      <button class="btn btn-primary btn-large" id="btn-howtoplay-start" data-i18n="ui.letsGo">LET'S GO! →</button>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
        SCREEN 1.1: ETHICS QUESTIONS
   ═══════════════════════════════════════════ -->
   <section id="screen-ethics" class="screen hidden">
@@ -293,27 +339,6 @@
           <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
         </svg>
         <button class="game-pause-btn pixel-font" id="btn-pause" aria-label="Pause game">❚❚</button>
-      </div>
-
-      <!-- Floating jump hint near Byte -->
-      <div class="game-jump-hint" aria-hidden="true">
-        <span class="pixel-font jump-hint-line">ARROW UP</span>
-        <span class="pixel-font jump-hint-or">OR</span>
-        <kbd class="kbd-key pixel-font">SPACE</kbd>
-        <span class="pixel-font jump-hint-line">TO JUMP</span>
-        <svg class="jump-arc" width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 5 35 C 5 8, 33 8, 33 4" stroke="#00f5ff" stroke-width="1.5" stroke-dasharray="3 3" stroke-linecap="round"/>
-          <polyline points="28,1 33,4 30,9" stroke="#00f5ff" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-        </svg>
-      </div>
-
-      <!-- Floating crush hint near blocks -->
-      <div class="game-crush-hint" aria-hidden="true">
-        <span class="pixel-font crush-hint-text">CRUSH<br>TO ANSWER!</span>
-        <svg class="crush-arc" width="72" height="52" viewBox="0 0 72 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 6 48 C 6 16, 52 10, 66 8" stroke="#ff006e" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round"/>
-          <polyline points="61,4 66,8 62,13" stroke="#ff006e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-        </svg>
       </div>
 
       <!-- Neon brick ground -->
@@ -526,7 +551,7 @@
         <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
 
         <div class="ticket-section">
-          <div class="ticket-label">YOUR GO GREEN TIP:</div>
+          <div class="ticket-label">YOUR TIP:</div>
           <div class="ticket-tip" id="ticket-tip">—</div>
         </div>
         <div class="ticket-divider">· · · · · · · · · · · · · · · · · · · ·</div>
@@ -582,6 +607,22 @@
       </div>
       <div class="thankyou-msg pixel-font" id="thankyou-msg">THANK YOU! SEE YOU NEXT TIME! 👾</div>
       <div class="thankyou-countdown pixel-font" id="thankyou-countdown">Resetting in 3...</div>
+    </div>
+  </div>
+
+  <!-- Game Over overlay (shown when livesRemaining reaches 0) -->
+  <div class="gameover-overlay hidden" id="gameover-overlay" role="dialog" aria-modal="true" aria-label="Game Over">
+    <div class="scanlines"></div>
+    <div class="gameover-content">
+      <div class="gameover-title pixel-font" data-i18n="ui.gameOverTitle">GAME OVER</div>
+      <div class="gameover-sub pixel-font">
+        <span data-i18n="ui.gameOverSub">You lost all your lives on Q</span> <span id="gameover-question">?</span> / 5
+      </div>
+      <div class="gameover-buttons">
+        <button class="btn btn-primary btn-large" id="btn-gameover-playagain" data-i18n="ui.playAgainBtn">▶ PLAY AGAIN</button>
+        <button class="btn btn-ghost btn-large" id="btn-gameover-backtostart" data-i18n="ui.backToStartBtn">↩ BACK TO START</button>
+      </div>
+      <div class="gameover-retry-caption pixel-font hidden" id="gameover-retry-caption" data-i18n="ui.noMoreRetries">No more retries — start fresh!</div>
     </div>
   </div>
 
