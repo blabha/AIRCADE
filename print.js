@@ -67,7 +67,7 @@ function populateTicketCard(state) {
   // Score + stamina level
   const scoreEl   = document.getElementById('ticket-score');
   const staminaEl = document.getElementById('ticket-stamina');
-  if (scoreEl)   scoreEl.textContent   = (score || 0) + '/20';
+  if (scoreEl)   scoreEl.textContent   = (score || 0) + '/35';
   if (staminaEl) staminaEl.textContent = 'Final Stamina: ' + (staminaLevel || 3) + '/5';
 
   // Daily footprint per stamina level

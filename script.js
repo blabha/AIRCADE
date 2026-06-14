@@ -446,8 +446,8 @@ document.getElementById('btn-userinfo-continue').addEventListener('click', () =>
 });
 
 document.getElementById('btn-howtoplay-start').addEventListener('click', () => {
-  startEthicsQuestions();
   showScreen('ethics');
+  setTimeout(() => startDemo(), 400);
 });
 
 // ── SCREEN 1.1: ETHICS QUESTIONS ─────────────
@@ -469,9 +469,16 @@ const game = {
   // Physics — CSS coords (Y increases downward)
   _byteBottom:     0,   // CSS Y of Byte's bottom edge
   _byteVelY:       0,   // positive = falling, negative = rising
+  _byteX:          0,   // screen X of Byte's left edge
+  _homeX:          0,   // home screen X (set in init, ~20% of worldW)
+  _byteVelX:       0,   // horizontal velocity (arc jump)
   _prevByteBottom: 0,
   _onGround:       true,
   _onBlock:        null,
+
+  // Arc-jump input tracking
+  _rightHeld:      false,
+  _rightPressedAt: 0,
 
   // World state
   _worldX:   0,         // how far world has scrolled (px)
@@ -493,17 +500,28 @@ const game = {
   _overlayOpen: false,
   _pendingCrushCb: null,
 
+  // Demo mode
+  _demoMode:  false,
+  _demoPhase: null,   // 'act1_scroll'|'act1_bubble'|'act1_resume'|'act2_scroll'|'act2_bubble'|'act2_question'|'ready'
+  _demoBubbleFrames: 0,
+  _demoDCEl:  null,
+  _demoBlockEl: null,
+  _demoDone:  false,  // never replay after first run
+
   // Tuning constants
-  GRAVITY:    0.65,
-  JUMP_FORCE: -16,    // negative = upward in CSS coords
+  GRAVITY:    0.6,
+  JUMP_FORCE: -12,    // negative = upward in CSS coords
+  JUMP_VX:    4.5,    // horizontal velocity for arc jump
   BASE_SCROLL_SPEED: 3.0,
   SPEED_MULTIPLIERS: [1.0, 1.05, 1.1, 1.2, 1.3],
-  ZONE_WIDTH: 2800,   // world-space width allocated per question
+  ZONE_WIDTH: 8000,   // world-space width allocated per question (14 objects × avg 500px gap)
   BYTE_W:     88,
   BYTE_H:     66,
   GROUND_H:   40,
   BLOCK_W:    52,
   BLOCK_H:    52,
+  DC_W:       80,
+  DC_H:       55,
   BLOCK_ELEV: 58,     // low-height block: bottom this many px above ground
 
   init() {
@@ -525,10 +543,15 @@ const game = {
     this._groundY    = this._worldH - this.GROUND_H;
 
     // Reset physics
+    this._homeX       = Math.round(this._worldW * 0.20);
+    this._byteX       = this._homeX;
+    this._byteVelX    = 0;
     this._byteBottom  = this._groundY;
     this._byteVelY    = 0;
     this._onGround    = true;
     this._onBlock     = null;
+    this._rightHeld      = false;
+    this._rightPressedAt = 0;
     this._questionIdx = state.currentQuestionIndex || 0;
     this._worldX      = this._questionIdx * this.ZONE_WIDTH;
     this._inJump     = false;
@@ -541,7 +564,11 @@ const game = {
 
     this._spawnStars();
     this._spawnClouds();
-    this._spawnBlocks();
+    if (this._demoMode) {
+      this._spawnDemoObjects();
+    } else {
+      this._spawnBlocks();
+    }
     this._bindInput();
     this._positionByte();
     this._setByteState('idle');
@@ -606,44 +633,14 @@ const game = {
     this._blocks    = [];
     this._obstacles = [];
 
-    // Per-question config: obstacle count and spacing between items
-    const CONFIGS = [
-      { nObs: 3, spacing: 160 },  // Q1
-      { nObs: 3, spacing: 140 },  // Q2
-      { nObs: 4, spacing: 120 },  // Q3
-      { nObs: 4, spacing: 100 },  // Q4
-      { nObs: 5, spacing: 85  },  // Q5
-    ];
-
-    // Block bottom must be above player head (BYTE_H=66) for hit-from-below to work
-    const BLOCK_ELEVS = {
-      low:  80,   // block bottom 80px above ground (14px clearance above player head)
-      mid:  120,
-      high: 160,
-    };
-    const ELEV_KEYS = ['low', 'mid', 'high'];
-
-    // Obstacle heights derived from max jump height
-    // JUMP_FORCE=-16, GRAVITY=0.65 → peak rise = 16²/(2×0.65) ≈ 197px
-    const MAX_JUMP_HEIGHT = Math.round((this.JUMP_FORCE * this.JUMP_FORCE) / (2 * this.GRAVITY));
-    const GROUND_OBS_H    = Math.round(MAX_JUMP_HEIGHT * 0.60);  // ~118px, clearable with full jump
-    const FLOAT_OBS_Y     = Math.round(MAX_JUMP_HEIGHT * 0.75);  // ~148px above ground, safe to walk under
-    // Only two obstacle types: ground (must jump over) and floating (must NOT jump)
-    const OBS_TYPES = ['low', 'floating'];
-
     // answerIds for 5 non-decoy blocks per question (cycles A→B→C→A→B)
     const ANSWER_IDS = ['A', 'B', 'C', 'A', 'B'];
 
     for (let qi = 0; qi < 5; qi++) {
-      const cfg = CONFIGS[qi];
-
       // Items start just off the right edge when this question's zone begins
       let curX = qi * this.ZONE_WIDTH + this._worldW + 220;
 
-      // Build item list: 7 ? blocks + N ! obstacles, then shuffle
-      const items = [];
-
-      // Pick 2 random decoy positions out of 7
+      // 7 ? blocks: pick 2 random decoy indices
       const bidx = [0,1,2,3,4,5,6];
       for (let i = bidx.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -652,41 +649,33 @@ const game = {
       const decoySet = new Set([bidx[0], bidx[1]]);
 
       let nonDecoyCount = 0;
+      const blockItems = [];
       for (let i = 0; i < 7; i++) {
         const isDecoy     = decoySet.has(i);
-        const elev        = ELEV_KEYS[Math.floor(Math.random() * 3)];
-        const blockCSSTop = this._groundY - BLOCK_ELEVS[elev] - this.BLOCK_H;
-        const answerId    = isDecoy ? null : ANSWER_IDS[nonDecoyCount++];
-        items.push({ kind: 'block', isDecoy, answerId, blockCSSTop });
+        const highBlock   = Math.random() < 0.5;
+        const blockCSSTop = highBlock
+          ? this._groundY - this.BLOCK_H - 110
+          : this._groundY - this.BLOCK_H;
+        const answerId = isDecoy ? null : ANSWER_IDS[nonDecoyCount++];
+        blockItems.push({ isDecoy, answerId, blockCSSTop });
       }
 
-      for (let i = 0; i < cfg.nObs; i++) {
-        const ot = OBS_TYPES[Math.floor(Math.random() * 2)];
-        let obsTop, obsH;
-        if (ot === 'low') {
-          // Ground obstacle: sits on floor, player must jump over
-          obsH   = GROUND_OBS_H;
-          obsTop = this._groundY - GROUND_OBS_H;
-        } else {
-          // Floating obstacle: mid-air at FLOAT_OBS_Y above ground, player must NOT jump
-          obsH   = this.BLOCK_H;
-          obsTop = this._groundY - FLOAT_OBS_Y - this.BLOCK_H;
-        }
-        items.push({ kind: 'obs', obsType: ot, obsTop, obsH });
-      }
+      // Strictly alternating: dc, block, dc, block ... (first = dc)
+      // 7 blocks → 7 DCs interspersed
+      const PATTERN = ['dc', 'block'];
+      let patIdx = 0;
+      let blockIdx = 0;
 
-      // Shuffle item order for random layout each run
-      for (let i = items.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [items[i], items[j]] = [items[j], items[i]];
-      }
+      const totalItems = 14; // 7 dc + 7 block
+      for (let i = 0; i < totalItems; i++) {
+        const kind = PATTERN[patIdx % 2];
+        patIdx++;
 
-      items.forEach(item => {
-        const jitter = Math.floor(Math.random() * 30) - 15;  // ±15px
-        const x = curX + jitter;
-        curX += cfg.spacing + Math.floor(Math.random() * 30);
+        const x = curX;
+        curX += 300 + Math.random() * 350;
 
-        if (item.kind === 'block') {
+        if (kind === 'block') {
+          const item = blockItems[blockIdx++];
           const el = document.createElement('div');
           el.className = 'q-block-platform hidden';
           el.textContent = '?';
@@ -703,23 +692,25 @@ const game = {
             blockCSSTop: item.blockCSSTop,
           });
         } else {
-          const el = document.createElement('div');
-          el.className = 'exclaim-block hidden';
-          el.textContent = '!';
-          el.style.height = item.obsH + 'px';
-          this._worldObjEl.appendChild(el);
+          const canvas = document.createElement('canvas');
+          canvas.width  = this.DC_W;
+          canvas.height = this.DC_H;
+          canvas.className = 'hidden';
+          canvas.style.position = 'absolute';
+          canvas.style.imageRendering = 'pixelated';
+          this._drawDatacenterCanvas(canvas);
+          this._worldObjEl.appendChild(canvas);
           this._obstacles.push({
             worldX:      x,
             screenX:     x,
-            el,
+            el:          canvas,
             used:        false,
             questionIdx: qi,
-            obsType:     item.obsType,
-            obsTop:      item.obsTop,
-            obsH:        item.obsH,
+            obsTop:      this._groundY - this.DC_H,
+            obsH:        this.DC_H,
           });
         }
-      });
+      }
     }
   },
 
@@ -736,11 +727,30 @@ const game = {
       const nav = ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '];
       if (nav.includes(e.key)) e.preventDefault();
       this._keys[e.key] = true;
+      // Track → timestamp before jump decision so 150ms co-press window works in any order
+      if (e.key === 'ArrowRight') {
+        this._rightHeld = true;
+        this._rightPressedAt = performance.now();
+      }
+      if ((e.key === 'ArrowUp' || e.key === ' ') && this._demoMode && this._demoPhase === 'ready') {
+        this._hideDemoReady();
+        this._demoMode  = false;
+        this._demoDone  = true;
+        this._demoPhase = null;
+        this.stop();
+        startEthicsQuestions();
+        return;
+      }
       if ((e.key === 'ArrowUp' || e.key === ' ') && (this._onGround || this._onBlock)) {
-        this._startJump();
+        const timeSinceRight = performance.now() - this._rightPressedAt;
+        const isArcJump = this._rightHeld || timeSinceRight < 150;
+        this._startJump(isArcJump);
       }
     };
-    this._keyUpHandler = (e) => { this._keys[e.key] = false; };
+    this._keyUpHandler = (e) => {
+      this._keys[e.key] = false;
+      if (e.key === 'ArrowRight') this._rightHeld = false;
+    };
 
     document.addEventListener('keydown', this._keyHandler);
     document.addEventListener('keyup',   this._keyUpHandler);
@@ -748,11 +758,12 @@ const game = {
 
   // Keyboard-only cabinet: touch and mouse handlers removed
 
-  _startJump() {
-    this._byteVelY = this.JUMP_FORCE;
-    this._onGround = false;
-    this._onBlock  = null;
-    this._inJump   = true;
+  _startJump(isArcJump) {
+    this._byteVelY  = this.JUMP_FORCE;
+    this._byteVelX  = isArcJump ? this.JUMP_VX : 0;
+    this._onGround  = false;
+    this._onBlock   = null;
+    this._inJump    = true;
     this._setByteState('jump');
   },
 
@@ -779,8 +790,7 @@ const game = {
 
   _positionByte() {
     if (!this._byteEl) return;
-    const screenX = Math.round(this._worldW * 0.20);
-    this._byteEl.style.left = screenX + 'px';
+    this._byteEl.style.left = Math.round(this._byteX) + 'px';
     this._byteEl.style.top  = (this._byteBottom - this.BYTE_H) + 'px';
   },
 
@@ -804,7 +814,7 @@ const game = {
     this._obstacles.forEach(b => {
       b.screenX = b.worldX - this._worldX;
       const inZone   = b.questionIdx === this._questionIdx;
-      const onScreen = b.screenX > -this.BLOCK_W - 60 && b.screenX < this._worldW + 200;
+      const onScreen = b.screenX > -this.DC_W - 60 && b.screenX < this._worldW + 200;
       if (!inZone || !onScreen || b.used) {
         b.el.classList.add('hidden');
       } else {
@@ -816,7 +826,7 @@ const game = {
   },
 
   _checkBlockCollision() {
-    const byteLeft    = Math.round(this._worldW * 0.20);
+    const byteLeft    = Math.round(this._byteX);
     const byteRight   = byteLeft + this.BYTE_W;
     const byteTop     = this._byteBottom - this.BYTE_H;
     const prevByteTop = this._prevByteBottom - this.BYTE_H;
@@ -844,17 +854,23 @@ const game = {
           break;
         }
 
-        // Landing on top: player falling, land on block surface (physics only — no trigger)
+        // Landing on top: player falling, land on block surface + trigger question
         if (this._byteVelY >= 0 &&
             this._byteBottom >= blockCSSTop &&
             this._byteBottom <= blockCSSTop + this.BLOCK_H + 8 &&
             byteTop < blockCSSTop) {
           this._byteBottom = blockCSSTop;
           this._byteVelY   = 0;
+          this._byteVelX   = 0;
           this._onGround   = false;
           this._onBlock    = b;
           this._inJump     = false;
           foundBlock = b;
+          if (b.isDecoy) {
+            this._crushDecoy(b);
+          } else if (b.questionIdx === this._questionIdx) {
+            this._crushBlock(b);
+          }
           break;
         }
 
@@ -877,17 +893,18 @@ const game = {
       if (this._obstacleHitCooldown > 0) this._obstacleHitCooldown--;
       return;
     }
-    const byteLeft   = Math.round(this._worldW * 0.20) + 12;
-    const byteRight  = byteLeft + this.BYTE_W - 24;
-    const byteTop    = this._byteBottom - this.BYTE_H + 12;
-    const byteBottom = this._byteBottom - 4;
+    const byteLeft   = Math.round(this._byteX) + 6;
+    const byteRight  = Math.round(this._byteX) + this.BYTE_W - 6;
+    const byteTop    = this._byteBottom - this.BYTE_H + 4;
+    const byteBottom = this._byteBottom;
 
     for (const b of this._obstacles) {
       if (b.used || b.questionIdx !== this._questionIdx) continue;
-      const ol = b.screenX + 6;
-      const or_ = b.screenX + this.BLOCK_W - 6;
-      const ot = b.obsTop + 4;
-      const ob = b.obsTop + b.obsH - 4;
+      if (byteBottom <= b.obsTop) continue;  // player cleared the top — no collision
+      const ol  = b.screenX;
+      const or_ = b.screenX + this.DC_W;
+      const ot  = b.obsTop;
+      const ob  = this._groundY;
       if (byteRight > ol && byteLeft < or_ && byteBottom > ot && byteTop < ob) {
         b.used = true;
         b.el.classList.add('hidden');
@@ -912,6 +929,7 @@ const game = {
 
   _update() {
     if (this._overlayOpen) return;
+    if (this._demoMode) { this._updateDemo(); return; }
 
     this._prevByteBottom = this._byteBottom;
 
@@ -921,8 +939,11 @@ const game = {
 
     // Gravity + velocity (only when airborne)
     if (!this._onGround && this._onBlock === null) {
-      this._byteVelY    += this.GRAVITY;
-      this._byteBottom  += this._byteVelY;
+      this._byteVelY   += this.GRAVITY;
+      this._byteBottom += this._byteVelY;
+      this._byteX      += this._byteVelX;
+      // Hard clamp: Byte never goes past 45% of screen width while airborne
+      if (this._byteX > this._worldW * 0.45) this._byteX = this._worldW * 0.45;
     }
 
     // Ground clamp
@@ -934,6 +955,13 @@ const game = {
       }
       this._byteBottom = this._groundY;
       this._byteVelY   = 0;
+      this._byteVelX   = 0;
+    }
+
+    // Drift back to home X after arc jump — 2px per frame, no snap
+    if (this._onGround && this._byteX > this._homeX) {
+      this._byteX -= 2;
+      if (this._byteX < this._homeX) this._byteX = this._homeX;
     }
 
     // Update block and obstacle screen positions
@@ -1011,7 +1039,7 @@ const game = {
     if (document.activeElement && document.activeElement !== document.body) {
       document.activeElement.blur();
     }
-    setTimeout(() => { if (cb) cb(); }, 120);
+    if (cb) cb();
   },
 
   react(answerType) {
@@ -1028,7 +1056,7 @@ const game = {
     const coin = document.createElement('div');
     coin.className = 'fly-coin';
     coin.textContent = '★';
-    const screenX = Math.round(this._worldW * 0.20);
+    const screenX = Math.round(this._byteX);
     coin.style.left   = (screenX + this.BYTE_W / 2 - 10) + 'px';
     coin.style.bottom = (this._worldH - this._byteBottom + 10) + 'px';
     world.appendChild(coin);
@@ -1043,6 +1071,42 @@ const game = {
     el.textContent = text;
     world.appendChild(el);
     setTimeout(() => el.remove(), 900);
+  },
+
+  _drawDatacenterCanvas(canvas) {
+    const ctx = canvas.getContext('2d');
+    const GY  = this.DC_H;  // local ground = canvas bottom
+    const buildings = [
+      { bx: 0,  bw: 17, bh: 38 },
+      { bx: 18, bw: 44, bh: 55 },
+      { bx: 63, bw: 17, bh: 38 },
+    ];
+    buildings.forEach(b => {
+      const by = GY - b.bh;
+      ctx.fillStyle = '#1a2744';
+      ctx.fillRect(b.bx, by, b.bw, b.bh);
+      ctx.strokeStyle = '#6b7fa3';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(b.bx + 0.5, by + 0.5, b.bw - 1, b.bh - 1);
+      ctx.fillStyle = '#6b7fa3';
+      ctx.fillRect(b.bx, by, b.bw, 3);
+      ctx.fillStyle = '#3a4f72';
+      ctx.fillRect(b.bx, by + 4, b.bw, 2);
+      ctx.shadowColor = '#00FFFF';
+      ctx.shadowBlur  = 6;
+      ctx.fillStyle   = '#00FFFF';
+      const cols = 2, rowH = 10;
+      const colW = Math.floor((b.bw - 8) / cols);
+      const winW = colW - 3, winH = 5;
+      for (let row = 0; by + 10 + row * rowH + winH < GY - 4; row++) {
+        for (let col = 0; col < cols; col++) {
+          ctx.fillRect(b.bx + 4 + col * colW, by + 10 + row * rowH, winW, winH);
+        }
+      }
+      ctx.shadowBlur = 0;
+    });
+    ctx.fillStyle = 'rgba(0,255,255,0.06)';
+    ctx.fillRect(2, GY - 2, this.DC_W - 4, 4);
   },
 
   _crushDecoy(block) {
@@ -1071,6 +1135,289 @@ const game = {
     }
   },
 
+  // ── Demo mode ──────────────────────────────────
+  _spawnDemoObjects() {
+    if (!this._worldObjEl) return;
+    this._worldObjEl.innerHTML = '';
+    this._blocks = [];
+    this._obstacles = [];
+
+    // Demo DC — appears at world X = worldW + 100 (scrolls in from right)
+    const canvas = document.createElement('canvas');
+    canvas.width  = this.DC_W;
+    canvas.height = this.DC_H;
+    canvas.className = 'hidden';
+    canvas.style.position = 'absolute';
+    canvas.style.imageRendering = 'pixelated';
+    this._drawDatacenterCanvas(canvas);
+    this._worldObjEl.appendChild(canvas);
+    this._demoDCEl = { worldX: this._worldW + 100, screenX: this._worldW + 100,
+      el: canvas, used: false, questionIdx: 0, obsTop: this._groundY - this.DC_H, obsH: this.DC_H };
+    this._obstacles = [this._demoDCEl];
+
+    // Demo block — placed 2 screen-widths out so it appears just after DC clears
+    const blockEl = document.createElement('div');
+    blockEl.className = 'q-block-platform hidden';
+    blockEl.textContent = '?';
+    this._worldObjEl.appendChild(blockEl);
+    const blockCSSTop = this._groundY - this.BLOCK_H - 110;
+    this._demoBlockEl = { worldX: this._worldW * 2 + 200, screenX: this._worldW * 2 + 200,
+      el: blockEl, activated: false, used: false, questionIdx: 0, isDecoy: false,
+      answerId: 'A', blockCSSTop };
+    this._blocks = [this._demoBlockEl];
+  },
+
+  _showDemoBubble(text) {
+    let el = document.getElementById('demo-bubble');
+    if (!el) return;
+    el.innerHTML = text;
+    el.classList.remove('hidden');
+  },
+
+  _hideDemoBubble() {
+    const el = document.getElementById('demo-bubble');
+    if (el) el.classList.add('hidden');
+  },
+
+  _showDemoReady() {
+    const el = document.getElementById('demo-ready');
+    if (el) el.classList.remove('hidden');
+  },
+
+  _hideDemoReady() {
+    const el = document.getElementById('demo-ready');
+    if (el) el.classList.add('hidden');
+  },
+
+  _openDemoQuestion() {
+    this._overlayOpen = true;
+    const overlay = document.getElementById('q-overlay');
+    if (!overlay) return;
+
+    // Populate with first question from bank (score NOT recorded)
+    const q = state.currentQuestions[0];
+    if (!q) return;
+
+    document.getElementById('question-text').textContent = q.question;
+    const catEl = document.getElementById('question-category');
+    if (catEl) catEl.textContent = q.scenario ? '🤖 ' + q.scenario.toUpperCase() : '';
+
+    const answers = ['A', 'B', 'C'].map(letter => ({
+      letter, text: q[letter].text, type: q[letter].type,
+      color: ANSWER_TYPE_COLOR[q[letter].type]
+    }));
+    answers.sort(() => Math.random() - 0.5);
+
+    const whyCard = document.getElementById('why-card');
+    if (whyCard) whyCard.className = 'why-card hidden';
+
+    const answersEl = document.getElementById('answer-options');
+    answersEl.innerHTML = '';
+    const dispLetters = ['A','B','C'];
+    answers.forEach((answer, ai) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.innerHTML = `<span class="answer-letter">${dispLetters[ai]})</span><span class="answer-text">${answer.text}</span>`;
+      btn.addEventListener('click', () => this._demoQuestionContinue());
+      answersEl.appendChild(btn);
+    });
+
+    const nextBtn = document.getElementById('btn-next-question');
+    if (nextBtn) nextBtn.classList.add('hidden');
+
+    // Add CONTINUE banner inside overlay
+    let contBanner = document.getElementById('demo-continue-banner');
+    if (!contBanner) {
+      contBanner = document.createElement('div');
+      contBanner.id = 'demo-continue-banner';
+      contBanner.className = 'demo-continue-banner pixel-font hidden';
+      contBanner.innerHTML = '↩ ANY ANSWER → CONTINUE DEMO';
+      overlay.appendChild(contBanner);
+    }
+    contBanner.classList.remove('hidden');
+
+    overlay.classList.remove('hidden');
+    void overlay.offsetWidth;
+    overlay.classList.add('overlay-burst-in');
+    const placeholder = document.getElementById('q-panel-placeholder');
+    if (placeholder) placeholder.classList.add('hidden');
+  },
+
+  _demoQuestionContinue() {
+    const overlay = document.getElementById('q-overlay');
+    if (overlay) { overlay.classList.add('hidden'); overlay.classList.remove('overlay-burst-in'); }
+    const contBanner = document.getElementById('demo-continue-banner');
+    if (contBanner) contBanner.classList.add('hidden');
+    const placeholder = document.getElementById('q-panel-placeholder');
+    if (placeholder) placeholder.classList.remove('hidden');
+    this._overlayOpen = false;
+    this._demoPhase = 'ready';
+    this._showDemoReady();
+  },
+
+  _updateDemo() {
+    const HALF_SCROLL = this.BASE_SCROLL_SPEED * 0.5;
+    const CENTER_X    = Math.round(this._worldW * 0.6);
+    const BUBBLE_FRAMES = 180; // 3 seconds at 60fps
+
+    // Physics always runs in demo (player can jump)
+    this._prevByteBottom = this._byteBottom;
+    if (!this._onGround && this._onBlock === null) {
+      this._byteVelY   += this.GRAVITY;
+      this._byteBottom += this._byteVelY;
+      this._byteX      += this._byteVelX;
+      if (this._byteX > this._worldW * 0.45) this._byteX = this._worldW * 0.45;
+    }
+    if (this._byteBottom >= this._groundY) {
+      this._onGround   = true;
+      this._onBlock    = null;
+      this._inJump     = false;
+      this._byteBottom = this._groundY;
+      this._byteVelY   = 0;
+      this._byteVelX   = 0;
+    }
+    if (this._onGround && this._byteX > this._homeX) {
+      this._byteX -= 2;
+      if (this._byteX < this._homeX) this._byteX = this._homeX;
+    }
+
+    if (this._demoPhase === 'act1_scroll') {
+      this._worldX += HALF_SCROLL;
+      const dc = this._demoDCEl;
+      dc.screenX = dc.worldX - this._worldX;
+      dc.el.classList.remove('hidden');
+      dc.el.style.left = dc.screenX + 'px';
+      dc.el.style.top  = dc.obsTop + 'px';
+
+      // Check obstacle collision — flash only, no life loss
+      const byteLeft   = Math.round(this._byteX) + 6;
+      const byteRight  = Math.round(this._byteX) + this.BYTE_W - 6;
+      const byteBottom = this._byteBottom;
+      const byteTop    = byteBottom - this.BYTE_H + 4;
+      if (byteBottom > dc.obsTop && byteRight > dc.screenX && byteLeft < dc.screenX + this.DC_W && byteTop < this._groundY) {
+        this._showFlash('OUCH!');
+        playSound('damage');
+        // push player back
+        this._byteVelX = -3;
+      }
+
+      if (dc.screenX <= CENTER_X) {
+        this._demoPhase = 'act1_bubble';
+        this._demoBubbleFrames = 0;
+        this._showDemoBubble('Jump over these!<br>↑+→ to arc jump');
+      }
+    } else if (this._demoPhase === 'act1_bubble') {
+      this._demoBubbleFrames++;
+      const dc = this._demoDCEl;
+      dc.screenX = dc.worldX - this._worldX;
+      dc.el.style.left = dc.screenX + 'px';
+      if (this._demoBubbleFrames >= BUBBLE_FRAMES) {
+        this._hideDemoBubble();
+        this._demoPhase = 'act1_resume';
+      }
+    } else if (this._demoPhase === 'act1_resume') {
+      this._worldX += HALF_SCROLL;
+      const dc = this._demoDCEl;
+      dc.screenX = dc.worldX - this._worldX;
+      dc.el.style.left = dc.screenX + 'px';
+      if (dc.screenX < -this.DC_W) {
+        dc.el.classList.add('hidden');
+        dc.used = true;
+        this._demoPhase = 'act2_scroll';
+      }
+    } else if (this._demoPhase === 'act2_scroll') {
+      this._worldX += HALF_SCROLL;
+      const blk = this._demoBlockEl;
+      blk.screenX = blk.worldX - this._worldX;
+      blk.el.classList.remove('hidden');
+      blk.el.style.left = blk.screenX + 'px';
+      blk.el.style.top  = blk.blockCSSTop + 'px';
+
+      if (blk.screenX <= CENTER_X) {
+        this._demoPhase = 'act2_bubble';
+        this._demoBubbleFrames = 0;
+        this._showDemoBubble('Hit these to open question!<br>↑ from below / ↑+→ land on top');
+      }
+
+      // Check block collision while scrolling
+      this._checkDemoBlockCollision();
+    } else if (this._demoPhase === 'act2_bubble') {
+      this._demoBubbleFrames++;
+      const blk = this._demoBlockEl;
+      blk.screenX = blk.worldX - this._worldX;
+      blk.el.style.left = blk.screenX + 'px';
+      if (this._demoBubbleFrames >= BUBBLE_FRAMES) {
+        this._hideDemoBubble();
+        this._demoPhase = 'act2_resume';
+      }
+      this._checkDemoBlockCollision();
+    } else if (this._demoPhase === 'act2_resume') {
+      this._worldX += HALF_SCROLL;
+      const blk = this._demoBlockEl;
+      blk.screenX = blk.worldX - this._worldX;
+      blk.el.style.left = blk.screenX + 'px';
+      this._checkDemoBlockCollision();
+      // If block scrolled off without being hit — go to ready
+      if (blk.screenX < -this.BLOCK_W && !blk.activated) {
+        blk.el.classList.add('hidden');
+        blk.used = true;
+        this._demoPhase = 'ready';
+        this._showDemoReady();
+      }
+    } else if (this._demoPhase === 'act2_question') {
+      // Waiting for player to dismiss demo question — handled by _demoQuestionContinue
+    } else if (this._demoPhase === 'ready') {
+      // Waiting for ↑ press — handled in _keyHandler
+    }
+
+    // Parallax
+    if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-(this._worldX * 0.15).toFixed(1)}px)`;
+    if (this._bgCloudsEl) this._bgCloudsEl.style.transform = `translateX(${-(this._worldX * 0.30).toFixed(1)}px)`;
+    if (!this._animating && !this._inJump) {
+      if (this._onGround || this._onBlock) this._setByteState('idle');
+    }
+    this._positionByte();
+  },
+
+  _checkDemoBlockCollision() {
+    const blk = this._demoBlockEl;
+    if (!blk || blk.activated || blk.used) return;
+    const byteLeft    = Math.round(this._byteX);
+    const byteRight   = byteLeft + this.BYTE_W;
+    const byteTop     = this._byteBottom - this.BYTE_H;
+    const blockBottom = blk.blockCSSTop + this.BLOCK_H;
+    const overlapX    = byteRight > blk.screenX + 8 && byteLeft < blk.screenX + this.BLOCK_W - 8;
+    if (!overlapX) return;
+    if (this._byteVelY < 0 && byteTop <= blockBottom && byteTop >= blk.blockCSSTop) {
+      this._byteVelY = 1.0;
+      blk.activated = true;
+      blk.el.classList.add('block-activated');
+      blk.el.textContent = '';
+      this._hideDemoBubble();
+      this._demoPhase = 'act2_question';
+      this._overlayOpen = true;
+      playSound('coin');
+      setTimeout(() => this._openDemoQuestion(), 380);
+      return;
+    }
+    if (this._byteVelY >= 0 && this._byteBottom >= blk.blockCSSTop &&
+        this._byteBottom <= blk.blockCSSTop + this.BLOCK_H + 8 && byteTop < blk.blockCSSTop) {
+      this._byteBottom = blk.blockCSSTop;
+      this._byteVelY   = 0;
+      this._byteVelX   = 0;
+      this._onBlock    = blk;
+      this._inJump     = false;
+      blk.activated    = true;
+      blk.el.classList.add('block-activated');
+      blk.el.textContent = '';
+      this._hideDemoBubble();
+      this._demoPhase = 'act2_question';
+      this._overlayOpen = true;
+      playSound('coin');
+      setTimeout(() => this._openDemoQuestion(), 380);
+    }
+  },
+
   stop() {
     this._running = false;
     if (this._raf) cancelAnimationFrame(this._raf);
@@ -1095,6 +1442,32 @@ function startEthicsQuestions() {
   game.stop();
   game.init();
   renderQuestion();
+}
+
+function startDemo() {
+  if (game._demoDone) {
+    // Already played the demo — go straight to game
+    startEthicsQuestions();
+    return;
+  }
+  // Pre-select questions so demo question can come from real bank
+  state.currentQuestions = selectQuestionsFromBank(state.userAge, state.userExpertise);
+  state.currentQuestionIndex = 0;
+  state.ethicsAnswers = [];
+  state.score = 0;
+  state.staminaLevel = 3;
+  state.livesRemaining = 3;
+  state.isFirstGameOver = false;
+  state.savedSessionData = null;
+  state.resumeFromQuestion = 0;
+
+  updateStaminaBars(3);
+  updateLivesDisplay();
+  game.stop();
+  game._demoMode = true;
+  game._demoPhase = 'act1_scroll';
+  game._demoBubbleFrames = 0;
+  game.init();
 }
 
 const TOTAL_QUESTIONS = 5;
@@ -1126,10 +1499,12 @@ function renderQuestion() {
 
   const answers = ['A', 'B', 'C'].map(letter => ({
     letter,
-    text:  q[letter].text,
-    score: q[letter].score,
-    type:  q[letter].type,
-    color: ANSWER_TYPE_COLOR[q[letter].type]
+    text:       q[letter].text,
+    score:      q[letter].score,
+    envWeight:  q[letter].envWeight,
+    moralScore: q[letter].moralScore,
+    type:       q[letter].type,
+    color:      ANSWER_TYPE_COLOR[q[letter].type]
   }));
 
   // Shuffle order (no answer-position hints)
@@ -1201,8 +1576,9 @@ function handleAnswer(answer, clickedBtn) {
   else if (answer.type === 'H') playSound('damage');
   else                          playSound('click');
 
-  // Accumulate score
-  state.score += answer.score;
+  // Accumulate score using calcQuestionScore
+  const qScore = GameLogic.calcQuestionScore(answer.envWeight, answer.moralScore);
+  state.score += qScore;
 
   // Update stamina bars
   const newLevel = calculateStaminaLevel(state.score);
@@ -1216,7 +1592,7 @@ function handleAnswer(answer, clickedBtn) {
     letter:   answer.letter,
     color:    answer.color,
     type:     answer.type,
-    score:    answer.score
+    score:    qScore
   });
 
   // Disable all buttons, highlight selected
@@ -1271,19 +1647,25 @@ function advanceQuestion() {
 
 function showPersonaScreen() {
   game.stop();
-  const persona = getPersonaFromScore(state.score);
-  state.persona = persona;
+  const p = GameLogic.getPersona(state.score);
+  // Build persona object compatible with print.js (expects .title, .byteSvg)
+  const visualKey = state.score <= 13 ? 'the_turbo_tapper' :
+                    state.score <= 19 ? 'the_sleepwalker'  :
+                    state.score <= 29 ? 'the_balanced_byte' :
+                                        'the_zen_prompter';
+  const visual = (typeof PERSONALITY_TYPES !== 'undefined') ? PERSONALITY_TYPES[visualKey] : null;
+  state.persona = { title: p.name, subtitle: p.desc, description: p.desc, byteSvg: visual ? visual.byteSvg : '' };
 
-  document.getElementById('persona-byte').innerHTML          = persona.byteSvg;
-  document.getElementById('persona-name').textContent        = persona.title;
-  document.getElementById('persona-tagline').textContent     = persona.subtitle;
-  document.getElementById('persona-description').textContent = persona.description;
-  document.getElementById('persona-score-display').textContent = 'Score: ' + state.score + '/20';
+  document.getElementById('persona-byte').innerHTML          = state.persona.byteSvg;
+  document.getElementById('persona-name').textContent        = p.name;
+  document.getElementById('persona-tagline').textContent     = p.desc;
+  document.getElementById('persona-description').textContent = '';
+  document.getElementById('persona-score-display').textContent = 'Score: ' + state.score + '/35';
 
   // Persona sound
-  if      (state.score <= -7)  playSound('turbo');
-  else if (state.score <= 4)   playSound('casual');
-  else if (state.score <= 14)  playSound('mindful');
+  if      (state.score <= 7)   playSound('turbo');
+  else if (state.score <= 19)  playSound('casual');
+  else if (state.score <= 29)  playSound('mindful');
   else                         playSound('green');
 
   showScreen('persona');
@@ -1377,14 +1759,6 @@ document.getElementById('btn-gameover-backtostart').addEventListener('click', ()
   Byte.setState('idle');
 });
 
-// ── SCREEN 3: PERSONALIZED TIP ───────────────
-
-function populateGreenerScreen() {
-  state.personalizedTip = getPersonalizedTip(state.ethicsAnswers, state.persona);
-  const tipEl = document.getElementById('tip-text');
-  if (tipEl) tipEl.textContent = state.personalizedTip;
-}
-
 function _saveSessionToSupabase(state) {
   const ans = (i) => (state.ethicsAnswers && state.ethicsAnswers[i]) || {};
   const payload = {
@@ -1429,15 +1803,6 @@ function _saveSessionToSupabase(state) {
     })
     .catch(err => console.error('Supabase save failed:', err));
 }
-
-document.getElementById('btn-print').addEventListener('click', () => {
-  state.sessionId = generateSessionId();
-  populateTicketCard(state);
-  _saveSessionToSupabase(state);
-  showScreen('print');
-  Byte.setState('print');
-  playSound('print');
-});
 
 // ── SCREEN 4: TICKET DOWNLOAD ────────────────
 

@@ -1092,12 +1092,12 @@ const SCORE_PERSONAS = (function () {
 })();
 
 function getPersonaFromScore(score) {
-  if (score <= -8)  return SCORE_PERSONAS['grid-goblin'];
-  if (score <= -2)  return SCORE_PERSONAS['turbo-tapper'];
-  if (score <= 4)   return SCORE_PERSONAS['casual-clicker'];
-  if (score <= 9)   return SCORE_PERSONAS['eco-experimenter'];
-  if (score <= 14)  return SCORE_PERSONAS['mindful-maker'];
-  if (score <= 17)  return SCORE_PERSONAS['green-hacker'];
+  if (score <=  7)  return SCORE_PERSONAS['grid-goblin'];
+  if (score <= 13)  return SCORE_PERSONAS['turbo-tapper'];
+  if (score <= 19)  return SCORE_PERSONAS['casual-clicker'];
+  if (score <= 24)  return SCORE_PERSONAS['eco-experimenter'];
+  if (score <= 29)  return SCORE_PERSONAS['mindful-maker'];
+  if (score <= 32)  return SCORE_PERSONAS['green-hacker'];
   return SCORE_PERSONAS['sustainable-sage'];
 }
 
@@ -1152,12 +1152,12 @@ function getPersonalizedTip(ethicsAnswers, persona) {
 }
 
 // ── Stamina level from cumulative score ──────────────────────────
-// Maps score range -15..+20 to tree levels 1..5
+// Maps score range 0..35 to tree levels 1..5
 function calculateStaminaLevel(score) {
-  if (score <= -8) return 1;
-  if (score <= -2) return 2;
-  if (score <=  4) return 3;
-  if (score <= 12) return 4;
+  if (score <=  7) return 1;
+  if (score <= 14) return 2;
+  if (score <= 21) return 3;
+  if (score <= 28) return 4;
   return 5;
 }
 

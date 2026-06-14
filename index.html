@@ -213,11 +213,11 @@
     <div class="howtoplay-content">
       <h2 class="pixel-font howtoplay-title" data-i18n="ui.howToPlay">HOW TO PLAY</h2>
       <div class="howtoplay-rows">
-        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">← →</span> to move</div>
-        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">↑ SPACE</span> to jump</div>
-        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">↓</span> (airborne) to crush a block</div>
-        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">?</span> blocks hide answers — crush the one you choose</div>
-        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">!</span> extra decoy blocks appear — don't let any block scroll off or you lose a life</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">↑</span> jump straight up</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">↑ + →</span> arc jump forward</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">?</span> crush these blocks to open a question</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">🏢</span> avoid datacenters — jump over them</div>
+        <div class="howtoplay-row pixel-font"><span class="howtoplay-key">!</span> don't let blocks scroll off screen</div>
       </div>
       <div class="howtoplay-lives">
         <div class="howtoplay-hearts" aria-hidden="true">
@@ -246,9 +246,9 @@
             <rect x="3" y="6" width="2" height="1" fill="#ff006e"/>
           </svg>
         </div>
-        <div class="pixel-font howtoplay-lives-caption" data-i18n="ui.livesCaption">You have 3 lives. Don't let blocks scroll off screen!</div>
+        <div class="pixel-font howtoplay-lives-caption">You have 3 lives.</div>
       </div>
-      <button class="btn btn-primary btn-large" id="btn-howtoplay-start" data-i18n="ui.letsGo">LET'S GO! →</button>
+      <button class="btn btn-primary btn-large" id="btn-howtoplay-start">LET'S GO! →</button>
     </div>
   </section>
 
@@ -308,9 +308,6 @@
         </div>
         <div class="game-bg-clouds" id="game-clouds"></div>
       </div>
-
-      <!-- Top banner -->
-      <div class="game-banner pixel-font" aria-hidden="true">CRUSH BLOCKS TO ANSWER QUESTIONS!</div>
 
       <!-- Lives / pause: top-right -->
       <div class="game-lives" aria-hidden="true">
@@ -404,6 +401,18 @@
 
         </div>
       </div><!-- /.q-overlay -->
+
+      <!-- Demo bubble tooltip -->
+      <div class="demo-bubble pixel-font hidden" id="demo-bubble"></div>
+
+      <!-- Demo ready panel (shown after both acts) -->
+      <div class="demo-ready hidden" id="demo-ready">
+        <div class="demo-ready-inner pixel-font">
+          <div>↑ jump straight up</div>
+          <div>↑ + → arc jump forward</div>
+          <div class="demo-ready-start">PRESS ↑ TO START</div>
+        </div>
+      </div>
 
     </div><!-- /.game-world -->
 

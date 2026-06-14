@@ -3390,6 +3390,63 @@ body.stamina-visible .ethics-main {
   clip-path: polygon(0 5px,5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px));
 }
 
+/* ── Demo bubble tooltip ── */
+.demo-bubble {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 15, 46, 0.92);
+  border: 2px solid var(--neon-cyan);
+  box-shadow: 0 0 18px rgba(0,245,255,0.45);
+  padding: 12px 24px;
+  font-size: 9px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+  text-align: center;
+  white-space: pre;
+  z-index: 20;
+  pointer-events: none;
+  line-height: 1.8;
+}
+
+/* ── Demo ready panel ── */
+.demo-ready {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(15, 15, 46, 0.92);
+  border: 2px solid var(--neon-pink);
+  box-shadow: 0 0 18px rgba(255,0,110,0.45);
+  padding: 16px 32px;
+  z-index: 20;
+  pointer-events: none;
+}
+.demo-ready-inner {
+  font-size: 9px;
+  color: var(--neon-cyan);
+  text-align: center;
+  line-height: 2;
+}
+.demo-ready-start {
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink);
+  font-size: 11px;
+  margin-top: 8px;
+  animation: blink-text 0.8s step-end infinite;
+}
+@keyframes blink-text { 50% { opacity: 0; } }
+
+/* ── Demo continue banner (inside q-overlay) ── */
+.demo-continue-banner {
+  text-align: center;
+  color: var(--neon-cyan);
+  font-size: 9px;
+  padding: 8px;
+  opacity: 0.8;
+}
+
 /* ── Hearts + pause button: top-right ── */
 .game-lives {
   position: absolute;

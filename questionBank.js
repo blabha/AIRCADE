@@ -6,11 +6,15 @@
    Types: H=High AI impact (-3pts), B=Balanced (+1pt), L=Low/conscious (+4pts)
 ═══════════════════════════════════════════ */
 
-// Score per type (from Scoring_Logic.md)
-// H: envScore=-3, moralAdj=-1 → clamp(-3,4,-4) = -3
-// B: envScore=+1, moralAdj=0  → clamp(-3,4,+1) = +1
-// L: envScore=+3, moralAdj=+1 → clamp(-3,4,+4) = +4
-const ANSWER_SCORES = { H: -3, B: 1, L: 4 };
+// Score per type — flat values for legacy ICON_STEPS usage
+const ANSWER_SCORES = { H: 0, B: 4, L: 7 };
+
+// envWeight + moralScore per type for calcQuestionScore
+const TYPE_ENV = {
+  H: { envWeight: 1, moralScore: 0 },
+  B: { envWeight: 3, moralScore: 1 },
+  L: { envWeight: 6, moralScore: 2 }
+};
 
 // Env metric estimates per type (for legacy resource bars)
 const ANSWER_METRICS = {
@@ -415,13 +419,16 @@ function selectQuestionsFromBank(userAge, userExpertise) {
 
 function buildOption(text, type) {
   const m = ANSWER_METRICS[type];
+  const e = TYPE_ENV[type];
   return {
     text,
     type,
-    score:     ANSWER_SCORES[type],
-    energy_wh: m.energy_wh,
-    water_ml:  m.water_ml,
-    co2_g:     m.co2_g
+    score:      ANSWER_SCORES[type],
+    envWeight:  e.envWeight,
+    moralScore: e.moralScore,
+    energy_wh:  m.energy_wh,
+    water_ml:   m.water_ml,
+    co2_g:      m.co2_g
   };
 }
 

@@ -13,13 +13,13 @@ const GameLogic = (() => {
   }
 
   function getPersona(totalScore) {
-    if (totalScore <= 7)  return { name: 'Grid Goblin',      desc: 'Maximum consumption, zero awareness' };
-    if (totalScore <= 13) return { name: 'Turbo Tapper',     desc: 'Fast and reckless; convenience wins every time' };
-    if (totalScore <= 19) return { name: 'Casual Clicker',   desc: 'Convenience-first with occasional good instincts' };
-    if (totalScore <= 24) return { name: 'Eco Experimenter', desc: 'Starting to connect the dots between choices and impact' };
-    if (totalScore <= 29) return { name: 'Mindful Maker',    desc: 'Thoughtful and intentional — balancing usefulness with care' };
-    if (totalScore <= 32) return { name: 'Green Hacker',     desc: 'Deliberately sustainable; optimizing the right things' };
-    return                       { name: 'Sustainable Sage', desc: 'Near-perfect alignment of impact and intent' };
+    if (totalScore <= 7)  return { name: 'Grid Goblin',      desc: 'Maximum consumption, zero awareness — draining the planet one click at a time' };
+    if (totalScore <= 13) return { name: 'Turbo Tapper',     desc: 'Fast and reckless; convenience wins every time, consequences be damned' };
+    if (totalScore <= 19) return { name: 'Casual Clicker',   desc: 'Convenience-first with occasional good instincts, but not yet connecting the dots' };
+    if (totalScore <= 24) return { name: 'Eco Experimenter', desc: 'Starting to connect the dots between choices and impact — curious, inconsistent' };
+    if (totalScore <= 29) return { name: 'Mindful Maker',    desc: 'Thoughtful and intentional — balancing usefulness with care for the planet' };
+    if (totalScore <= 32) return { name: 'Green Hacker',     desc: 'Deliberately sustainable; optimizing the right things with skill and intention' };
+    return                       { name: 'Sustainable Sage', desc: 'Near-perfect alignment of impact and intent — a model for conscious AI use' };
   }
 
   // ── State transitions ──────────────────────────────────────────────────────
