@@ -117,36 +117,29 @@
           <li>
             <span class="step-num">01</span>
             <div>
-              <strong data-i18n="ui.step1title">Tell us about you</strong>
-              <p data-i18n="ui.step1desc">Quick optional profile to personalize your experience</p>
+              <strong data-i18n="ui.step1title">MOVE</strong>
+              <p data-i18n="ui.step1desc">Use ← → arrow keys to move Byte</p>
             </div>
           </li>
           <li>
             <span class="step-num">02</span>
             <div>
-              <strong data-i18n="ui.step2title">Answer 5 ethics questions</strong>
-              <p data-i18n="ui.step2desc">Shape your AI profile &amp; watch your stamina tree grow</p>
+              <strong data-i18n="ui.step2title">JUMP</strong>
+              <p data-i18n="ui.step2desc">Press ↑ or SPACE to jump onto ? blocks</p>
             </div>
           </li>
           <li>
             <span class="step-num">03</span>
             <div>
-              <strong data-i18n="ui.step3title">Discover your persona</strong>
-              <p data-i18n="ui.step3desc">See what kind of AI user you are</p>
+              <strong data-i18n="ui.step3title">CRUSH</strong>
+              <p data-i18n="ui.step3desc">Land on a ? block to trigger a question</p>
             </div>
           </li>
           <li>
             <span class="step-num">04</span>
             <div>
-              <strong data-i18n="ui.step4title">Get your personalized tip</strong>
-              <p data-i18n="ui.step4desc">Learn how to go greener</p>
-            </div>
-          </li>
-          <li>
-            <span class="step-num">05</span>
-            <div>
-              <strong data-i18n="ui.step5title">Print your ticket</strong>
-              <p data-i18n="ui.step5desc">Take home your journey card</p>
+              <strong data-i18n="ui.step4title">ANSWER</strong>
+              <p data-i18n="ui.step4desc">Answer 5 questions to discover your AI persona</p>
             </div>
           </li>
         </ol>
@@ -640,6 +633,11 @@
     <span id="error-msg">Something went wrong</span>
     <button id="error-close" aria-label="Close error">✕</button>
   </div>
+
+  <style>
+    @keyframes overlayFadeOut { from { opacity:1; } to { opacity:0; } }
+    .q-overlay.fade-out { animation: overlayFadeOut 150ms ease forwards; pointer-events: none; }
+  </style>
 
   <!-- External libs -->
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>

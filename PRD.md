@@ -1,5 +1,5 @@
 # (Ai)rcade — Product Requirements Document
-### Status: **IMPLEMENTED** — Last updated 2026-06-05
+### Status: **IMPLEMENTED** — Last updated 2026-06-14
 
 ---
 
@@ -134,12 +134,13 @@ Calls `setLanguage(lang)` (defined in `translations.js`), then navigates to Idle
 
 ## Instructions Overlay
 
-**Steps shown:**
-1. Tell us about you — Quick optional profile
-2. Answer 5 ethics questions — Shape your AI profile & watch the stamina bars
-3. Discover your persona — See what kind of AI user you are
-4. Get your personalized tip — Learn how to go greener
-5. Print your ticket — Take home your journey card
+**Steps shown (4 steps, describing the platformer game itself):**
+1. **MOVE** — Use ← → arrow keys to move Byte
+2. **JUMP** — Press ↑ or SPACE to jump onto ? blocks
+3. **CRUSH** — Land on a ? block to trigger a question
+4. **ANSWER** — Answer 5 questions to discover your AI persona
+
+All step text is translated via the `data-i18n` system (`ui.step1title`, `ui.step1desc` … `ui.step4title`, `ui.step4desc`).
 
 **CTA:** `LET'S GO! →` — resets game state, navigates to Screen 0.5.
 

@@ -510,10 +510,10 @@ const game = {
 
   // Tuning constants
   GRAVITY:    0.6,
-  JUMP_FORCE: -12,    // negative = upward in CSS coords
-  JUMP_VX:    4.5,    // horizontal velocity for arc jump
-  BASE_SCROLL_SPEED: 3.0,
-  SPEED_MULTIPLIERS: [1.0, 1.05, 1.1, 1.2, 1.3],
+  JUMP_FORCE: -14,    // negative = upward in CSS coords
+  JUMP_VX:    6.0,    // horizontal velocity for arc jump
+  BASE_SCROLL_SPEED: 5.0,
+  SPEED_MULTIPLIERS: [1.0, 1.1, 1.2, 1.3, 1.5],
   ZONE_WIDTH: 8000,   // world-space width allocated per question (14 objects × avg 500px gap)
   BYTE_W:     88,
   BYTE_H:     66,
@@ -783,9 +783,9 @@ const game = {
         setTimeout(() => {
           const firstAnswer = document.querySelector('#answer-options .answer-btn:not(:disabled)');
           if (firstAnswer) firstAnswer.focus();
-        }, 460);
+        }, 200);
       }
-    }, 380);
+    }, 150);
   },
 
   _positionByte() {
@@ -1047,7 +1047,7 @@ const game = {
     if (answerType === 'L') { this._setByteState('star-jump'); this._spawnCoin(); }
     else if (answerType === 'H') { this._setByteState('damage'); }
     else { this._setByteState('nod'); }
-    setTimeout(() => { this._animating = false; this._setByteState('idle'); }, 950);
+    setTimeout(() => { this._animating = false; this._setByteState('idle'); }, 500);
   },
 
   _spawnCoin() {
@@ -1258,7 +1258,7 @@ const game = {
   _updateDemo() {
     const HALF_SCROLL = this.BASE_SCROLL_SPEED * 0.5;
     const CENTER_X    = Math.round(this._worldW * 0.6);
-    const BUBBLE_FRAMES = 180; // 3 seconds at 60fps
+    const BUBBLE_FRAMES = 90; // 1.5 seconds at 60fps
 
     // Physics always runs in demo (player can jump)
     this._prevByteBottom = this._byteBottom;
@@ -1397,7 +1397,7 @@ const game = {
       this._demoPhase = 'act2_question';
       this._overlayOpen = true;
       playSound('coin');
-      setTimeout(() => this._openDemoQuestion(), 380);
+      setTimeout(() => this._openDemoQuestion(), 150);
       return;
     }
     if (this._byteVelY >= 0 && this._byteBottom >= blk.blockCSSTop &&
@@ -1414,7 +1414,7 @@ const game = {
       this._demoPhase = 'act2_question';
       this._overlayOpen = true;
       playSound('coin');
-      setTimeout(() => this._openDemoQuestion(), 380);
+      setTimeout(() => this._openDemoQuestion(), 150);
     }
   },
 
@@ -1624,22 +1624,27 @@ document.getElementById('btn-next-question').addEventListener('click', () => {
   nextBtn.disabled = true;
   playSound('coin');
   advanceQuestion();
-  setTimeout(() => { nextBtn.disabled = false; }, 400);
+  setTimeout(() => { nextBtn.disabled = false; }, 200);
 });
 
 function advanceQuestion() {
   document.getElementById('btn-next-question').classList.add('hidden');
 
-  const overlay = document.getElementById('q-overlay');
-  if (overlay) overlay.classList.add('hidden');
-
   state.currentQuestionIndex++;
+  const afterFade = state.currentQuestionIndex >= TOTAL_QUESTIONS
+    ? () => { playSound('levelComplete'); game.walkForward(() => showPersonaScreen()); }
+    : () => { game.walkForward(() => renderQuestion()); };
 
-  if (state.currentQuestionIndex >= TOTAL_QUESTIONS) {
-    playSound('levelComplete');
-    game.walkForward(() => showPersonaScreen());
+  const overlay = document.getElementById('q-overlay');
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+      overlay.classList.remove('fade-out', 'overlay-burst-in');
+      afterFade();
+    }, 150);
   } else {
-    game.walkForward(() => renderQuestion());
+    afterFade();
   }
 }
 
