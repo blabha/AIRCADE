@@ -20,11 +20,7 @@ const state = {
   ethicsAnswers: [],
   currentQuestions: [],
   currentQuestionIndex: 0,
-  persona: null,
-  livesRemaining:    3,
-  isFirstGameOver:   false,
-  savedSessionData:  null,
-  resumeFromQuestion: 0
+  persona: null
 };
 
 // ── DOM References ───────────────────────────
@@ -135,10 +131,6 @@ function resetGameState() {
   state.currentQuestions     = [];
   state.currentQuestionIndex = 0;
   state.persona              = null;
-  state.livesRemaining       = 3;
-  state.isFirstGameOver      = false;
-  state.savedSessionData     = null;
-  state.resumeFromQuestion   = 0;
 }
 
 // ── Error Handling ───────────────────────────
@@ -154,6 +146,19 @@ document.getElementById('error-close').addEventListener('click', () => {
 
 // ── SCREEN 0: IDLE ──────────────────────────
 document.getElementById('btn-start').addEventListener('click', () => {
+  // Update instructions overlay to match actual game controls
+  const stepUpdates = [
+    ['ui.step1title', 'DODGE!',   'ui.step1desc', 'Jump over data centers!'],
+    ['ui.step2title', 'HIT ?',    'ui.step2desc', 'Hit ? blocks to answer questions'],
+    ['ui.step3title', 'ANSWER',   'ui.step3desc', 'Answer 5 questions'],
+    ['ui.step4title', 'PERSONA',  'ui.step4desc', 'Discover your AI persona'],
+  ];
+  stepUpdates.forEach(([tKey, tText, dKey, dText]) => {
+    const titleEl = document.querySelector(`[data-i18n="${tKey}"]`);
+    const descEl  = document.querySelector(`[data-i18n="${dKey}"]`);
+    if (titleEl) titleEl.textContent = tText;
+    if (descEl)  descEl.textContent  = dText;
+  });
   overlayInstructions.classList.remove('hidden');
   Byte.say('Here\'s how to play! 🎮');
   setTimeout(() => document.getElementById('btn-lets-go').focus(), 60);
@@ -498,7 +503,6 @@ const game = {
   _raf:         null,
   _running:     false,
   _overlayOpen: false,
-  _pendingCrushCb: null,
 
   // Demo mode
   _demoMode:  false,
@@ -514,7 +518,7 @@ const game = {
   JUMP_VX:    6.0,    // horizontal velocity for arc jump
   BASE_SCROLL_SPEED: 5.0,
   SPEED_MULTIPLIERS: [1.0, 1.1, 1.2, 1.3, 1.5],
-  ZONE_WIDTH: 8000,   // world-space width allocated per question (14 objects × avg 500px gap)
+  ZONE_WIDTH: 4000,   // world-space width allocated per question
   BYTE_W:     88,
   BYTE_H:     66,
   GROUND_H:   40,
@@ -557,7 +561,6 @@ const game = {
     this._inJump     = false;
     this._animating  = false;
     this._overlayOpen = false;
-    this._pendingCrushCb = null;
     this._obstacles  = [];
     this._obstacleHitCooldown = 0;
     this._keys = {};
@@ -633,49 +636,23 @@ const game = {
     this._blocks    = [];
     this._obstacles = [];
 
-    // answerIds for 5 non-decoy blocks per question (cycles A→B→C→A→B)
-    const ANSWER_IDS = ['A', 'B', 'C', 'A', 'B'];
+    // Pattern per zone: dc, dc, block, dc, block, dc, block, dc
+    // 5 datacenters + 3 ? blocks — interleaved so blocks always follow DCs
+    const PATTERN = ['dc', 'dc', 'block', 'dc', 'block', 'dc', 'block', 'dc'];
 
     for (let qi = 0; qi < 5; qi++) {
-      // Items start just off the right edge when this question's zone begins
       let curX = qi * this.ZONE_WIDTH + this._worldW + 220;
 
-      // 7 ? blocks: pick 2 random decoy indices
-      const bidx = [0,1,2,3,4,5,6];
-      for (let i = bidx.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [bidx[i], bidx[j]] = [bidx[j], bidx[i]];
-      }
-      const decoySet = new Set([bidx[0], bidx[1]]);
-
-      let nonDecoyCount = 0;
-      const blockItems = [];
-      for (let i = 0; i < 7; i++) {
-        const isDecoy     = decoySet.has(i);
-        const highBlock   = Math.random() < 0.5;
-        const blockCSSTop = highBlock
-          ? this._groundY - this.BLOCK_H - 110
-          : this._groundY - this.BLOCK_H;
-        const answerId = isDecoy ? null : ANSWER_IDS[nonDecoyCount++];
-        blockItems.push({ isDecoy, answerId, blockCSSTop });
-      }
-
-      // Strictly alternating: dc, block, dc, block ... (first = dc)
-      // 7 blocks → 7 DCs interspersed
-      const PATTERN = ['dc', 'block'];
-      let patIdx = 0;
-      let blockIdx = 0;
-
-      const totalItems = 14; // 7 dc + 7 block
-      for (let i = 0; i < totalItems; i++) {
-        const kind = PATTERN[patIdx % 2];
-        patIdx++;
-
+      for (let i = 0; i < PATTERN.length; i++) {
+        const kind = PATTERN[i];
         const x = curX;
-        curX += 300 + Math.random() * 350;
+        curX += 300 + Math.floor(Math.random() * 200);
 
         if (kind === 'block') {
-          const item = blockItems[blockIdx++];
+          const highBlock   = Math.random() < 0.5;
+          const blockCSSTop = highBlock
+            ? this._groundY - this.BLOCK_H - 110
+            : this._groundY - this.BLOCK_H;
           const el = document.createElement('div');
           el.className = 'q-block-platform hidden';
           el.textContent = '?';
@@ -687,9 +664,8 @@ const game = {
             activated:   false,
             used:        false,
             questionIdx: qi,
-            isDecoy:     item.isDecoy,
-            answerId:    item.answerId,
-            blockCSSTop: item.blockCSSTop,
+            isDecoy:     false,
+            blockCSSTop,
           });
         } else {
           const canvas = document.createElement('canvas');
@@ -732,7 +708,7 @@ const game = {
         this._rightHeld = true;
         this._rightPressedAt = performance.now();
       }
-      if ((e.key === 'ArrowUp' || e.key === ' ') && this._demoMode && this._demoPhase === 'ready') {
+      if ((e.key === 'ArrowUp' || e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Enter') && this._demoMode && this._demoPhase === 'ready') {
         this._hideDemoReady();
         this._demoMode  = false;
         this._demoDone  = true;
@@ -847,9 +823,7 @@ const game = {
             byteTop <= blockBottom &&
             byteTop >= blockCSSTop) {
           this._byteVelY = 1.0;  // stop upward movement, gravity takes over
-          if (b.isDecoy) {
-            this._crushDecoy(b);
-          } else if (b.questionIdx === this._questionIdx) {
+          if (b.questionIdx === this._questionIdx) {
             this._crushBlock(b);
           }
           break;
@@ -867,9 +841,7 @@ const game = {
           this._onBlock    = b;
           this._inJump     = false;
           foundBlock = b;
-          if (b.isDecoy) {
-            this._crushDecoy(b);
-          } else if (b.questionIdx === this._questionIdx) {
+          if (b.questionIdx === this._questionIdx) {
             this._crushBlock(b);
           }
           break;
@@ -901,7 +873,7 @@ const game = {
 
     for (const b of this._obstacles) {
       if (b.used || b.questionIdx !== this._questionIdx) continue;
-      if (byteBottom <= b.obsTop) continue;  // player cleared the top — no collision
+      if (byteBottom <= b.obsTop) continue;
       const ol  = b.screenX;
       const or_ = b.screenX + this.DC_W;
       const ot  = b.obsTop;
@@ -915,8 +887,6 @@ const game = {
         this._setByteState('damage');
         this._animating = true;
         setTimeout(() => { this._animating = false; }, 650);
-        this._loseLife();
-        if (!this._running) return;
         break;
       }
     }
@@ -969,15 +939,13 @@ const game = {
     this._updateBlocks();
     this._updateObstacles();
 
-    // Scroll-off penalty: lose a life for each uncrushed ? block that exits left edge
+    // Silently retire blocks that scroll off the left edge — no penalty
     for (const b of this._blocks) {
       if (b.questionIdx !== this._questionIdx) continue;
       if (b.used || b.activated) continue;
       if (b.screenX + this.BLOCK_W < 0) {
         b.used = true;
         b.el.classList.add('hidden');
-        this._loseLife();
-        if (!this._running) return;
       }
     }
 
@@ -1009,8 +977,6 @@ const game = {
   showBlock() { /* blocks are pre-placed; no-op */ },
 
   walkAndHit(cb) {
-    // Set pending callback — fires when player crushes next block
-    this._pendingCrushCb = cb;
     this._questionIdx = state.currentQuestionIndex;
   },
 
@@ -1033,6 +999,15 @@ const game = {
         }
       });
     }
+    // Jump camera to the start of the next zone so blocks appear immediately
+    this._worldX = (this._questionIdx + 1) * this.ZONE_WIDTH;
+    // Reset Byte to ground at home position so each zone starts cleanly
+    this._byteBottom = this._groundY;
+    this._byteVelY   = 0;
+    this._byteVelX   = 0;
+    this._byteX      = this._homeX;
+    this._onGround   = true;
+    this._inJump     = false;
     this._onBlock     = null;
     this._animating   = false;
     this._overlayOpen = false;
@@ -1110,31 +1085,6 @@ const game = {
     ctx.fillRect(2, GY - 2, this.DC_W - 4, 4);
   },
 
-  _crushDecoy(block) {
-    block.activated = true;
-    block.used      = true;
-    block.el.classList.add('block-activated');
-    setTimeout(() => {
-      block.el.classList.remove('block-activated');
-      block.el.classList.add('hidden');
-    }, 400);
-    playSound('damage');
-    this._showFlash('WRONG!');
-    this._setByteState('damage');
-    this._animating = true;
-    setTimeout(() => { this._animating = false; }, 650);
-    this._loseLife();
-  },
-
-  _loseLife() {
-    state.livesRemaining = Math.max(0, state.livesRemaining - 1);
-    updateLivesDisplay();
-    if (state.livesRemaining <= 0) {
-      this._running = false;
-      if (this._raf) cancelAnimationFrame(this._raf);
-      setTimeout(() => showGameOver(), 350);
-    }
-  },
 
   // ── Demo mode ──────────────────────────────────
   _spawnDemoObjects() {
@@ -1220,6 +1170,13 @@ const game = {
       btn.className = 'answer-btn';
       btn.innerHTML = `<span class="answer-letter">${dispLetters[ai]})</span><span class="answer-text">${answer.text}</span>`;
       btn.addEventListener('click', () => this._demoQuestionContinue());
+      btn.addEventListener('keydown', (e) => {
+        const all = [...document.querySelectorAll('#answer-options .answer-btn')];
+        const idx = all.indexOf(btn);
+        if (e.key === 'ArrowDown') { e.preventDefault(); if (all[idx + 1]) all[idx + 1].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); if (all[idx - 1]) all[idx - 1].focus(); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this._demoQuestionContinue(); }
+      });
       answersEl.appendChild(btn);
     });
 
@@ -1243,6 +1200,10 @@ const game = {
     overlay.classList.add('overlay-burst-in');
     const placeholder = document.getElementById('q-panel-placeholder');
     if (placeholder) placeholder.classList.add('hidden');
+    setTimeout(() => {
+      const firstBtn = document.querySelector('#answer-options .answer-btn');
+      if (firstBtn) firstBtn.focus();
+    }, 300);
   },
 
   _demoQuestionContinue() {
@@ -1428,19 +1389,35 @@ const game = {
   }
 };
 
+// Remove stale CRUSH BLOCK row from controls panel (idempotent — safe to call multiple times)
+function _updateControlsPanel() {
+  const panel = document.getElementById('controls-hint');
+  if (!panel) return;
+  panel.querySelectorAll('.controls-hint-row').forEach(row => {
+    if (row.textContent.includes('CRUSH')) row.remove();
+  });
+}
+
+// Update howtoplay screen to remove lives/scroll-off-penalty references (runs once on load)
+(function _updateHowtoplayScreen() {
+  // Remove "don't let blocks scroll off screen" row — no longer a penalty
+  document.querySelectorAll('.howtoplay-row').forEach(row => {
+    if (row.textContent.includes('scroll off')) row.remove();
+  });
+  // Hide the lives section — no lives system
+  const livesEl = document.querySelector('.howtoplay-lives');
+  if (livesEl) livesEl.style.display = 'none';
+})();
+
 function startEthicsQuestions() {
   state.ethicsAnswers        = [];
   state.score                = 0;
   state.staminaLevel         = 3;
   state.currentQuestions     = selectQuestionsFromBank(state.userAge, state.userExpertise);
   state.currentQuestionIndex = 0;
-  state.livesRemaining       = 3;
-  state.isFirstGameOver      = false;
-  state.savedSessionData     = null;
-  state.resumeFromQuestion   = 0;
 
   updateStaminaBars(3);
-  updateLivesDisplay();
+  _updateControlsPanel();
   game.stop();
   game.init();
   renderQuestion();
@@ -1458,13 +1435,9 @@ function startDemo() {
   state.ethicsAnswers = [];
   state.score = 0;
   state.staminaLevel = 3;
-  state.livesRemaining = 3;
-  state.isFirstGameOver = false;
-  state.savedSessionData = null;
-  state.resumeFromQuestion = 0;
 
   updateStaminaBars(3);
-  updateLivesDisplay();
+  _updateControlsPanel();
   game.stop();
   game._demoMode = true;
   game._demoPhase = 'act1_scroll';
@@ -1731,85 +1704,6 @@ document.getElementById('btn-go-green').addEventListener('click', () => {
   showScreen('print');
   Byte.setState('print');
   playSound('print');
-});
-
-// ── Lives display ────────────────────────────
-function updateLivesDisplay() {
-  const hearts = document.querySelectorAll('#screen-ethics .game-heart');
-  hearts.forEach((h, i) => {
-    h.classList.toggle('heart-lost', i >= state.livesRemaining);
-  });
-}
-
-// ── Game Over overlay ────────────────────────
-function showGameOver() {
-  state.resumeFromQuestion = state.currentQuestionIndex;
-  state.savedSessionData = {
-    ethicsAnswers: [...state.ethicsAnswers],
-    score:         state.score,
-    staminaLevel:  state.staminaLevel
-  };
-
-  const overlay = document.getElementById('gameover-overlay');
-  if (!overlay) return;
-
-  const qEl = document.getElementById('gameover-question');
-  if (qEl) qEl.textContent = state.currentQuestionIndex + 1;
-
-  const playAgainBtn   = document.getElementById('btn-gameover-playagain');
-  const retryCaption   = document.getElementById('gameover-retry-caption');
-  if (state.isFirstGameOver) {
-    if (playAgainBtn)  playAgainBtn.classList.add('hidden');
-    if (retryCaption)  retryCaption.classList.remove('hidden');
-  } else {
-    if (playAgainBtn)  playAgainBtn.classList.remove('hidden');
-    if (retryCaption)  retryCaption.classList.add('hidden');
-  }
-
-  overlay.classList.remove('hidden');
-  if (playAgainBtn && !state.isFirstGameOver) playAgainBtn.focus();
-}
-
-document.getElementById('btn-gameover-playagain').addEventListener('click', () => {
-  document.getElementById('gameover-overlay').classList.add('hidden');
-
-  state.isFirstGameOver      = true;
-  state.livesRemaining       = 3;
-  state.currentQuestionIndex = state.resumeFromQuestion;
-
-  if (state.savedSessionData) {
-    state.ethicsAnswers = [...state.savedSessionData.ethicsAnswers];
-    state.score         = state.savedSessionData.score;
-    state.staminaLevel  = state.savedSessionData.staminaLevel;
-  }
-
-  updateStaminaBars(state.staminaLevel);
-  updateLivesDisplay();
-
-  game.stop();
-  game.init();
-  renderQuestion();
-});
-
-document.getElementById('btn-gameover-backtostart').addEventListener('click', () => {
-  document.getElementById('gameover-overlay').classList.add('hidden');
-  game.stop();
-  resetGameState();
-  state.prompt        = '';
-  state.taskType      = 'text-short';
-  state.metrics       = null;
-  state.sessionId     = generateSessionId();
-  state.userName      = '';
-  state.userAge       = '';
-  state.userExpertise = '';
-  state.userGender    = '';
-  document.getElementById('user-name').value      = '';
-  document.getElementById('user-age').value       = '';
-  document.getElementById('user-expertise').value = '';
-  document.getElementById('user-gender').value    = '';
-  updateBytePosition(0);
-  showScreen('idle');
-  Byte.setState('idle');
 });
 
 function _saveSessionToSupabase(state) {

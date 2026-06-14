@@ -520,14 +520,8 @@
         </div>
 
         <div class="ticket-qr">
-          <div class="qr-placeholder" aria-label="QR code placeholder">
-            <div class="qr-mock">
-              <div></div><div></div><div></div>
-              <div></div><div></div><div></div>
-              <div></div><div></div><div></div>
-            </div>
-          </div>
-          <div class="ticket-url pixel-font">aircade.app</div>
+          <canvas id="ticket-qr-canvas" width="80" height="80" aria-label="QR code for ai-rcade.lovable.app" style="display:block;image-rendering:pixelated;"></canvas>
+          <div class="ticket-url pixel-font">ai-rcade.lovable.app</div>
         </div>
       </div>
     </div>
@@ -598,6 +592,7 @@
 
   <!-- External libs -->
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 
   <!-- App modules -->
   <script src="sounds.js"></script>

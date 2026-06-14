@@ -44,6 +44,29 @@ async function downloadCard(sessionId) {
   }
 }
 
+function generateTicketQR() {
+  const canvas = document.getElementById('ticket-qr-canvas');
+  if (!canvas || typeof qrcode === 'undefined') return;
+  const qr = qrcode(0, 'M');
+  qr.addData('https://ai-rcade.lovable.app/');
+  qr.make();
+  const ctx    = canvas.getContext('2d');
+  const size   = canvas.width;          // 80px
+  const count  = qr.getModuleCount();
+  const cell   = size / count;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#0a0a2e';            // dark navy modules
+  for (let r = 0; r < count; r++) {
+    for (let c = 0; c < count; c++) {
+      if (qr.isDark(r, c)) {
+        ctx.fillRect(Math.floor(c * cell), Math.floor(r * cell),
+                     Math.ceil(cell), Math.ceil(cell));
+      }
+    }
+  }
+}
+
 function populateTicketCard(state) {
   const { sessionId, userName, userAge, ethicsAnswers, score, staminaLevel, persona } = state;
 
@@ -86,4 +109,6 @@ function populateTicketCard(state) {
     // Truncate for ticket readability
     tipEl.textContent = tipText.length > 140 ? tipText.slice(0, 137) + '…' : tipText;
   }
+
+  generateTicketQR();
 }
