@@ -44,11 +44,12 @@ async function downloadCard(sessionId) {
   }
 }
 
-function generateTicketQR() {
+function generateTicketQR(sessionId) {
   const canvas = document.getElementById('ticket-qr-canvas');
   if (!canvas || typeof qrcode === 'undefined') return;
+  const url = 'https://ai-rcade.lovable.app/session?id=' + (sessionId || '');
   const qr = qrcode(0, 'M');
-  qr.addData('https://ai-rcade.lovable.app/');
+  qr.addData(url);
   qr.make();
   const ctx    = canvas.getContext('2d');
   const size   = canvas.width;          // 80px
@@ -110,5 +111,5 @@ function populateTicketCard(state) {
     tipEl.textContent = tipText.length > 140 ? tipText.slice(0, 137) + '…' : tipText;
   }
 
-  generateTicketQR();
+  generateTicketQR(sessionId);
 }
