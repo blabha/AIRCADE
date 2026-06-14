@@ -776,6 +776,7 @@ const game = {
     setTimeout(() => {
       const overlay = document.getElementById('q-overlay');
       if (overlay) {
+        overlay.style.display = '';
         overlay.classList.remove('hidden');
         void overlay.offsetWidth;
         overlay.classList.add('overlay-burst-in');
@@ -783,7 +784,7 @@ const game = {
         setTimeout(() => {
           const firstAnswer = document.querySelector('#answer-options .answer-btn:not(:disabled)');
           if (firstAnswer) firstAnswer.focus();
-        }, 200);
+        }, 300);
       }
     }, 150);
   },
@@ -1236,6 +1237,7 @@ const game = {
     }
     contBanner.classList.remove('hidden');
 
+    overlay.style.display = '';
     overlay.classList.remove('hidden');
     void overlay.offsetWidth;
     overlay.classList.add('overlay-burst-in');
@@ -1245,7 +1247,7 @@ const game = {
 
   _demoQuestionContinue() {
     const overlay = document.getElementById('q-overlay');
-    if (overlay) { overlay.classList.add('hidden'); overlay.classList.remove('overlay-burst-in'); }
+    if (overlay) { overlay.classList.add('hidden'); overlay.style.display = 'none'; overlay.classList.remove('overlay-burst-in'); }
     const contBanner = document.getElementById('demo-continue-banner');
     if (contBanner) contBanner.classList.add('hidden');
     const placeholder = document.getElementById('q-panel-placeholder');
@@ -1526,22 +1528,20 @@ function renderQuestion() {
       <span class="answer-text">${answer.text}</span>
     `;
     btn.addEventListener('click', function () {
-      console.log('ANSWER CLICKED');
-      playSound('click');
       handleAnswer(answer, btn);
     });
-    // Arrow key navigation between answer buttons
     btn.addEventListener('keydown', function (e) {
       const all = [...document.querySelectorAll('#answer-options .answer-btn:not(:disabled)')];
-      const idx = all.indexOf(this);
+      const myIdx = all.indexOf(this);
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        const next = all[idx + 1];
-        if (next) next.focus();
+        if (all[myIdx + 1]) all[myIdx + 1].focus();
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        const prev = all[idx - 1];
-        if (prev) prev.focus();
+        if (all[myIdx - 1]) all[myIdx - 1].focus();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
       }
     });
     answersEl.appendChild(btn);
@@ -1556,10 +1556,26 @@ function renderQuestion() {
 
   if (overlay) {
     overlay.classList.add('hidden');
+    overlay.style.display = 'none';
     overlay.classList.remove('overlay-burst-in');
   }
-  if (placeholder) placeholder.classList.remove('hidden');
-  if (whyCard) whyCard.className = 'why-card hidden';
+  if (placeholder) {
+    placeholder.classList.remove('hidden');
+    placeholder.style.display = '';
+  }
+  if (whyCard) {
+    whyCard.className = 'why-card hidden';
+    whyCard.style.display = 'none';
+  }
+  const nextBtnReset = document.getElementById('btn-next-question');
+  if (nextBtnReset) {
+    nextBtnReset.classList.add('hidden');
+    nextBtnReset.style.display = 'none';
+  }
+  // Reset any dimmed answer buttons from previous question
+  document.querySelectorAll('#answer-options .answer-btn').forEach(b => {
+    b.style.opacity = '';
+  });
 
   game.showBlock();
   game.walkAndHit(() => {
@@ -1572,7 +1588,10 @@ function renderQuestion() {
 }
 
 function handleAnswer(answer, clickedBtn) {
-  // Sound feedback
+  // Guard against double-fire (button already disabled)
+  if (clickedBtn.disabled) return;
+
+  // Type-specific sound: H → damage, B → click, L → goodChoice
   if (answer.type === 'L')      playSound('goodChoice');
   else if (answer.type === 'H') playSound('damage');
   else                          playSound('click');
@@ -1587,10 +1606,11 @@ function handleAnswer(answer, clickedBtn) {
   }
   state.score += qScore;
 
-  // Update stamina bars
-  const newLevel = calculateStaminaLevel(state.score);
-  if (newLevel !== state.staminaLevel) {
-    updateStaminaBars(newLevel);
+  // Per-answer stamina feedback: H → -1 bar, B → neutral, L → +1 bar
+  if (answer.type === 'H') {
+    updateStaminaBars(Math.max(1, state.staminaLevel - 1));
+  } else if (answer.type === 'L') {
+    updateStaminaBars(Math.min(5, state.staminaLevel + 1));
   }
 
   // Record answer
@@ -1602,40 +1622,60 @@ function handleAnswer(answer, clickedBtn) {
     score:    qScore
   });
 
-  // Disable all buttons, highlight selected
-  document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+  // Disable all answer buttons, highlight selected
+  document.querySelectorAll('#answer-options .answer-btn').forEach(b => {
+    b.disabled = true;
+    if (b !== clickedBtn) b.style.opacity = '0.6';
+  });
   clickedBtn.classList.add(`selected-${answer.color}`);
 
   // Byte reacts to answer type
   game.react(answer.type);
 
-  // Reveal right panel: hide placeholder, show why card
+  // Reveal right panel — force inline display to override any CSS specificity
   const placeholder = document.getElementById('q-panel-placeholder');
-  if (placeholder) placeholder.classList.add('hidden');
+  if (placeholder) {
+    placeholder.classList.add('hidden');
+    placeholder.style.display = 'none';
+  }
 
-  // Show WHY card with generic text per type
   const whyCard = document.getElementById('why-card');
-  document.getElementById('why-text').textContent = WHY_TEXT[answer.type] || WHY_TEXT.B;
-  whyCard.className = `why-card why-border-${answer.color}`;
+  const whyText = document.getElementById('why-text');
+  if (whyText) whyText.textContent = WHY_TEXT[answer.type] || WHY_TEXT.B;
+  if (whyCard) {
+    whyCard.className = `why-card why-border-${answer.color}`;
+    whyCard.style.display = '';
+  }
 
   const nextBtn = document.getElementById('btn-next-question');
-  nextBtn.classList.remove('hidden');
-  // Auto-focus CONTINUE so player can press ENTER immediately
-  setTimeout(() => nextBtn.focus(), 50);
+  if (nextBtn) {
+    nextBtn.classList.remove('hidden');
+    nextBtn.style.display = '';
+    setTimeout(() => nextBtn.focus(), 80);
+  }
 }
 
 // ── Next button ──────────────────────────────
-document.getElementById('btn-next-question').addEventListener('click', () => {
+(function () {
   const nextBtn = document.getElementById('btn-next-question');
-  if (nextBtn.disabled) return;
-  nextBtn.disabled = true;
-  playSound('coin');
-  advanceQuestion();
-  setTimeout(() => { nextBtn.disabled = false; }, 200);
-});
+  nextBtn.addEventListener('click', () => {
+    if (nextBtn.disabled) return;
+    nextBtn.disabled = true;
+    playSound('coin');
+    advanceQuestion();
+    setTimeout(() => { nextBtn.disabled = false; }, 200);
+  });
+  nextBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      nextBtn.click();
+    }
+  });
+})();
 
 function advanceQuestion() {
-  document.getElementById('btn-next-question').classList.add('hidden');
+  const _advBtn = document.getElementById('btn-next-question');
+  if (_advBtn) { _advBtn.classList.add('hidden'); _advBtn.style.display = 'none'; }
 
   state.currentQuestionIndex++;
   const afterFade = state.currentQuestionIndex >= TOTAL_QUESTIONS
@@ -1647,6 +1687,7 @@ function advanceQuestion() {
     overlay.classList.add('fade-out');
     setTimeout(() => {
       overlay.classList.add('hidden');
+      overlay.style.display = 'none';
       overlay.classList.remove('fade-out', 'overlay-burst-in');
       afterFade();
     }, 150);
@@ -1659,19 +1700,19 @@ function advanceQuestion() {
 
 function showPersonaScreen() {
   game.stop();
-  const p = GameLogic.getPersona(state.score);
-  // Build persona object compatible with print.js (expects .title, .byteSvg)
-  const visualKey = state.score <= 13 ? 'the_turbo_tapper' :
-                    state.score <= 19 ? 'the_sleepwalker'  :
-                    state.score <= 29 ? 'the_balanced_byte' :
-                                        'the_zen_prompter';
-  const visual = (typeof PERSONALITY_TYPES !== 'undefined') ? PERSONALITY_TYPES[visualKey] : null;
-  state.persona = { title: p.name, subtitle: p.desc, description: p.desc, byteSvg: visual ? visual.byteSvg : '' };
+  // getPersonaFromScore is defined in data.js (loaded) — returns { title, subtitle, description, byteSvg }
+  const p = getPersonaFromScore(state.score);
+  state.persona = {
+    title:       p.title,
+    subtitle:    p.subtitle,
+    description: p.description,
+    byteSvg:     p.byteSvg || ''
+  };
 
   document.getElementById('persona-byte').innerHTML          = state.persona.byteSvg;
-  document.getElementById('persona-name').textContent        = p.name;
-  document.getElementById('persona-tagline').textContent     = p.desc;
-  document.getElementById('persona-description').textContent = '';
+  document.getElementById('persona-name').textContent        = p.title;
+  document.getElementById('persona-tagline').textContent     = p.subtitle;
+  document.getElementById('persona-description').textContent = p.description || '';
   document.getElementById('persona-score-display').textContent = 'Score: ' + state.score + '/35';
 
   // Persona sound
