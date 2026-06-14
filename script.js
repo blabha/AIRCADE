@@ -1526,6 +1526,7 @@ function renderQuestion() {
       <span class="answer-text">${answer.text}</span>
     `;
     btn.addEventListener('click', function () {
+      console.log('ANSWER CLICKED');
       playSound('click');
       handleAnswer(answer, btn);
     });
@@ -1576,8 +1577,14 @@ function handleAnswer(answer, clickedBtn) {
   else if (answer.type === 'H') playSound('damage');
   else                          playSound('click');
 
-  // Accumulate score using calcQuestionScore
-  const qScore = GameLogic.calcQuestionScore(answer.envWeight, answer.moralScore);
+  // Accumulate score — defensive wrapper in case GameLogic.calcQuestionScore throws
+  let qScore = 0;
+  try {
+    const computed = GameLogic.calcQuestionScore(answer.envWeight, answer.moralScore);
+    qScore = Number.isFinite(computed) ? computed : (typeof answer.score === 'number' ? answer.score : 0);
+  } catch (_) {
+    qScore = typeof answer.score === 'number' ? answer.score : 0;
+  }
   state.score += qScore;
 
   // Update stamina bars

@@ -184,6 +184,16 @@ All step text is translated via the `data-i18n` system (`ui.step1title`, `ui.ste
 
 Screen 1.1 is a Chrome Dino-style DOM platformer. The player controls **Byte** (a character sprite) across a scrolling world. Five `?` blocks are placed at increasing horizontal distances. Landing on a `?` block triggers a question overlay. After answering all 5 questions the game ends and the app moves to Screen 2.
 
+### Physics & Speed Constants
+
+| Constant | Value | Notes |
+|---|---|---|
+| `GRAVITY` | 0.6 | px/frame² |
+| `JUMP_FORCE` | −14 | upward velocity on jump |
+| `JUMP_VX` | 6.0 | horizontal velocity on arc jump |
+| `BASE_SCROLL_SPEED` | 5.0 | px/frame at Q1 |
+| `SPEED_MULTIPLIERS` | [1.0, 1.1, 1.2, 1.3, 1.5] | per question index (Q1–Q5) |
+
 ### Game Engine (`game` object in `script.js`)
 
 - `requestAnimationFrame` loop with `game.start()` / `game.stop()`
@@ -239,6 +249,23 @@ A scrolling dashed ground line animates at the bottom of the screen (Mario runne
 | ≥ 13 | 5 | ■■■■■ |
 
 All three bars (Water, CO₂, Energy) update together to the same level after each answer. Level starts at 3. Pop animation on change.
+
+### Question Overlay Timing
+
+| Event | Delay |
+|---|---|
+| `_crushBlock` shows overlay after block collision | 150 ms |
+| First answer button auto-focus after overlay appears | 200 ms |
+| `btn-next-question` re-enable debounce | 200 ms |
+| `react()` Byte animation (star-jump / damage / nod) | 500 ms |
+| Demo speech bubble display | 90 frames (~1.5 s at 60 fps) |
+
+### Overlay Close (CONTINUE / NEXT QUESTION)
+- `advanceQuestion()` adds CSS class `.fade-out` on `#q-overlay` triggering a 150 ms fade-out animation
+- `_overlayOpen` remains `true` during the fade — game loop stays paused
+- After 150 ms: overlay is hidden, `game.walkForward()` is called, `_overlayOpen` is set to `false`
+- Byte resumes from his current position — no position reset, no scroll reset
+- CSS animation defined inline in `index.html`: `@keyframes overlayFadeOut` + `.q-overlay.fade-out`
 
 ### After Answer Selection
 - All answer buttons disabled. Selected button stays visually identical (no color reveal). Non-selected buttons dim to 60% opacity.
