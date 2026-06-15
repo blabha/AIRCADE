@@ -1754,8 +1754,7 @@ function _saveSessionToSupabase(state) {
 // ── SCREEN 4: TICKET DOWNLOAD ────────────────
 
 document.getElementById('btn-download').addEventListener('click', () => {
-  downloadCard(state.sessionId);
-  showThankYouAndReset();
+  printOrDownloadCard(state.sessionId, showThankYouAndReset);
 });
 
 function showThankYouAndReset() {

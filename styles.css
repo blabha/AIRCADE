@@ -2745,17 +2745,24 @@ body.stamina-visible .ethics-main {
   width: 100%;
 }
 
+/* ── Ticket card: fixed 384×576 px, no overflow ── */
 .ticket-card {
   background: #fff;
   color: #111;
-  width: 340px;
+  width: 384px;
+  height: 576px;
+  max-height: 576px;
   border-radius: 4px;
-  padding: 28px 24px;
+  padding: 0 22px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.4;
   box-shadow: 0 8px 40px rgba(0,0,0,0.5);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .ticket-card::before,
@@ -2770,126 +2777,163 @@ body.stamina-visible .ethics-main {
 .ticket-card::before { top: -8px; }
 .ticket-card::after  { bottom: -8px; }
 
+/* ── HEADER ZONE ── */
 .ticket-header {
   text-align: center;
-  margin-bottom: 16px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .ticket-logo {
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 700;
   font-family: var(--pixel-font);
   color: #111;
   letter-spacing: 0.05em;
+  display: block;
+  margin-top: 20px;
 }
 
 .ticket-session {
-  font-size: 8px;
+  font-size: 10px;
   font-family: var(--pixel-font);
   color: #666;
-  margin-top: 6px;
+  display: block;
+  margin-top: 4px;
 }
 
+/* ── DIVIDERS ── */
 .ticket-divider {
   text-align: center;
   color: #aaa;
-  font-size: 12px;
-  margin: 12px 0;
+  font-size: 10px;
   letter-spacing: 0.05em;
+  margin-top: 6px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
+/* ── SECTIONS (generic) ── */
 .ticket-section {
-  margin-bottom: 4px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .ticket-label {
   font-weight: 700;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 2px;
   color: #444;
-  margin-bottom: 6px;
+  margin-top: 6px;
+  margin-bottom: 0;
 }
 
+/* ── PLAYER ZONE ── */
 .ticket-player {
-  font-size: 15px;
+  font-size: 14px;
   color: #111;
-  margin-bottom: 4px;
+  margin-top: 4px;
 }
 
 .ticket-persona-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-top: 4px;
 }
 
 .ticket-persona-byte {
-  width: 48px;
-  height: 36px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
 }
 
+.ticket-persona-byte img,
 .ticket-persona-byte svg {
   width: 100%;
   height: 100%;
 }
 
 .ticket-persona-name {
-  font-size: 9px;
+  font-size: 14px;
+  font-weight: 700;
   color: #111;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
 
+/* ── SCORE ZONE ── */
 .ticket-score {
-  font-size: 11px;
+  font-size: 22px;
+  font-weight: 700;
   color: #111;
-  margin-bottom: 4px;
+  margin-top: 2px;
 }
 
 .ticket-stamina {
-  font-size: 13px;
+  font-size: 11px;
   color: #444;
+  margin-top: 2px;
 }
 
+/* ── FOOTPRINT ZONE ── */
 .ticket-footprint {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin-top: 4px;
+  gap: 1px;
+  margin-top: 3px;
 }
 
 .ticket-footprint-row {
-  font-size: 12px;
+  font-size: 11px;
   color: #222;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
+/* ── TIP ZONE ── */
 .ticket-tip {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 10px;
+  line-height: 1.4;
   color: #111;
+  margin-top: 3px;
 }
 
+/* ── QUOTE ZONE ── */
 .ticket-remember {
   text-align: center;
   font-style: italic;
-  color: #555;
-  font-size: 12px;
-  line-height: 1.6;
+  color: #111;
+  font-size: 9px;
+  line-height: 1.5;
+  opacity: 1;
+  flex-shrink: 0;
+  overflow: hidden;
+  margin-top: 6px;
 }
 
+/* ── QR ZONE ── */
 .ticket-qr {
-  margin-top: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 3px;
+  margin-top: 16px;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.ticket-qr canvas {
+  display: block;
+  width: 64px !important;
+  height: 64px !important;
 }
 
 .ticket-url {
-  font-size: 8px;
+  font-size: 9px;
+  font-weight: 700;
   color: #333;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+  text-align: center;
 }
 
 /* ════════════════════════════════════════
