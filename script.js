@@ -586,7 +586,7 @@ const game = {
     if (!el) return;
     el.innerHTML = '';
     const COLORS = ['0,245,255', '255,0,110', '255,255,240', '255,255,240', '255,255,240'];
-    for (let i = 0; i < 45; i++) {
+    for (let i = 0; i < 20; i++) {
       const s = document.createElement('div');
       s.className = 'game-star';
       const color = COLORS[Math.floor(Math.random() * COLORS.length)];
@@ -605,10 +605,8 @@ const game = {
     el.innerHTML = '';
     const clouds = [
       { l:5,  t:10, w:90,  dur:28, del:0  },
-      { l:25, t:22, w:70,  dur:22, del:8  },
-      { l:50, t:7,  w:110, dur:32, del:4  },
+      { l:35, t:7,  w:110, dur:32, del:4  },
       { l:70, t:18, w:80,  dur:26, del:14 },
-      { l:88, t:13, w:65,  dur:20, del:20 },
     ];
     const SVG = (w) => {
       const h = Math.round(w * 0.6);
@@ -810,7 +808,10 @@ const game = {
 
     let foundBlock = null;
     for (const b of this._blocks) {
-      if (b.used || b.activated) continue;
+      if (b.used) continue;
+      if (b.activated) continue;
+      // Skip blocks more than 300px away — no collision possible
+      if (Math.abs(b.screenX - byteLeft) > 300) continue;
       const blockCSSTop = b.blockCSSTop;
       const blockBottom = blockCSSTop + this.BLOCK_H;
       const overlapX    = byteRight > b.screenX + 8 && byteLeft < b.screenX + this.BLOCK_W - 8;
@@ -892,9 +893,13 @@ const game = {
     }
   },
 
-  _loop() {
+  _loop(now) {
     if (!this._running) return;
-    this._raf = requestAnimationFrame(() => this._loop());
+    this._raf = requestAnimationFrame((t) => this._loop(t));
+    // Cap to 30 fps — skip frames that arrive faster than 33 ms apart
+    if (now !== undefined && now - (this._lastFrameTime || 0) < 33) return;
+    this._lastFrameTime = now;
+    this._frameCount = (this._frameCount || 0) + 1;
     this._update();
   },
 
@@ -952,9 +957,11 @@ const game = {
     this._checkBlockCollision();
     this._checkObstacleCollision();
 
-    // Parallax: stars at 15%, clouds at 30%
-    if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-(this._worldX * 0.15).toFixed(1)}px)`;
-    if (this._bgCloudsEl) this._bgCloudsEl.style.transform = `translateX(${-(this._worldX * 0.30).toFixed(1)}px)`;
+    // Parallax: update every 3 frames to reduce style recalcs
+    if (this._frameCount % 3 === 0) {
+      if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-(this._worldX * 0.15).toFixed(1)}px)`;
+      if (this._bgCloudsEl) this._bgCloudsEl.style.transform = `translateX(${-(this._worldX * 0.30).toFixed(1)}px)`;
+    }
 
     // Byte animation state (don't override jump/react anims)
     if (!this._animating && !this._inJump) {
