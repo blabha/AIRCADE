@@ -21,7 +21,7 @@ async function printOrDownloadCard(sessionId, onSuccess) {
   try {
     const canvas = await html2canvas(card, {
       backgroundColor: '#ffffff',
-      scale: 3,
+      scale: 4,
       width: 384,
       height: 576,
       useCORS: true,
@@ -78,9 +78,9 @@ async function downloadCard(sessionId) {
 function generateTicketQR(sessionId) {
   const canvas = document.getElementById('ticket-qr-canvas');
   if (!canvas || typeof qrcode === 'undefined') return;
-  // 64×64 — sized to fit within the QR zone
-  canvas.width  = 64;
-  canvas.height = 64;
+  // 60×60 — sized to fit within the QR zone
+  canvas.width  = 60;
+  canvas.height = 60;
   const url = 'https://ai-rcade.lovable.app/session?id=' + (sessionId || '');
   const qr = qrcode(0, 'M');
   qr.addData(url);
@@ -135,9 +135,15 @@ function _pixelFace() {
 function populateTicketCard(state) {
   const { sessionId, userName, userAge, ethicsAnswers, score, staminaLevel, persona } = state;
 
-  // Session ID hidden on ticket (still used for QR URL and Supabase)
+  // Session ID — shown under the title in small grey text
   const sessionEl = document.getElementById('ticket-session');
-  if (sessionEl) sessionEl.textContent = '';
+  if (sessionEl) {
+    sessionEl.textContent = sessionId ? 'SESSION: #' + String(sessionId).slice(0, 6).toUpperCase() : '';
+    sessionEl.style.cssText = 'font-size:7px;color:#999999;text-align:center;margin:2px 0 4px;display:block;';
+  }
+  // Compensate for the added line by reducing the title top margin
+  const logoEl = document.querySelector('#ticket-card .ticket-logo');
+  if (logoEl) logoEl.style.marginTop = (parseInt(getComputedStyle(logoEl).marginTop) - 4) + 'px';
 
   // Player name
   const playerEl = document.getElementById('ticket-player');

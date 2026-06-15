@@ -146,19 +146,6 @@ document.getElementById('error-close').addEventListener('click', () => {
 
 // ── SCREEN 0: IDLE ──────────────────────────
 document.getElementById('btn-start').addEventListener('click', () => {
-  // Update instructions overlay to match actual game controls
-  const stepUpdates = [
-    ['ui.step1title', 'DODGE!',   'ui.step1desc', 'Jump over data centers!'],
-    ['ui.step2title', 'HIT ?',    'ui.step2desc', 'Hit ? blocks to answer questions'],
-    ['ui.step3title', 'ANSWER',   'ui.step3desc', 'Answer 5 questions'],
-    ['ui.step4title', 'PERSONA',  'ui.step4desc', 'Discover your AI persona'],
-  ];
-  stepUpdates.forEach(([tKey, tText, dKey, dText]) => {
-    const titleEl = document.querySelector(`[data-i18n="${tKey}"]`);
-    const descEl  = document.querySelector(`[data-i18n="${dKey}"]`);
-    if (titleEl) titleEl.textContent = tText;
-    if (descEl)  descEl.textContent  = dText;
-  });
   overlayInstructions.classList.remove('hidden');
   Byte.say('Here\'s how to play! 🎮');
   setTimeout(() => document.getElementById('btn-lets-go').focus(), 60);
@@ -516,8 +503,8 @@ const game = {
   GRAVITY:    0.6,
   JUMP_FORCE: -14,    // negative = upward in CSS coords
   JUMP_VX:    6.0,    // horizontal velocity for arc jump
-  BASE_SCROLL_SPEED: 5.0,
-  SPEED_MULTIPLIERS: [1.0, 1.1, 1.2, 1.3, 1.5],
+  BASE_SCROLL_SPEED: 7.5,
+  SPEED_MULTIPLIERS: [1.2, 1.32, 1.44, 1.56, 1.8],
   ZONE_WIDTH: 4000,   // world-space width allocated per question
   BYTE_W:     88,
   BYTE_H:     66,
@@ -576,6 +563,7 @@ const game = {
     this._positionByte();
     this._setByteState('idle');
 
+    this._bgScrollX = 0;   // accumulates only actual scroll (not worldX jumps)
     this._running = true;
     if (this._raf) cancelAnimationFrame(this._raf);
     this._loop();
@@ -911,7 +899,9 @@ const game = {
 
     // Auto-scroll: world moves left at per-question speed
     const mult = this.SPEED_MULTIPLIERS[this._questionIdx] || 1.0;
-    this._worldX += this.BASE_SCROLL_SPEED * mult;
+    const _scrollDelta = this.BASE_SCROLL_SPEED * mult;
+    this._worldX    += _scrollDelta;
+    this._bgScrollX += _scrollDelta;
 
     // Gravity + velocity (only when airborne)
     if (!this._onGround && this._onBlock === null) {
@@ -957,10 +947,12 @@ const game = {
     this._checkBlockCollision();
     this._checkObstacleCollision();
 
-    // Parallax: update every 3 frames to reduce style recalcs
+    // Parallax: update every 3 frames; wrap _bgScrollX to prevent off-screen drift
     if (this._frameCount % 3 === 0) {
-      if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-(this._worldX * 0.15).toFixed(1)}px)`;
-      if (this._bgCloudsEl) this._bgCloudsEl.style.transform = `translateX(${-(this._worldX * 0.30).toFixed(1)}px)`;
+      const _starOff  = (this._bgScrollX * 0.15) % (this._worldW || 1200);
+      const _cloudOff = (this._bgScrollX * 0.30) % ((this._worldW || 1200) * 1.5);
+      if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-_starOff.toFixed(1)}px)`;
+      if (this._bgCloudsEl) this._bgCloudsEl.style.transform = `translateX(${-_cloudOff.toFixed(1)}px)`;
     }
 
     // Byte animation state (don't override jump/react anims)
@@ -1226,8 +1218,9 @@ const game = {
   },
 
   _updateDemo() {
-    const HALF_SCROLL = this.BASE_SCROLL_SPEED * 0.5;
-    const CENTER_X    = Math.round(this._worldW * 0.6);
+    const HALF_SCROLL  = this.BASE_SCROLL_SPEED * 0.5;
+    const CENTER_X     = Math.round(this._worldW * 0.6);
+    const _prevWorldX  = this._worldX;
     const BUBBLE_FRAMES = 90; // 1.5 seconds at 60fps
 
     // Physics always runs in demo (player can jump)
@@ -1340,9 +1333,12 @@ const game = {
       // Waiting for ↑ press — handled in _keyHandler
     }
 
-    // Parallax
-    if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-(this._worldX * 0.15).toFixed(1)}px)`;
-    if (this._bgCloudsEl) this._bgCloudsEl.style.transform = `translateX(${-(this._worldX * 0.30).toFixed(1)}px)`;
+    // Parallax — accumulate actual scroll only (not worldX jumps)
+    this._bgScrollX += this._worldX - _prevWorldX;
+    const _dStarOff  = (this._bgScrollX * 0.15) % (this._worldW || 1200);
+    const _dCloudOff = (this._bgScrollX * 0.30) % ((this._worldW || 1200) * 1.5);
+    if (this._bgStarsEl)  this._bgStarsEl.style.transform  = `translateX(${-_dStarOff.toFixed(1)}px)`;
+    if (this._bgCloudsEl) this._bgCloudsEl.style.transform = `translateX(${-_dCloudOff.toFixed(1)}px)`;
     if (!this._animating && !this._inJump) {
       if (this._onGround || this._onBlock) this._setByteState('idle');
     }
@@ -1714,39 +1710,32 @@ document.getElementById('btn-go-green').addEventListener('click', () => {
 });
 
 function _saveSessionToSupabase(state) {
-  const ans = (i) => (state.ethicsAnswers && state.ethicsAnswers[i]) || {};
+  const fp = (DAILY_FOOTPRINT && DAILY_FOOTPRINT[state.staminaLevel]) || (DAILY_FOOTPRINT && DAILY_FOOTPRINT[3]) || {};
   const payload = {
-    session_id:       state.sessionId,
-    player_name:      state.userName || 'Anonymous',
-    age_group:        state.userAge    || null,
-    expertise:        state.userExpertise || null,
-    gender:           state.userGender   || null,
-    language:         (typeof currentLang !== 'undefined') ? currentLang : 'en',
-    score:            state.score        ?? null,
-    persona:          state.persona ? state.persona.title : null,
-    stamina_level:    state.staminaLevel ?? null,
-    answer_1_category: ans(0).category ?? null,
-    answer_1_type:     ans(0).type     ?? null,
-    answer_1_score:    ans(0).score    ?? null,
-    answer_2_category: ans(1).category ?? null,
-    answer_2_type:     ans(1).type     ?? null,
-    answer_2_score:    ans(1).score    ?? null,
-    answer_3_category: ans(2).category ?? null,
-    answer_3_type:     ans(2).type     ?? null,
-    answer_3_score:    ans(2).score    ?? null,
-    answer_4_category: ans(3).category ?? null,
-    answer_4_type:     ans(3).type     ?? null,
-    answer_4_score:    ans(3).score    ?? null,
-    answer_5_category: ans(4).category ?? null,
-    answer_5_type:     ans(4).type     ?? null,
-    answer_5_score:    ans(4).score    ?? null,
+    source:        'arcade',
+    player_id:     state.sessionId,
+    persona:       state.persona ? state.persona.title : null,
+    score:         state.score        ?? null,
+    energy_kwh:    fp.energy ? parseFloat(fp.energy) : null,
+    water_l:       fp.water  ? parseFloat(fp.water)  : null,
+    co2_g:         fp.co2    ? parseFloat(fp.co2)    : null,
+    prompts_count: 5,
+    metadata:      JSON.stringify({
+      player_name: state.userName || 'Anonymous',
+      age_group:   state.userAge       || null,
+      expertise:   state.userExpertise || null,
+      gender:      state.userGender    || null,
+      language:    (typeof currentLang !== 'undefined') ? currentLang : 'en',
+      stamina_level: state.staminaLevel ?? null,
+      answers:     state.ethicsAnswers || [],
+    }),
   };
-  fetch('https://tpacbxkobtekehqrgodd.supabase.co/rest/v1/aircade_sessions', {
+  fetch('https://tpacbxkobtekehqrgodd.supabase.co/rest/v1/sessions', {
     method:  'POST',
     headers: {
       'Content-Type':  'application/json',
-      'apikey':        'sb_publishable_qSeNNoQsnXbfNFWc-a8Bxg_0Y2LgLYx',
-      'Authorization': 'Bearer sb_publishable_qSeNNoQsnXbfNFWc-a8Bxg_0Y2LgLYx',
+      'apikey':        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwYWNieGtvYnRla2VocXJnb2RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NzM0NTYsImV4cCI6MjA5NjE0OTQ1Nn0.N_bQ84KSkFf9SPlZzA8jhGo-VblXDmMfTakcqj0g8c0',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwYWNieGtvYnRla2VocXJnb2RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NzM0NTYsImV4cCI6MjA5NjE0OTQ1Nn0.N_bQ84KSkFf9SPlZzA8jhGo-VblXDmMfTakcqj0g8c0',
       'Prefer':        'return=minimal',
     },
     body: JSON.stringify(payload),

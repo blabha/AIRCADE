@@ -1636,13 +1636,7 @@ body.stamina-visible .ethics-main {
 }
 
 .privacy-note {
-  font-size: 13px;
-  color: var(--text-dim);
-  background: rgba(0, 245, 255, 0.04);
-  border: 1px solid rgba(0, 245, 255, 0.15);
-  border-radius: var(--radius);
-  padding: 12px 16px;
-  line-height: 1.5;
+  display: none;
 }
 
 /* ════════════════════════════════════════
@@ -2785,7 +2779,7 @@ body.stamina-visible .ethics-main {
 }
 
 .ticket-logo {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   font-family: var(--pixel-font);
   color: #111;
@@ -2831,7 +2825,7 @@ body.stamina-visible .ethics-main {
 
 /* ── PLAYER ZONE ── */
 .ticket-player {
-  font-size: 14px;
+  font-size: 12px;
   color: #111;
   margin-top: 4px;
 }
@@ -2864,14 +2858,14 @@ body.stamina-visible .ethics-main {
 
 /* ── SCORE ZONE ── */
 .ticket-score {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #111;
   margin-top: 2px;
 }
 
 .ticket-stamina {
-  font-size: 11px;
+  font-size: 10px;
   color: #444;
   margin-top: 2px;
 }
@@ -2885,14 +2879,14 @@ body.stamina-visible .ethics-main {
 }
 
 .ticket-footprint-row {
-  font-size: 11px;
+  font-size: 10px;
   color: #222;
   line-height: 1.4;
 }
 
 /* ── TIP ZONE ── */
 .ticket-tip {
-  font-size: 10px;
+  font-size: 9px;
   line-height: 1.4;
   color: #111;
   margin-top: 3px;
@@ -2924,12 +2918,12 @@ body.stamina-visible .ethics-main {
 
 .ticket-qr canvas {
   display: block;
-  width: 64px !important;
-  height: 64px !important;
+  width: 60px !important;
+  height: 60px !important;
 }
 
 .ticket-url {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
   color: #333;
   letter-spacing: 0.08em;

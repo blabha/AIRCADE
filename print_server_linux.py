@@ -40,7 +40,12 @@ def _prepare_image(img: Image.Image) -> Image.Image:
 def _print_via_cups(path: str) -> None:
     """Send file to CUPS printer."""
     subprocess.run(
-        ['lp', '-d', PRINTER_NAME, path],
+        [
+            'lp', '-d', PRINTER_NAME,
+            '-o', 'fit-to-page',
+            '-o', 'Resolution=203dpi',
+            path,
+        ],
         check=True,
         capture_output=True,
         text=True,
@@ -90,7 +95,7 @@ def print_label():
             raw = raw.split(',', 1)[1]
         img = Image.open(io.BytesIO(base64.b64decode(raw)))
         img = _prepare_image(img)
-        img.save(TMP_PATH)
+        img.save(TMP_PATH, 'PNG', optimize=False)
         _print_via_cups(TMP_PATH)
         return jsonify({'status': 'ok', 'message': 'Label sent to printer'})
     except subprocess.CalledProcessError as e:
