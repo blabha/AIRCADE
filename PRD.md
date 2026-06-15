@@ -12,7 +12,7 @@
 | **Format** | Interactive web application (laptop/tablet, full-viewport) |
 | **Duration** | 2–3 minutes per session |
 | **Audience** | General public (age 0+), no technical background assumed |
-| **Installation** | Laser-cut arcade cabinet with touchscreen |
+| **Installation** | Laser-cut arcade cabinet with keyboard-only controls (no mouse, no touch) |
 
 ---
 
@@ -32,6 +32,7 @@ A playful, educational arcade-style experience that teaches people about the env
 | **Frontend** | HTML5, CSS3, Vanilla JavaScript (no framework) |
 | **Fonts** | Press Start 2P (Google Fonts) — pixel/arcade aesthetic |
 | **Image capture** | html2canvas (CDN) — for ticket card download |
+| **QR code** | qrcode-generator@1.4.4 (CDN) — renders session-specific QR to canvas |
 | **AI generation** | Pre-generated offline (no live API) |
 | **Backend** | None — fully static, runs as local HTML file |
 | **Deployment** | Static file, no server required |
@@ -51,7 +52,7 @@ AIRCADE/
 ├── sounds.js           # Sound effects (Web Audio API)
 ├── api.js              # Mock AI responses (offline)
 ├── byte.js             # Byte mascot speech logic
-├── print.js            # Ticket card population + download
+├── print.js            # Ticket card population + QR generation + download
 └── assets/
     ├── cat-astronaut.jpg
     └── bakery-logo.jpg
@@ -90,19 +91,18 @@ const state = {
 [Screen −1: Language Select]
     ↓ Choose language (EN / ES / CA)
 [Screen 0: Idle / Attract Mode]
-    ↓ Press Start
-[Instructions Overlay]
+    ↓ Press Start → Instructions Overlay
     ↓ Let's Go
 [Screen 0.5: User Info]
     ↓ Continue
-[Screen 1.1: Ethics Questions × 5]  ← platformer game (Chrome Dino style)
+[Screen 1.05: How To Play]
+    ↓ Let's Go
+[Screen 1.1: Ethics Questions × 5]  ← Chrome Dino-style platformer
     ↓ After Q5
 [Screen 2: Persona Reveal]
-    ↓ Go Green
-[Screen 3: Personalized Tip]
-    ↓ Print Your Ticket
-[Screen 4: Ticket Download]
-    ↓ Play Again → Screen 0
+    ↓ Go Green → session saved to Supabase
+[Screen 3: Ticket Download]
+    ↓ Print Ticket → thank-you overlay (3 s) → Screen −1
 ```
 
 ---
@@ -128,19 +128,19 @@ Calls `setLanguage(lang)` (defined in `translations.js`), then navigates to Idle
 - `▶ PRESS START` button (blinking)
 - Footer: `© (Ai)rcade 2025 | ☁ FREE PLAY ☁`
 
-**On PRESS START:** Instructions overlay appears.
+**On PRESS START:** Instructions overlay appears. Step text is set dynamically by JS (overrides `data-i18n` text at runtime).
 
 ---
 
 ## Instructions Overlay
 
-**Steps shown (4 steps, describing the platformer game itself):**
-1. **MOVE** — Use ← → arrow keys to move Byte
-2. **JUMP** — Press ↑ or SPACE to jump onto ? blocks
-3. **CRUSH** — Land on a ? block to trigger a question
-4. **ANSWER** — Answer 5 questions to discover your AI persona
+**Steps shown (4 steps, set dynamically in `btn-start` click handler):**
+1. **DODGE!** — Jump over data centers!
+2. **HIT ?** — Hit ? blocks to answer questions
+3. **ANSWER** — Answer 5 questions
+4. **PERSONA** — Discover your AI persona
 
-All step text is translated via the `data-i18n` system (`ui.step1title`, `ui.step1desc` … `ui.step4title`, `ui.step4desc`).
+All step elements use `data-i18n` attributes but their text is overwritten by JS on overlay open.
 
 **CTA:** `LET'S GO! →` — resets game state, navigates to Screen 0.5.
 
@@ -174,15 +174,33 @@ All step text is translated via the `data-i18n` system (`ui.step1title`, `ui.ste
 **On CONTINUE:**
 - Stores `userName`, `userAge`, `userExpertise`, `userGender` in state
 - Randomly assigns one of 5 prompts from the prompt pool
-- Calls `selectQuestionsFromBank(userAge, userExpertise)` → 5 questions
-- Submits session data to Supabase (fire-and-forget)
-- Navigates to Screen 1.1
+- Navigates to Screen 1.05 (How To Play)
+
+---
+
+## Screen 1.05: HOW TO PLAY
+
+Static instruction screen. Shows jump controls and object key. Includes a lives section (`howtoplay-lives`) and a "scroll off screen" row — both are hidden at runtime by JS (no lives system, no scroll-off penalty).
+
+**CTA:** `LET'S GO! →` — starts the demo game sequence.
 
 ---
 
 ## Screen 1.1: ETHICS QUESTIONS (Platformer Game)
 
-Screen 1.1 is a Chrome Dino-style DOM platformer. The player controls **Byte** (a character sprite) across a scrolling world. Five `?` blocks are placed at increasing horizontal distances. Landing on a `?` block triggers a question overlay. After answering all 5 questions the game ends and the app moves to Screen 2.
+Screen 1.1 is a Chrome Dino-style DOM platformer. The world auto-scrolls left; Byte stays near the left side of the screen. Five zones (one per question) each contain 5 datacenter obstacles and 3 `?` blocks. Hitting a `?` block triggers a question overlay. After answering all 5 questions the game ends and the app moves to Screen 2. **The game never stops or shows game over — the player always completes all 5 questions.**
+
+### Zone System
+
+- 5 zones, one per question, each `ZONE_WIDTH = 4000` px wide in world-space
+- Pattern per zone: `[dc, dc, block, dc, block, dc, block, dc]` — 5 datacenters + 3 `?` blocks
+- After answering, camera jumps to the start of the next zone; Byte resets to ground at home X
+- Blocks that scroll past the left edge are silently retired — no penalty
+
+### Datacenter Obstacles
+
+- Canvas-drawn pixel-art buildings (80×55 px) — decorative, non-blocking
+- Collision: OUCH! flash + damage sound + 60-frame cooldown only. No life loss, no game stop.
 
 ### Physics & Speed Constants
 
@@ -193,35 +211,36 @@ Screen 1.1 is a Chrome Dino-style DOM platformer. The player controls **Byte** (
 | `JUMP_VX` | 6.0 | horizontal velocity on arc jump |
 | `BASE_SCROLL_SPEED` | 5.0 | px/frame at Q1 |
 | `SPEED_MULTIPLIERS` | [1.0, 1.1, 1.2, 1.3, 1.5] | per question index (Q1–Q5) |
+| `ZONE_WIDTH` | 4000 | world-space px per question zone |
 
 ### Game Engine (`game` object in `script.js`)
 
-- `requestAnimationFrame` loop with `game.start()` / `game.stop()`
-- Physics: gravity, jump force, ground collision, block top-landing detection
-- Byte moves left/right with arrow keys; jumps with ↑ or SPACE
-- A `_keyHandler` on `document` is added by `game.start()` and removed by `game.stop()`
+- `requestAnimationFrame` loop — `game.init()` starts it, `game.stop()` cancels it
+- Physics: gravity, jump force, ground collision, block top-landing and hit-from-below detection
+- Byte jumps with ↑ or SPACE; ↑+→ held together gives a horizontal arc jump
+- A `_keyHandler` on `document` is added by `game.init()` and removed by `game.stop()`
 - Screen guard inside `_keyHandler`: `if (state.screen !== 'ethics') return;` — prevents the handler from consuming key events on any other screen
+- When overlay is open: `_overlayOpen = true`, `_update()` returns immediately, overlay receives all key events natively
+
+### Demo Mode
+
+Before `startEthicsQuestions()` runs, a scripted demo plays:
+1. **act1_scroll** — datacenter scrolls to center; bubble: "Jump over these! ↑+→ to arc jump"
+2. **act1_bubble** — 90-frame pause, bubble visible
+3. **act1_resume** — datacenter scrolls off-screen
+4. **act2_scroll** — `?` block scrolls to center; bubble: "Hit these to open question!"
+5. **act2_bubble** — 90-frame pause
+6. **act2_question** — player can hit the block; demo question overlay opens (score NOT recorded)
+7. **ready** — "PRESS ↑ TO START" panel shown; any movement key starts the real game
+
+Demo question uses a real question from the bank; any answer continues the demo (no scoring).
 
 ### Layout (top to bottom)
 
-1. **Mario HUD** — full-width dark header strip with scanline overlay; shows 3 pixel-segment bars:
-   - 💧 WATER — 5 blue pixel blocks
-   - 🌿 CO₂ — 5 green pixel blocks
-   - ⚡ ENERGY — 5 yellow pixel blocks
-   - Each bar starts at 3/5 filled. Updates with a pop animation after every answer.
-
-2. **Cloud path** — 64 px sky band; Byte cloud SVG travels left → right across it. START label at left, FINISH at right. Three decorative clouds drift in background.
-
-3. **Progress indicator** — "Question X of 5" text + 5 dot indicators (pending / active / done).
-
-4. **Question card** — frosted glass panel (`backdrop-filter: blur`), fills remaining screen height. Contains:
-   - Category badge (scenario name, pixel font)
-   - Question text
-   - 3 answer buttons (shuffled order each question)
-   - WHY card (hidden until answer selected)
-   - NEXT → button (hidden until answer selected)
-
-A scrolling dashed ground line animates at the bottom of the screen (Mario runner aesthetic).
+1. **Mario HUD** — full-width dark header strip; shows 3 pixel-segment bars (Water / CO₂ / Energy)
+2. **Game World** — scrolling platformer canvas with stars, moon, clouds parallax background
+3. **Controls hint** — bottom-right glass panel: `←→ MOVE` and `↑ JUMP` (CRUSH BLOCK row removed at runtime)
+4. **Question Overlay** — glass panel pair: left = question + answers, right = WHY card + CONTINUE
 
 ### Question Bank (`questionBank.js`)
 15 combinations: 5 age groups × 3 expertise levels, 20 questions each.
@@ -238,7 +257,7 @@ A scrolling dashed ground line animates at the bottom of the screen (Mario runne
 
 **Total score range:** −15 to +20
 
-### Stamina HUD (`calculateStaminaLevel`)
+### Stamina HUD
 
 | Score | Level | Bars filled |
 |---|---|---|
@@ -248,29 +267,29 @@ A scrolling dashed ground line animates at the bottom of the screen (Mario runne
 | 5 to 12 | 4 | ■■■■□ |
 | ≥ 13 | 5 | ■■■■■ |
 
-All three bars (Water, CO₂, Energy) update together to the same level after each answer. Level starts at 3. Pop animation on change.
+All three bars (Water, CO₂, Energy) update together to the same level after each answer. Level starts at 3. Pop animation on change. Per-answer: H → −1 bar, B → neutral, L → +1 bar.
 
 ### Question Overlay Timing
 
 | Event | Delay |
 |---|---|
 | `_crushBlock` shows overlay after block collision | 150 ms |
-| First answer button auto-focus after overlay appears | 200 ms |
+| First answer button auto-focus after overlay appears | 300 ms |
 | `btn-next-question` re-enable debounce | 200 ms |
 | `react()` Byte animation (star-jump / damage / nod) | 500 ms |
 | Demo speech bubble display | 90 frames (~1.5 s at 60 fps) |
 
-### Overlay Close (CONTINUE / NEXT QUESTION)
-- `advanceQuestion()` adds CSS class `.fade-out` on `#q-overlay` triggering a 150 ms fade-out animation
+### Overlay Close (CONTINUE)
+- `advanceQuestion()` adds CSS class `.fade-out` on `#q-overlay` — 150 ms fade animation
 - `_overlayOpen` remains `true` during the fade — game loop stays paused
-- After 150 ms: overlay is hidden, `game.walkForward()` is called, `_overlayOpen` is set to `false`
-- Byte resumes from his current position — no position reset, no scroll reset
-- CSS animation defined inline in `index.html`: `@keyframes overlayFadeOut` + `.q-overlay.fade-out`
+- After 150 ms: overlay hidden, `game.walkForward()` called
+- `walkForward()` resets Byte to ground at home X position and jumps the camera to the next zone start; then calls the provided callback
+- `_overlayOpen` is set to `false` inside `walkForward()`
 
 ### After Answer Selection
-- All answer buttons disabled. Selected button stays visually identical (no color reveal). Non-selected buttons dim to 60% opacity.
-- **WHY card** appears below buttons with a neon-cyan left border and generic explanation per type (H / B / L).
-- **NEXT →** button appears. On click: coin sound plays, Byte advances along cloud path, next question loads.
+- All answer buttons disabled. Non-selected buttons dim to 60% opacity.
+- **WHY card** appears with a generic explanation per type (H / B / L).
+- **CONTINUE →** button appears. On click: coin sound plays, overlay fades out, next question loads.
 
 ### Sound on answer
 - L answer → `goodChoice` sound
@@ -286,80 +305,67 @@ All three bars (Water, CO₂, Energy) update together to the same level after ea
 ## Screen 2: PERSONA REVEAL
 
 **Elements:**
-- Persona-variant Byte avatar (200×150 px, floating animation)
+- Persona-variant Byte avatar (floating animation)
 - Persona name (pixel font, neon cyan)
 - Persona tagline (italic, neon yellow)
-- Glass panel with persona description + "Score: X/20"
+- Glass panel with persona description + `Score: X/35`
 - `GO GREEN →` button
 
-### Persona Mapping
+**On GO GREEN:** regenerates `sessionId`, populates ticket card, saves session to Supabase, navigates to Screen 3.
 
-| Score | Persona | Sound |
-|---|---|---|
-| ≥ 18 | Sustainable Sage | green |
-| 15–17 | Green Hacker | green |
-| 10–14 | Mindful Maker | mindful |
-| 5–9 | Eco Experimenter | mindful |
-| −1 to 4 | Casual Clicker | casual |
-| −7 to −2 | Turbo Tapper | casual |
-| ≤ −8 | Grid Goblin | turbo |
+### Persona Mapping (`getPersonaFromScore` in `data.js`)
 
----
+| Score | Persona |
+|---|---|
+| ≥ 18 | Sustainable Sage |
+| 15–17 | Green Hacker |
+| 10–14 | Mindful Maker |
+| 5–9 | Eco Experimenter |
+| −1 to 4 | Casual Clicker |
+| −7 to −2 | Turbo Tapper |
+| ≤ −8 | Grid Goblin |
 
-## Screen 3: PERSONALIZED TIP
+### Persona Sound
 
-**Elements:**
-- Hero row: Byte with sunglasses + thumbs up + "GO GREENER! 🌱" heading
-- Single tip card (frosted glass, neon-green border):
-  - Badge: "⚡ PERSONALIZED FOR YOU"
-  - Tip text (2–4 sentences, cached in `state.personalizedTip`)
-- `PRINT YOUR TICKET →` button
-
-### Tip Algorithm (`getPersonalizedTip` in `data.js`)
-1. Find the worst H answer (lowest score among type-H answers)
-2. If no H answers, use the last answer
-3. Match `answer.category` keyword → specific tip:
-   - `homework` → study-first tip
-   - `learn / read / stor / writ` → write-yourself tip
-   - `draw / art / image / creat` → sketch-first tip
-   - `research / science / project` → sources-first tip
-   - `cod / website / app` → debug-only tip
-   - fallback → generic H tip
-4. Type B → balanced challenge tip
-5. Type L → share-your-habit tip
+| Score threshold | Sound |
+|---|---|
+| ≤ 7 | `turbo` |
+| 8–19 | `casual` |
+| 20–29 | `mindful` |
+| ≥ 30 | `green` |
 
 ---
 
-## Screen 4: TICKET DOWNLOAD
+## Screen 3: TICKET DOWNLOAD
 
 **Elements:**
 - Header: "YOUR TICKET IS READY! 🖨️"
 - Byte (small, waving + leaf accessory)
-- White ticket card with perforated-edge aesthetic (captured by html2canvas)
-- `🖨 PRINT TICKET` button (auto-focused on load)
-- `↩ PLAY AGAIN` button
+- White ticket card (captured by html2canvas)
+- `🖨 PRINT TICKET` button (auto-focused on screen load)
 
-### Keyboard Navigation (Screen 4)
-- Screen loads → `PRINT TICKET` auto-focused (neon cyan glow)
-- ↑ / ↓ arrow keys (or TAB / SHIFT+TAB) move focus between the two buttons
-- ENTER or SPACE activates the focused button
-- Focused button shows neon cyan outline glow via `:focus` CSS
+**On PRINT TICKET:** `downloadCard()` runs, then `showThankYouAndReset()` — a thank-you overlay appears for 3 seconds, then full state reset and navigation to Screen −1 (Language Select).
+
+### Keyboard Navigation (Screen 3)
+- Screen loads → `PRINT TICKET` button auto-focused (neon cyan glow via `:focus` CSS)
+- ENTER or SPACE activates the button
 
 ### Ticket Card Content
 
 | Field | Source |
 |---|---|
-| Session ID | `#XXXXXX` (random, regenerated on each ticket print) |
+| Session ID | `SESSION: #XXXXXX` (regenerated on GO GREEN click) |
 | Player | `state.userName` (or "Anonymous") |
 | Persona byte | Mini Byte SVG (persona variant) |
 | Persona name | `state.persona.title` |
-| Score | `state.score + '/20'` |
+| Score | `state.score + '/35'` |
 | Final Stamina | `state.staminaLevel + '/5'` |
 | Est. Daily AI Footprint | Water / CO₂ / Energy per stamina level (see table below) |
-| Go Green Tip | `state.personalizedTip` (truncated to 140 chars) |
+| Go Green Tip | From `getPersonalizedTip()` (truncated to 140 chars) |
 | Quote | "Every prompt has a footprint. Leave a positive one." |
-| QR placeholder | Mock 3×3 pixel grid |
-| URL | `aircade.app` |
+| QR code | Real scannable QR (80×80 px canvas, `qrcode-generator` library) |
+| QR URL | `https://ai-rcade.lovable.app/session?id=SESSION_ID` (unique per session) |
+| URL label | `ai-rcade.lovable.app` |
 
 ### Daily Footprint Values (`DAILY_FOOTPRINT` in `data.js`)
 
@@ -385,15 +391,6 @@ All three bars (Water, CO₂, Energy) update together to the same level after ea
 
 ---
 
-## Byte Cloud Traveler
-
-- Small Byte cloud SVG on the cloud-path band (Screen 1.1 only)
-- Position: `left: 0%` at Q1, advances ~17% per question, reaches ~85% at Q5
-- CSS transition: `left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)`
-- Three decorative background clouds drift slowly via CSS animation
-
----
-
 ## Multilingual Support
 
 Language selected on Screen −1 before Idle.
@@ -415,13 +412,14 @@ All UI strings use `data-i18n` attributes and `t('key.path')` helper. Falls back
 | Any button click | `click` |
 | L answer selected | `goodChoice` |
 | H answer selected | `damage` |
-| NEXT → pressed | `coin` |
+| Obstacle (datacenter) hit | `damage` |
+| CONTINUE pressed | `coin` |
 | After Q5 | `levelComplete` |
 | Ticket screen opens | `print` |
-| Persona: score ≤ −8 | `turbo` |
-| Persona: score −7 to 4 | `casual` |
-| Persona: score 5–14 | `mindful` |
-| Persona: score ≥ 15 | `green` |
+| Persona: score ≤ 7 | `turbo` |
+| Persona: score 8–19 | `casual` |
+| Persona: score 20–29 | `mindful` |
+| Persona: score ≥ 30 | `green` |
 
 ---
 
@@ -432,19 +430,22 @@ All UI strings use `data-i18n` attributes and `t('key.path')` helper. Falls back
 | Any | TAB | Move focus forward |
 | Screen 0 | ENTER / SPACE | Press Start |
 | Screen 0.5 | ENTER on Name field | Focus Age selector, open dropdown |
-| Screen 0.5 | ENTER on open dropdown | Confirm selection, advance to next field |
+| Screen 0.5 | ENTER / SPACE on open dropdown | Confirm selection, advance to next field |
 | Screen 0.5 | ESC on open dropdown | Close dropdown, keep focus on selector |
 | Screen 0.5 | TAB | Advance through Name → Age → Expertise → Gender → CONTINUE |
 | Screen 1.1 | ← → | Move Byte left / right |
-| Screen 1.1 | ↑ or SPACE | Jump |
-| Screen 4 | ↑ / ↓ | Move focus between PRINT TICKET and PLAY AGAIN |
-| Screen 4 | ENTER / SPACE | Activate focused button |
+| Screen 1.1 | ↑ or SPACE | Jump straight up |
+| Screen 1.1 | ↑ + → | Arc jump forward |
+| Screen 1.1 (overlay) | ↑ ↓ | Navigate answer buttons |
+| Screen 1.1 (overlay) | ENTER / SPACE | Select answer / press CONTINUE |
+| Screen 1.1 (demo ready) | ↑ / SPACE / ← / → / ENTER | Start real game |
+| Screen 3 | ENTER / SPACE | Print ticket |
 
 ---
 
 ## Data Collection
 
-Session data is submitted to Supabase after the user clicks CONTINUE on Screen 0.5.
+Session data is submitted to Supabase when the player clicks **GO GREEN** on Screen 2 (not on CONTINUE — the full score and persona are only known after Q5).
 
 **Endpoint:** `https://tpacbxkobtekehqrgodd.supabase.co/rest/v1/aircade_sessions`
 **Method:** POST (direct `fetch`, no Supabase client library)
@@ -454,17 +455,16 @@ Session data is submitted to Supabase after the user clicks CONTINUE on Screen 0
 
 | Field | Value |
 |---|---|
-| `session_id` | `state.sessionId` |
-| `user_name` | `state.userName` (may be empty) |
-| `user_age` | `state.userAge` |
-| `user_expertise` | `state.userExpertise` |
-| `user_gender` | `state.userGender` (may be empty) |
-| `score` | `state.score` |
-| `stamina_level` | `state.staminaLevel` |
-| `persona` | `state.persona.title` |
-| `ethics_answers` | JSON array of answer objects |
+| `session_id` | `state.sessionId` (regenerated just before save) |
+| `player_name` | `state.userName` (may be empty → "Anonymous") |
+| `age_group` | `state.userAge` |
+| `expertise` | `state.userExpertise` |
+| `gender` | `state.userGender` (may be empty) |
 | `language` | active language code |
-| `created_at` | server timestamp |
+| `score` | `state.score` |
+| `persona` | `state.persona.title` |
+| `stamina_level` | `state.staminaLevel` |
+| `answer_1_category` … `answer_5_score` | per-answer category, type, score (15 fields) |
 
 **Error handling:** All errors are silent to the player. The POST is fire-and-forget and does not block the game flow.
 
@@ -490,6 +490,7 @@ Session data is submitted to Supabase after the user clicks CONTINUE on Screen 0
 | Thermal printer integration | Out of scope (hardware) | — |
 | PWA / offline caching | Not implemented | Runs fine as local file |
 | Supabase schema enforcement | Not implemented | Table accepts arbitrary JSON fields |
+| Session URL landing page | Deferred | QR points to `ai-rcade.lovable.app/session?id=X`; page not yet built |
 
 ---
 
@@ -499,5 +500,6 @@ Session data is submitted to Supabase after the user clicks CONTINUE on Screen 0
 - **Playful tone** — arcade energy, Byte is a cheerful guide
 - **No shame** — persona descriptions are warm even for high-impact players
 - **No gaming** — answer order shuffled; impact type hidden until after selection; no color coding on selected answer
-- **Accessible** — ARIA labels on progress elements, error toast for failures
+- **Accessible** — ARIA labels, keyboard-only operation throughout
 - **Multilingual** — full UI in English, Castilian, and Catalan
+- **Always completes** — no game over, no lives system; every player answers all 5 questions

@@ -10,7 +10,7 @@ Built for a laser-cut arcade cabinet with keyboard-only controls (no mouse, no t
 
 ## What It Is
 
-Players control **Byte**, a cloud mascot, through a Chrome Dino-style platformer. Landing on `?` blocks triggers ethics questions about AI use. After 5 questions, players receive a personalized **AI Persona** based on their answers, a tailored green tip, and a printable ticket.
+Players control **Byte**, a cloud mascot, through a Chrome Dino-style platformer. The world auto-scrolls; Byte jumps over datacenter obstacles and hits `?` blocks to trigger ethics questions about AI use. After 5 questions, players receive a personalized **AI Persona** based on their answers, a tailored green tip, and a printable ticket with a unique QR code linking to their session.
 
 **Duration:** 2–3 minutes per session  
 **Audience:** General public (age 0+), no technical background assumed  
@@ -25,10 +25,10 @@ Screen −1: Language Select  →  EN / ES / CA
 Screen 0:  Idle / Attract Mode  →  PRESS START
            Instructions Overlay  →  LET'S GO
 Screen 0.5: User Info  →  Name, Age, Expertise, Gender  →  CONTINUE
+Screen 1.05: How To Play  →  LET'S GO
 Screen 1.1: Ethics Platformer Game  →  5 ? blocks  →  5 questions
 Screen 2:  Persona Reveal  →  GO GREEN
-Screen 3:  Personalized Tip  →  PRINT YOUR TICKET
-Screen 4:  Ticket Download  →  🖨 PRINT / ↩ PLAY AGAIN
+Screen 3:  Ticket Download  →  🖨 PRINT TICKET  →  Thank-you (3 s)  →  Screen −1
 ```
 
 ---
@@ -40,14 +40,26 @@ Screen 4:  Ticket Download  →  🖨 PRINT / ↩ PLAY AGAIN
 | Any | TAB | Move focus forward |
 | Screen 0 | ENTER / SPACE | Press Start |
 | Screen 0.5 | ENTER on Name | Focus Age selector |
-| Screen 0.5 | ENTER on selector | Confirm and advance |
+| Screen 0.5 | ENTER / SPACE on selector | Confirm and advance |
 | Screen 0.5 | ESC | Close dropdown |
 | Screen 1.1 | ← → | Move Byte |
-| Screen 1.1 | ↑ or SPACE | Jump |
+| Screen 1.1 | ↑ or SPACE | Jump straight up |
+| Screen 1.1 | ↑ + → | Arc jump forward |
 | Screen 1.1 (overlay) | ↑ ↓ | Navigate answer buttons |
 | Screen 1.1 (overlay) | ENTER / SPACE | Select answer / CONTINUE |
-| Screen 4 | ↑ / ↓ | Switch between buttons |
-| Screen 4 | ENTER / SPACE | Activate button |
+| Screen 1.1 (demo ready) | ↑ / SPACE / ← / → / ENTER | Start real game |
+| Screen 3 | ENTER / SPACE | Print ticket |
+
+---
+
+## Game Mechanics
+
+- The world auto-scrolls left. Byte stays near the left side of the screen.
+- **Datacenters** scroll in from the right — jump over them. Hitting one shows an OUCH! flash but does not stop the game.
+- **? blocks** trigger a question overlay when hit (from below or by landing on top).
+- After each answer the camera jumps to the next zone and Byte resets to the ground.
+- **No lives, no game over.** Every player completes all 5 questions.
+- Speed increases slightly per question (×1.0 → ×1.5).
 
 ---
 
@@ -71,6 +83,8 @@ Screen 4:  Ticket Download  →  🖨 PRINT / ↩ PLAY AGAIN
 | 5 to 12 | 4 | ■■■■□ |
 | ≥ 13 | 5 | ■■■■■ |
 
+Per answer: H → −1 bar, B → neutral, L → +1 bar.
+
 ---
 
 ## AI Personas
@@ -87,6 +101,19 @@ Screen 4:  Ticket Download  →  🖨 PRINT / ↩ PLAY AGAIN
 
 ---
 
+## Ticket Card
+
+Each player receives a downloadable PNG ticket containing:
+- Session ID, player name, AI persona
+- Score and final stamina level
+- Estimated daily AI footprint (water / CO₂ / energy)
+- A personalized green tip
+- A unique QR code linking to `https://ai-rcade.lovable.app/session?id=SESSION_ID`
+
+The QR code is generated fresh per session using the `qrcode-generator` library (CDN) and rendered to a canvas element captured by `html2canvas`.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -95,6 +122,7 @@ Screen 4:  Ticket Download  →  🖨 PRINT / ↩ PLAY AGAIN
 | Fonts | Press Start 2P (Google Fonts) |
 | Sound | Web Audio API (`sounds.js`) |
 | Image export | html2canvas (CDN) |
+| QR code | qrcode-generator@1.4.4 (CDN) |
 | i18n | Built-in translation system (`translations.js`) |
 | Data | Supabase REST API — fire-and-forget, no library |
 | Deployment | Fully static — runs as a local HTML file, no server needed |
@@ -114,7 +142,7 @@ AIRCADE/
 ├── sounds.js           # Sound effects (Web Audio API)
 ├── api.js              # Mock AI responses (offline)
 ├── byte.js             # Byte mascot speech logic
-├── print.js            # Ticket card population + download
+├── print.js            # Ticket card population + QR generation + download
 └── assets/
     ├── cat-astronaut.jpg
     └── bakery-logo.jpg
@@ -142,9 +170,9 @@ Expertise levels: `Beginner`, `Average`, `Expert`
 
 ## Data Collection
 
-Anonymous session data is submitted to Supabase after Screen 0.5 and again after the ticket screen.
+Anonymous session data is submitted to Supabase when the player clicks **GO GREEN** on Screen 2 (after all 5 questions are answered).
 
-**Fields:** `session_id`, `user_name`, `user_age`, `user_expertise`, `user_gender`, `score`, `stamina_level`, `persona`, `ethics_answers` (JSON), `language`
+**Fields:** `session_id`, `player_name`, `age_group`, `expertise`, `gender`, `language`, `score`, `stamina_level`, `persona`, `answer_1_category` … `answer_5_score` (15 per-answer fields)
 
 All errors are silent — data collection never blocks game flow.
 
@@ -158,3 +186,4 @@ All errors are silent — data collection never blocks game flow.
 - **No gaming** — answer order shuffled; impact type hidden until after selection
 - **Accessible** — ARIA labels, keyboard-only operation throughout
 - **Multilingual** — full UI in English, Castilian, and Catalan
+- **Always completes** — no lives, no game over; every player finishes all 5 questions
