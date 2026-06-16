@@ -1,0 +1,14 @@
+[Unit]
+Description=(Ai)rcade Local Web Server
+After=network.target
+
+[Service]
+Type=simple
+User=aircade
+WorkingDirectory=/home/aircade/AIRCADE
+ExecStart=/usr/bin/python3 -m http.server 8080
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=(Ai)rcade Kiosk
+Exec=chromium-browser --kiosk --noerrdialogs --disable-infobars --disable-session-crashed-bubble --disable-translate --no-first-run http://localhost:8080
+X-GNOME-Autostart-enabled=true
