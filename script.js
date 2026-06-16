@@ -548,6 +548,7 @@ const game = {
     this._inJump     = false;
     this._animating  = false;
     this._overlayOpen = false;
+    this._missedZones = 0;
     this._obstacles  = [];
     this._obstacleHitCooldown = 0;
     this._keys = {};
@@ -733,6 +734,7 @@ const game = {
     block.activated = true;
     block.el.classList.add('block-activated');
     block.el.textContent = '';
+    this._missedZones = 0;
     this._overlayOpen = true;
     playSound('coin');
     setTimeout(() => {
@@ -941,6 +943,86 @@ const game = {
       if (b.screenX + this.BLOCK_W < 0) {
         b.used = true;
         b.el.classList.add('hidden');
+      }
+    }
+
+    // Auto-advance when all blocks in current zone were missed
+    if (!this._overlayOpen) {
+      const activeBlocks = this._blocks.filter(
+        b => b.questionIdx === this._questionIdx && !b.used
+      );
+      if (activeBlocks.length === 0) {
+        this._missedZones++;
+        this._overlayOpen = true;
+
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,10,30,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;z-index:900;';
+
+        if (this._missedZones < 3) {
+          const h1 = document.createElement('div');
+          h1.textContent = 'KEEP GOING!';
+          h1.style.cssText = "font-family:'Press Start 2P',monospace;font-size:2rem;color:#00FFFF;text-shadow:0 0 12px #00FFFF;text-align:center;";
+
+          const h2 = document.createElement('div');
+          h2.textContent = 'Jump on the ? blocks!';
+          h2.style.cssText = "font-family:'Press Start 2P',monospace;font-size:0.85rem;color:#00FFFF;text-align:center;";
+
+          const btn = document.createElement('button');
+          btn.textContent = 'RESUME';
+          btn.className = 'btn-start';
+          btn.style.marginTop = '8px';
+
+          overlay.appendChild(h1);
+          overlay.appendChild(h2);
+          overlay.appendChild(btn);
+          document.body.appendChild(overlay);
+          btn.focus();
+
+          const close = () => {
+            overlay.remove();
+            this._overlayOpen = false;
+            state.currentQuestionIndex++;
+            if (state.currentQuestionIndex >= TOTAL_QUESTIONS) {
+              game.walkForward(() => showPersonaScreen());
+            } else {
+              game.walkForward(() => renderQuestion());
+            }
+          };
+
+          btn.addEventListener('click', close);
+          btn.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); close(); }
+          });
+
+        } else {
+          this._missedZones = 0;
+
+          const h1 = document.createElement('div');
+          h1.textContent = "LET'S TRY AGAIN!";
+          h1.style.cssText = "font-family:'Press Start 2P',monospace;font-size:2rem;color:#00FFFF;text-shadow:0 0 12px #00FFFF;text-align:center;";
+
+          const btn = document.createElement('button');
+          btn.textContent = 'RESTART';
+          btn.className = 'btn-start';
+          btn.style.marginTop = '8px';
+
+          overlay.appendChild(h1);
+          overlay.appendChild(btn);
+          document.body.appendChild(overlay);
+          btn.focus();
+
+          const close = () => {
+            overlay.remove();
+            this._overlayOpen = false;
+            resetGameState();
+            showScreen('langselect');
+          };
+
+          btn.addEventListener('click', close);
+          btn.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); close(); }
+          });
+        }
       }
     }
 

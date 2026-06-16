@@ -1002,14 +1002,30 @@ const SCORE_PERSONAS = (function () {
       description: 'Maximum consumption, zero awareness. You plugged in and never looked back. Data centres are humming overtime just for you — maybe a pause button is in order?',
       tip: 'Start small: pick one task this week where you solve it yourself before turning to AI. One conscious pause per day adds up to real change.',
       byteSvg: _svg(C +
-        '<rect x="115" y="14" width="30" height="20" rx="3" fill="#3a0a1a" stroke="#ff006e" stroke-width="2"/>' +
-        '<rect x="123" y="8" width="5" height="8" rx="1" fill="#ff006e"/>' +
-        '<rect x="132" y="8" width="5" height="8" rx="1" fill="#ff006e"/>' +
+        // Controller — pulsing red glow
+        '<rect x="115" y="14" width="30" height="20" rx="3" fill="#3a0a1a" stroke="#ff006e" stroke-width="2">' +
+          '<animate attributeName="stroke-opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="123" y="8" width="5" height="8" rx="1" fill="#ff006e">' +
+          '<animate attributeName="opacity" values="1;0.15;1" dur="1.2s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="132" y="8" width="5" height="8" rx="1" fill="#ff006e">' +
+          '<animate attributeName="opacity" values="1;0.15;1" dur="1.2s" begin="0.1s" repeatCount="indefinite"/>' +
+        '</rect>' +
         '<rect x="120" y="23" width="5" height="5" rx="2" fill="#ff006e"/>' +
         '<rect x="135" y="23" width="5" height="5" rx="2" fill="#ff006e"/>' +
+        // Heavy half-closed eyes
         '<rect x="54" y="44" width="14" height="8" rx="2" fill="#1a1a2e"/>' +
         '<rect x="92" y="44" width="14" height="8" rx="2" fill="#1a1a2e"/>' +
-        '<rect x="64" y="64" width="32" height="4" rx="2" fill="#1a1a2e"/>')
+        // Flat mouth
+        '<rect x="64" y="64" width="32" height="4" rx="2" fill="#1a1a2e"/>' +
+        // Slow tired blink overlays
+        '<rect x="54" y="44" width="14" height="8" rx="2" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.7;0.74;0.84;0.88" dur="5s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="92" y="44" width="14" height="8" rx="2" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.7;0.74;0.84;0.88" dur="5s" repeatCount="indefinite"/>' +
+        '</rect>')
     },
     'turbo-tapper': {
       title: 'TURBO TAPPER',
@@ -1017,15 +1033,33 @@ const SCORE_PERSONAS = (function () {
       description: 'Convenience wins every time for you. You tap, you get, you forget. Quick choices leave long footprints. Just one more second of thought could change the whole game.',
       tip: 'Before you hit generate, ask yourself one question: "Can I do even part of this myself?" That two-second pause is where better habits are built.',
       byteSvg: _svg(C +
-        '<polygon points="126,12 117,32 126,32 112,58 132,28 121,28 134,12" fill="#ffbe0b"/>' +
-        '<polygon points="138,16 131,34 138,34 127,56 143,32 135,32 146,16" fill="#ff9900" opacity="0.75"/>' +
-        '<line x1="110" y1="22" x2="103" y2="24" stroke="#ffbe0b" stroke-width="1.5" opacity="0.5"/>' +
-        '<line x1="110" y1="29" x2="102" y2="29" stroke="#ffbe0b" stroke-width="1.5" opacity="0.5"/>' +
+        // Lightning bolts — fast flicker
+        '<polygon points="126,12 117,32 126,32 112,58 132,28 121,28 134,12" fill="#ffbe0b">' +
+          '<animate attributeName="opacity" values="1;0.3;1;0.5;1" dur="0.7s" repeatCount="indefinite"/>' +
+        '</polygon>' +
+        '<polygon points="138,16 131,34 138,34 127,56 143,32 135,32 146,16" fill="#ff9900" opacity="0.75">' +
+          '<animate attributeName="opacity" values="0.75;0.15;0.75;0.4;0.75" dur="0.7s" begin="0.15s" repeatCount="indefinite"/>' +
+        '</polygon>' +
+        // Speed lines
+        '<line x1="110" y1="22" x2="103" y2="24" stroke="#ffbe0b" stroke-width="1.5">' +
+          '<animate attributeName="opacity" values="0.5;0.05;0.5" dur="0.7s" repeatCount="indefinite"/>' +
+        '</line>' +
+        '<line x1="110" y1="29" x2="102" y2="29" stroke="#ffbe0b" stroke-width="1.5">' +
+          '<animate attributeName="opacity" values="0.5;0.05;0.5" dur="0.7s" begin="0.2s" repeatCount="indefinite"/>' +
+        '</line>' +
+        // Wide excited eyes
         '<rect x="50" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>' +
         '<rect x="92" y="40" width="18" height="18" rx="3" fill="#1a1a2e"/>' +
         '<rect x="54" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>' +
         '<rect x="96" y="43" width="5" height="5" rx="1" fill="white" opacity="0.8"/>' +
-        '<rect x="66" y="62" width="28" height="7" rx="3.5" fill="#1a1a2e"/>')
+        '<rect x="66" y="62" width="28" height="7" rx="3.5" fill="#1a1a2e"/>' +
+        // Rapid blink overlays
+        '<rect x="50" y="40" width="18" height="18" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.82;0.85;0.89;0.92" dur="2.5s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="92" y="40" width="18" height="18" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.82;0.85;0.89;0.92" dur="2.5s" repeatCount="indefinite"/>' +
+        '</rect>')
     },
     'casual-clicker': {
       title: 'CASUAL CLICKER',
@@ -1034,7 +1068,18 @@ const SCORE_PERSONAS = (function () {
       tip: 'Trust your instincts more. Before your next AI prompt, spend 30 seconds attempting it yourself — you\'ll save energy and often get a more personal result.',
       byteSvg: _svg(C + E +
         '<path d="M 64 64 Q 80 70 96 64" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-        '<text x="118" y="50" font-size="22" fill="#ffbe0b">~</text>')
+        // Floating tilde
+        '<g>' +
+          '<animateTransform attributeName="transform" type="translate" values="0,0;0,-3;0,0" dur="2.5s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>' +
+          '<text x="118" y="50" font-size="22" fill="#ffbe0b">~</text>' +
+        '</g>' +
+        // Standard blink overlays
+        '<rect x="54" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.84;0.9;0.94" dur="4s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="92" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.84;0.9;0.94" dur="4s" repeatCount="indefinite"/>' +
+        '</rect>')
     },
     'eco-experimenter': {
       title: 'ECO EXPERIMENTER',
@@ -1042,10 +1087,25 @@ const SCORE_PERSONAS = (function () {
       description: 'You are beginning to see the link between your choices and their impact. Keep experimenting — every conscious click moves the needle in the right direction.',
       tip: 'Keep going! Start asking "what\'s the lowest-impact way to get this result?" before every session. The habit becomes automatic faster than you think.',
       byteSvg: _svg(C + E + S +
-        '<circle cx="130" cy="32" r="13" fill="none" stroke="#06d6a0" stroke-width="2" opacity="0.6"/>' +
-        '<line x1="130" y1="19" x2="130" y2="45" stroke="#06d6a0" stroke-width="1.5" opacity="0.5"/>' +
-        '<line x1="117" y1="32" x2="143" y2="32" stroke="#06d6a0" stroke-width="1.5" opacity="0.5"/>' +
-        '<circle cx="130" cy="26" r="3" fill="#06d6a0"/>')
+        // Slowly rotating crosshair
+        '<g>' +
+          '<animateTransform attributeName="transform" type="rotate" values="0 130 32;360 130 32" dur="8s" repeatCount="indefinite"/>' +
+          '<circle cx="130" cy="32" r="13" fill="none" stroke="#06d6a0" stroke-width="2" opacity="0.6"/>' +
+          '<line x1="130" y1="19" x2="130" y2="45" stroke="#06d6a0" stroke-width="1.5" opacity="0.5"/>' +
+          '<line x1="117" y1="32" x2="143" y2="32" stroke="#06d6a0" stroke-width="1.5" opacity="0.5"/>' +
+        '</g>' +
+        // Pulsing target dot
+        '<circle cx="130" cy="26" r="3" fill="#06d6a0">' +
+          '<animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/>' +
+          '<animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/>' +
+        '</circle>' +
+        // Standard blink overlays
+        '<rect x="54" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.84;0.9;0.94" dur="4s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="92" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.84;0.9;0.94" dur="4s" repeatCount="indefinite"/>' +
+        '</rect>')
     },
     'mindful-maker': {
       title: 'MINDFUL MAKER',
@@ -1054,9 +1114,20 @@ const SCORE_PERSONAS = (function () {
       tip: 'You\'re already doing great. Level up by tracking how often you skip AI entirely for tasks you\'d have prompted last year — that gap is your real impact.',
       byteSvg: _svg(C + E +
         '<path d="M 60 65 Q 80 76 100 65" stroke="#1a1a2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
-        '<ellipse cx="130" cy="28" rx="10" ry="14" fill="#06d6a0" opacity="0.85" transform="rotate(-20 130 28)"/>' +
-        '<line x1="122" y1="38" x2="138" y2="18" stroke="#03a87c" stroke-width="1.5"/>' +
-        '<circle cx="130" cy="20" r="3" fill="#03a87c"/>')
+        // Gently swaying leaf
+        '<g>' +
+          '<animateTransform attributeName="transform" type="rotate" values="-10 130 40;10 130 40;-10 130 40" dur="3s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>' +
+          '<ellipse cx="130" cy="28" rx="10" ry="14" fill="#06d6a0" opacity="0.85" transform="rotate(-20 130 28)"/>' +
+          '<line x1="122" y1="38" x2="138" y2="18" stroke="#03a87c" stroke-width="1.5"/>' +
+          '<circle cx="130" cy="20" r="3" fill="#03a87c"/>' +
+        '</g>' +
+        // Standard blink overlays
+        '<rect x="54" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.84;0.9;0.94" dur="4s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="92" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.8;0.84;0.9;0.94" dur="4s" repeatCount="indefinite"/>' +
+        '</rect>')
     },
     'green-hacker': {
       title: 'GREEN HACKER',
@@ -1064,14 +1135,26 @@ const SCORE_PERSONAS = (function () {
       description: 'Deliberately sustainable — you found the cheat codes for low-impact AI use and you are running them. You earn the hacker badge for knowing how the system works AND choosing to work with it.',
       tip: 'You\'ve found the cheat codes — now teach someone else. Sharing sustainable AI habits multiplies your impact far beyond your own sessions.',
       byteSvg: _svg(C +
+        // Green sunglasses
         '<rect x="48" y="40" width="28" height="22" rx="5" fill="#06d6a0" opacity="0.9"/>' +
         '<rect x="84" y="40" width="28" height="22" rx="5" fill="#06d6a0" opacity="0.9"/>' +
         '<line x1="76" y1="51" x2="84" y2="51" stroke="#06d6a0" stroke-width="3"/>' +
         '<rect x="51" y="43" width="22" height="16" rx="3" fill="#044a35"/>' +
         '<rect x="87" y="43" width="22" height="16" rx="3" fill="#044a35"/>' +
-        '<rect x="54" y="46" width="7" height="5" rx="1" fill="white" opacity="0.25"/>' +
+        // Lens gleam — left
+        '<rect x="53" y="45" width="7" height="4" rx="2" fill="white" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;0.7;0;0" keyTimes="0;0.3;0.4;0.5;1" dur="3s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        // Lens gleam — right
+        '<rect x="89" y="45" width="7" height="4" rx="2" fill="white" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;0.7;0;0" keyTimes="0;0.35;0.45;0.55;1" dur="3s" repeatCount="indefinite"/>' +
+        '</rect>' +
         '<path d="M 56 66 Q 80 80 104 66" stroke="#1a1a2e" stroke-width="4" fill="none" stroke-linecap="round"/>' +
-        '<text x="120" y="90" font-size="20">🌿</text>')
+        // Bouncing leaf
+        '<g>' +
+          '<animateTransform attributeName="transform" type="translate" values="0,0;0,-4;0,0" dur="1.8s" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" repeatCount="indefinite"/>' +
+          '<text x="120" y="90" font-size="20">🌿</text>' +
+        '</g>')
     },
     'sustainable-sage': {
       title: 'SUSTAINABLE SAGE',
@@ -1079,14 +1162,29 @@ const SCORE_PERSONAS = (function () {
       description: 'The rarest unlock. You have achieved near-perfect harmony between what you need from AI and the footprint you leave behind. You are not just a player — you are proof it is possible.',
       tip: 'You\'ve unlocked the top tier. The next challenge: help design systems that make low-impact AI the default, not the exception. You\'re ready for that conversation.',
       byteSvg: _svg(C +
+        // Crown base
         '<rect x="58" y="17" width="44" height="7" rx="2" fill="#06d6a0"/>' +
         '<polygon points="58,17 64,7 70,17" fill="#06d6a0"/>' +
         '<polygon points="77,17 80,5 83,17" fill="#06d6a0"/>' +
         '<polygon points="90,17 96,7 102,17" fill="#06d6a0"/>' +
-        '<circle cx="64" cy="11" r="2.5" fill="#00f5ff"/>' +
-        '<circle cx="80" cy="7" r="3" fill="#ffbe0b"/>' +
-        '<circle cx="96" cy="11" r="2.5" fill="#00f5ff"/>' +
-        _EYES + BS)
+        // Staggered twinkling gems
+        '<circle cx="64" cy="11" r="2.5" fill="#00f5ff">' +
+          '<animate attributeName="opacity" values="1;0.1;1" dur="1.5s" begin="0s" repeatCount="indefinite"/>' +
+        '</circle>' +
+        '<circle cx="80" cy="7" r="3" fill="#ffbe0b">' +
+          '<animate attributeName="opacity" values="1;0.1;1" dur="1.5s" begin="0.5s" repeatCount="indefinite"/>' +
+        '</circle>' +
+        '<circle cx="96" cy="11" r="2.5" fill="#00f5ff">' +
+          '<animate attributeName="opacity" values="1;0.1;1" dur="1.5s" begin="1s" repeatCount="indefinite"/>' +
+        '</circle>' +
+        E + BS +
+        // Happy blink overlays
+        '<rect x="54" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.85;0.88;0.93;0.96" dur="3.5s" repeatCount="indefinite"/>' +
+        '</rect>' +
+        '<rect x="92" y="44" width="14" height="14" rx="3" fill="#c8e8f5" opacity="0">' +
+          '<animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.85;0.88;0.93;0.96" dur="3.5s" repeatCount="indefinite"/>' +
+        '</rect>')
     }
   };
 })();
